@@ -19,6 +19,10 @@ class TunEditorPlugin: FlutterPlugin, MethodCallHandler {
   override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
     channel = MethodChannel(flutterPluginBinding.binaryMessenger, "tun_editor")
     channel.setMethodCallHandler(this)
+
+    flutterPluginBinding
+      .platformViewRegistry
+      .registerViewFactory("tun_editor", NativeViewFactory())
   }
 
   override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
