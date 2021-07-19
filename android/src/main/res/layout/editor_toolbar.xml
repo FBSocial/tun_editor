@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<HorizontalScrollView android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <Button
+            android:id="@+id/action_undo"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:text="Undo"
+            android:paddingHorizontal="20dp"
+            android:contentDescription="@null" />
+        <Button
+            android:id="@+id/action_redo"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:text="Redo"
+            android:paddingHorizontal="20dp"
+            android:contentDescription="@null" />
+        <Button
+            android:id="@+id/action_bold"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:text="Bold"
+            android:paddingHorizontal="20dp"
+            android:contentDescription="@null" />
+    </LinearLayout>
+
+</HorizontalScrollView>
