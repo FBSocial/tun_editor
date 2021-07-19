@@ -17,12 +17,35 @@ class FullPageEditorState extends State<FullPageEditor> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        alignment: Alignment.center,
-        child: TunEditor.buildEditor(),
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: Container(
+          width: double.infinity,
+          height: double.infinity,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: Colors.pink,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black,
+                offset: Offset(0, 3),
+                spreadRadius: 3,
+                blurRadius: 10,
+              ),
+            ],
+          ),
+          child: Column(
+            children: [
+              Expanded(
+                child: TunEditor.buildEditor(),
+              ),
+              SizedBox(
+                height: 50,
+                child: TunEditor.toolbar(),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

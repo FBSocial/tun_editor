@@ -5,21 +5,17 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="df33a74e-fe2b-46f7-8893-ba2148c55366" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/runConfigurations.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/android/src/main/kotlin/com/tuntech/tun_editor/TunEditorPlugin.kt" beforeDir="false" afterPath="$PROJECT_DIR$/android/src/main/kotlin/com/tuntech/tun_editor/TunEditorPlugin.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/lib/main.dart" beforeDir="false" afterPath="$PROJECT_DIR$/example/lib/main.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/tun_editor.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/tun_editor.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tun_editor.iml" beforeDir="false" afterPath="$PROJECT_DIR$/tun_editor.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/android/build.gradle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/src/main/kotlin/com/tuntech/tun_editor/view/NativeView.kt" beforeDir="false" afterPath="$PROJECT_DIR$/android/src/main/kotlin/com/tuntech/tun_editor/view/NativeView.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/example/lib/full_page_editor.dart" beforeDir="false" afterPath="$PROJECT_DIR$/example/lib/full_page_editor.dart" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[SerialNumber@192.168.3.62:5555]" />
+  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[VirtualDevicePath@/home/jeffrey/.android/avd/Pixel_3_API_22.avd]" />
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
@@ -31,6 +27,7 @@
   <component name="PropertiesComponent">
     <property name="dart.analysis.tool.window.force.activate" value="true" />
     <property name="dart.analysis.tool.window.visible" value="false" />
+    <property name="io.flutter.reload.alreadyRun" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="show.migrate.to.gradle.popup" value="false" />
   </component>
@@ -46,9 +43,25 @@
     <servers />
   </component>
   <component name="WindowStateProjectService">
-    <state x="623" y="256" width="672" height="678" key="search.everywhere.popup" timestamp="1626431286205">
+    <state width="1878" height="298" key="GridCell.Tab.0.bottom" timestamp="1626663836747">
       <screen x="0" y="27" width="1920" height="1053" />
     </state>
-    <state x="623" y="256" width="672" height="678" key="search.everywhere.popup/0.27.1920.1053@0.27.1920.1053" timestamp="1626431286205" />
+    <state width="1878" height="298" key="GridCell.Tab.0.bottom/0.27.1920.1053@0.27.1920.1053" timestamp="1626663836747" />
+    <state width="1878" height="298" key="GridCell.Tab.0.center" timestamp="1626663836747">
+      <screen x="0" y="27" width="1920" height="1053" />
+    </state>
+    <state width="1878" height="298" key="GridCell.Tab.0.center/0.27.1920.1053@0.27.1920.1053" timestamp="1626663836747" />
+    <state width="1878" height="298" key="GridCell.Tab.0.left" timestamp="1626663836747">
+      <screen x="0" y="27" width="1920" height="1053" />
+    </state>
+    <state width="1878" height="298" key="GridCell.Tab.0.left/0.27.1920.1053@0.27.1920.1053" timestamp="1626663836747" />
+    <state width="1878" height="298" key="GridCell.Tab.0.right" timestamp="1626663836747">
+      <screen x="0" y="27" width="1920" height="1053" />
+    </state>
+    <state width="1878" height="298" key="GridCell.Tab.0.right/0.27.1920.1053@0.27.1920.1053" timestamp="1626663836747" />
+    <state x="623" y="256" width="672" height="678" key="search.everywhere.popup" timestamp="1626663314384">
+      <screen x="0" y="27" width="1920" height="1053" />
+    </state>
+    <state x="623" y="256" width="672" height="678" key="search.everywhere.popup/0.27.1920.1053@0.27.1920.1053" timestamp="1626663314384" />
   </component>
 </project>

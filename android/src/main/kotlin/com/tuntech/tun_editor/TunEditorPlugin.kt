@@ -7,6 +7,7 @@ import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
+import io.flutter.plugin.platform.PlatformViewRegistry
 
 /** TunEditorPlugin */
 class TunEditorPlugin: FlutterPlugin, MethodCallHandler {
@@ -20,9 +21,9 @@ class TunEditorPlugin: FlutterPlugin, MethodCallHandler {
     channel = MethodChannel(flutterPluginBinding.binaryMessenger, "tun_editor")
     channel.setMethodCallHandler(this)
 
-    flutterPluginBinding
-      .platformViewRegistry
-      .registerViewFactory("tun_editor", NativeViewFactory())
+    val registry: PlatformViewRegistry = flutterPluginBinding.platformViewRegistry
+    registry.registerViewFactory("tun_editor", NativeViewFactory())
+    registry.registerViewFactory("tun_editor_toolbar", ToolbarViewFactory())
   }
 
   override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
