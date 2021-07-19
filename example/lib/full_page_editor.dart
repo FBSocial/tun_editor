@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:tun_editor/tun_editor.dart';
+import 'package:tun_editor/tun_editor_controller.dart';
+import 'package:tun_editor/tun_editor_toolbar.dart';
 
 class FullPageEditor extends StatefulWidget {
 
@@ -13,6 +15,15 @@ class FullPageEditor extends StatefulWidget {
 }
 
 class FullPageEditorState extends State<FullPageEditor> {
+
+  late TunEditorController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+  
+    _controller = TunEditorController.document(document: "Hello World");
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,14 +48,19 @@ class FullPageEditorState extends State<FullPageEditor> {
           child: Column(
             children: [
               Expanded(
-                child: TunEditor.buildEditor(),
+                child: TunEditor(
+                  controller: _controller,
+                ),
               ),
               SizedBox(
                 height: 50,
-                child: TunEditor.toolbar(),
+                child: TunEditorToolbar(
+                  controller: _controller,
+                ),
               ),
             ],
           ),
+
         ),
       ),
     );
