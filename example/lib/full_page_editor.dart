@@ -50,6 +50,7 @@ class FullPageEditorState extends State<FullPageEditor> {
               Expanded(
                 child: TunEditor(
                   controller: _controller,
+                  placeHolder: "Hello World",
                 ),
               ),
               SizedBox(
@@ -60,7 +61,6 @@ class FullPageEditorState extends State<FullPageEditor> {
               ),
             ],
           ),
-
         ),
       ),
     );

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:tun_editor/tun_editor_api.dart';
 import 'package:tun_editor/tun_editor_controller.dart';
 
 class TunEditor extends StatefulWidget {
@@ -39,8 +40,8 @@ class TunEditorState extends State<TunEditor> {
   @override
   Widget build(BuildContext context) {
     Map<String, dynamic> creationParams = {
-      CREATION_PARAM_PLACERHOLDER: "",
-      CREATION_PARAM_DEFAULT_TEXT: "",
+      CREATION_PARAM_PLACERHOLDER: placeHolder,
+      CREATION_PARAM_DEFAULT_TEXT: defaultText,
     };
 
     if (Platform.isAndroid) {
@@ -63,6 +64,10 @@ class TunEditorState extends State<TunEditor> {
             creationParamsCodec: StandardMessageCodec(),
           )
             ..addOnPlatformViewCreatedListener(params.onPlatformViewCreated)
+            ..addOnPlatformViewCreatedListener((int id) {
+              TunEditorApi api = TunEditorApi(id, TunEditorHandlerImpl());
+              controller.registerTunEditorApi(api);
+            })
             ..create();
         },
       );
@@ -79,5 +84,9 @@ class TunEditorState extends State<TunEditor> {
       throw UnsupportedError("Unsupported platform view");
     }
   }
+
+}
+
+class TunEditorHandlerImpl extends TunEditorHandler {
 
 }
