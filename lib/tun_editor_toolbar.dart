@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:tun_editor/tun_editor_controller.dart';
-import 'package:tun_editor/tun_editor_toolbar_api.dart';
 
 class TunEditorToolbar extends StatefulWidget {
 
@@ -48,8 +47,7 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
           )
             ..addOnPlatformViewCreatedListener(params.onPlatformViewCreated)
             ..addOnPlatformViewCreatedListener((int id) {
-              TunEditorToolbarApi api = TunEditorToolbarApi(id, TunEditorToolbarHandlerImpl(controller));
-              controller.registerTunEditorToolbarApi(api);
+              controller.attachTunEditorToolbar(id);
             })
             ..create();
         },
@@ -67,29 +65,3 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
   }
 
 }
-
-class TunEditorToolbarHandlerImpl extends TunEditorToolbarHandler {
-
-  final TunEditorController _controller;
-
-  TunEditorToolbarHandlerImpl(
-    this._controller,
-  );
-
-  @override
-  void undo() {
-    _controller.undo();
-  }
-
-  @override
-  void redo() {
-    _controller.redo();
-  }
-
-  @override
-  void setBold() {
-    _controller.setBold();
-  }
-
-}
-

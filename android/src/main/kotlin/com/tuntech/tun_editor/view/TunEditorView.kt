@@ -1,6 +1,8 @@
 package com.tuntech.tun_editor.view
 
 import android.content.Context
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.View
 import com.chinalwb.are.AREditText
 import com.chinalwb.are.styles.toolbar.ARE_ToolbarDefault
@@ -9,7 +11,6 @@ import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.platform.PlatformView
-import jp.wasabeef.richeditor.RichEditor
 import java.util.*
 
 internal class TunEditorView(
@@ -19,7 +20,6 @@ internal class TunEditorView(
     messenger: BinaryMessenger
 ) : PlatformView, MethodChannel.MethodCallHandler {
 
-    private val editor: RichEditor = RichEditor(context)
     private val areEditor: AREditText = AREditText(context)
     private val areToolbar: ARE_ToolbarDefault = ARE_ToolbarDefault(context)
     private val areToolbarItemBold: ARE_ToolItem_Bold = ARE_ToolItem_Bold()
@@ -38,30 +38,39 @@ internal class TunEditorView(
 
         areToolbar.addToolbarItem(areToolbarItemBold)
         areEditor.setToolbar(areToolbar)
+        areEditor.addTextChangedListener(object: TextWatcher {
+            override fun beforeTextChanged(
+                s: CharSequence?, start: Int,
+                count: Int, after: Int
+            ) {
+            }
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+            }
+            override fun afterTextChanged(s: Editable?) {
+                methodChannel.invokeMethod("onTextChange", s?.toString() ?: "")
+            }
+        })
         if (creationParams?.containsKey("place_holder") == true) {
             val placeHolder: String = (creationParams?.get("place_holder") as? String) ?: ""
-            editor.setPlaceholder(placeHolder)
             areEditor.setHint(placeHolder)
-        }
-        editor.setOnTextChangeListener { text ->
-            println(text)
         }
     }
 
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
         when (call.method) {
             "undo" -> {
-                editor.undo()
                 result.success(null)
             }
             "redo" -> {
-                editor.redo()
                 result.success(null)
             }
             "setBold" -> {
-                editor.setBold()
-                result.success(null)
                 areToolbarItemBold.style.setChecked(!areToolbarItemBold.style.isChecked)
+                result.success(null)
+            }
+            "getHtml" -> {
+                val html = areEditor.getHtml()
+                result.success(html)
             }
         }
     }

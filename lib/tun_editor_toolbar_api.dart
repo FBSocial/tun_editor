@@ -1,4 +1,6 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:tun_editor/tun_editor_value.dart';
 
 class TunEditorToolbarApi {
 
@@ -35,10 +37,12 @@ class TunEditorToolbarApi {
 
 }
 
-abstract class TunEditorToolbarHandler {
+mixin TunEditorToolbarHandler on ValueNotifier<TunEditorValue> {
 
   void undo();
+
   void redo();
+
   void setBold();
 
 }

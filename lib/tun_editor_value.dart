@@ -1,6 +1,6 @@
 class TunEditorValue {
   
-  final String text;
+  String text;
 
   TunEditorValue({
     required this.text,

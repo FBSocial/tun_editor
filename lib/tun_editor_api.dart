@@ -1,4 +1,6 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:tun_editor/tun_editor_value.dart';
 
 class TunEditorApi {
 
@@ -15,6 +17,8 @@ class TunEditorApi {
   Future<bool?> _onMethodCall(MethodCall call) async {
     switch (call.method) {
       case "onTextChange":
+        print("on text change: ${call.arguments}");
+        _handler.onTextChange(call.arguments);
         break;
 
       default:
@@ -36,7 +40,13 @@ class TunEditorApi {
     _channel.invokeMethod("setBold");
   }
 
+  Future<String> getHtml() async {
+    final String res = await _channel.invokeMethod("getHtml");
+    return res;
+  }
+
 }
 
-abstract class TunEditorHandler {
+mixin TunEditorHandler on ValueNotifier<TunEditorValue> {
+  void onTextChange(String text);
 }

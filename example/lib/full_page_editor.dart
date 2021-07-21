@@ -22,7 +22,10 @@ class FullPageEditorState extends State<FullPageEditor> {
   void initState() {
     super.initState();
   
-    _controller = TunEditorController.document(document: "Hello World");
+    _controller = TunEditorController.document(text: "")
+        ..addListener(() {
+          setState(() {});
+        });
   }
 
   @override
@@ -34,17 +37,6 @@ class FullPageEditorState extends State<FullPageEditor> {
           width: double.infinity,
           height: double.infinity,
           alignment: Alignment.center,
-          decoration: BoxDecoration(
-            color: Colors.pink,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black,
-                offset: Offset(0, 3),
-                spreadRadius: 3,
-                blurRadius: 10,
-              ),
-            ],
-          ),
           child: Column(
             children: [
               Expanded(
@@ -57,6 +49,12 @@ class FullPageEditorState extends State<FullPageEditor> {
                 height: 50,
                 child: TunEditorToolbar(
                   controller: _controller,
+                ),
+              ),
+              Container(
+                height: 50,
+                child: Text(
+                  _controller.value.text,
                 ),
               ),
             ],
