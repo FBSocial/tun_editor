@@ -15,7 +15,7 @@ class TunEditorViewFactory: NSObject, FlutterPlatformViewFactory {
         viewIdentifier viewId: Int64,
         arguments args: Any?
     ) -> FlutterPlatformView {
-        return (
+        return TunEditorView(
             frame: frame,
             viewIdentifier: viewId,
             arguments: args,
@@ -44,13 +44,13 @@ class TunEditorView: NSObject, FlutterPlatformView {
     }
 
     func createNativeView(view _view: UIView) {
-        _view.backgroudnColor = UIColor.blue
+        _view.backgroundColor = UIColor.blue
         let nativeLabel = UILabel()
         nativeLabel.text = "Native text from IOS"
         nativeLabel.textColor = UIColor.white
         nativeLabel.textAlignment = .center
         nativeLabel.frame = CGRect(x: 0, y: 0, width: 180, height: 48.0)
-        _view.addSubView(nativeLabel)
+        _view.addSubview(nativeLabel)
     }
 
 }

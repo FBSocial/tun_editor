@@ -1,0 +1,22 @@
+PODS:
+  - Flutter (1.0.0)
+  - tun_editor (0.0.1):
+    - Flutter
+
+DEPENDENCIES:
+  - Flutter (from `Flutter`)
+  - tun_editor (from `.symlinks/plugins/tun_editor/ios`)
+
+EXTERNAL SOURCES:
+  Flutter:
+    :path: Flutter
+  tun_editor:
+    :path: ".symlinks/plugins/tun_editor/ios"
+
+SPEC CHECKSUMS:
+  Flutter: 434fef37c0980e73bb6479ef766c45957d4b510c
+  tun_editor: 4e4c6609d93deda98f5b73c6c427ea241c3b1c1d
+
+PODFILE CHECKSUM: aafe91acc616949ddb318b77800a7f51bffa2a4c
+
+COCOAPODS: 1.9.3
