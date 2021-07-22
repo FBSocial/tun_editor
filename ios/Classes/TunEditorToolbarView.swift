@@ -1,8 +1,7 @@
 import Flutter
 import UIKit
-import RichEditorView
 
-class TunEditorViewFactory: NSObject, FlutterPlatformViewFactory {
+class TunEditorToolbarViewFactory: NSObject, FlutterPlatformViewFactory {
 
     private var messenger: FlutterBinaryMessenger
 
@@ -16,7 +15,7 @@ class TunEditorViewFactory: NSObject, FlutterPlatformViewFactory {
         viewIdentifier viewId: Int64,
         arguments args: Any?
     ) -> FlutterPlatformView {
-        return TunEditorView(
+        return TunEditorToolbarView(
             frame: frame,
             viewIdentifier: viewId,
             arguments: args,
@@ -25,7 +24,7 @@ class TunEditorViewFactory: NSObject, FlutterPlatformViewFactory {
 
 }
 
-class TunEditorView: NSObject, FlutterPlatformView {
+class TunEditorToolbarView: NSObject, FlutterPlatformView {
 
     private var _view: UIView
 
@@ -45,11 +44,23 @@ class TunEditorView: NSObject, FlutterPlatformView {
     }
 
     func createNativeView(view _view: UIView) {
-        // _view.backgroundColor = UIColor.blue
-
-        let editor = RichEditorView(frame: _view.bounds)
-        editor.html = "<h1>My Awesome Editor</h1>Now I am editing in <em>style.</em>"
-        _view.addSubview(editor)
+        let toolbar = HStack(
+            alignment: .center,
+            spacing: 20,
+            content: {
+                Button {
+                    Text("Undo")
+                }
+                Button {
+                    Text("Undo")
+                }
+                Button {
+                    Text("Bold")
+                }
+            }
+        )
+        // .frame(height: 100, maxWidth: .infinity)
+        _view.addSubview(toolbar)
     }
 
 }
