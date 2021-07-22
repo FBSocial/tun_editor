@@ -23,6 +23,12 @@ internal class TunEditorToolbarView(
     private lateinit var btnUndo: Button
     private lateinit var btnRedo: Button
     private lateinit var btnSetBold: Button
+    private lateinit var btnSetItalic: Button
+    private lateinit var btnSetUnderline: Button
+    private lateinit var btnSetStrikeThrough: Button
+    private lateinit var btnSetHeadline1: Button
+    private lateinit var btnSetHeadline2: Button
+    private lateinit var btnSetHeadline3: Button
 
     private val methodChannel = MethodChannel(messenger, "tun/editor/toolbar/${id}")
 
@@ -32,6 +38,12 @@ internal class TunEditorToolbarView(
         btnUndo = toolbar.findViewById<Button>(R.id.action_undo)
         btnRedo = toolbar.findViewById<Button>(R.id.action_redo)
         btnSetBold = toolbar.findViewById<Button>(R.id.action_bold)
+        btnSetItalic = toolbar.findViewById<Button>(R.id.action_italic)
+        btnSetUnderline = toolbar.findViewById<Button>(R.id.action_underline)
+        btnSetStrikeThrough = toolbar.findViewById<Button>(R.id.action_strike_through)
+        btnSetHeadline1 = toolbar.findViewById<Button>(R.id.action_headline_1)
+        btnSetHeadline2 = toolbar.findViewById<Button>(R.id.action_headline_2)
+        btnSetHeadline3 = toolbar.findViewById<Button>(R.id.action_headline_3)
         btnUndo.setOnClickListener {
             methodChannel.invokeMethod("undo", null)
         }
@@ -40,6 +52,24 @@ internal class TunEditorToolbarView(
         }
         btnSetBold.setOnClickListener {
             methodChannel.invokeMethod("setBold", null)
+        }
+        btnSetItalic.setOnClickListener {
+            methodChannel.invokeMethod("setItalic", null)
+        }
+        btnSetUnderline.setOnClickListener {
+            methodChannel.invokeMethod("setUnderline", null)
+        }
+        btnSetStrikeThrough.setOnClickListener {
+            methodChannel.invokeMethod("setStrikeThrough", null)
+        }
+        btnSetHeadline1.setOnClickListener {
+            methodChannel.invokeMethod("setHeadline1", null)
+        }
+        btnSetHeadline2.setOnClickListener {
+            methodChannel.invokeMethod("setHeadline2", null)
+        }
+        btnSetHeadline3.setOnClickListener {
+            methodChannel.invokeMethod("setHeadline3", null)
         }
     }
 

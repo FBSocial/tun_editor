@@ -19,13 +19,30 @@ class TunEditorToolbarApi {
       case "undo":
         _handler.undo();
         break;
-
       case "redo":
         _handler.redo();
         break;
 
       case "setBold":
         _handler.setBold();
+        break;
+      case "setItalic":
+        _handler.setItalic();
+        break;
+      case "setUnderline":
+        _handler.setUnderline();
+        break;
+      case "setStrikeThrough":
+        _handler.setStrikeThrough();
+        break;
+      case "setHeadline1":
+        _handler.setHeadline1();
+        break;
+      case "setHeadline2":
+        _handler.setHeadline2();
+        break;
+      case "setHeadline3":
+        _handler.setHeadline3();
         break;
 
       default:
@@ -40,9 +57,14 @@ class TunEditorToolbarApi {
 mixin TunEditorToolbarHandler on ValueNotifier<TunEditorValue> {
 
   void undo();
-
   void redo();
 
   void setBold();
+  void setItalic();
+  void setUnderline();
+  void setStrikeThrough();
+  void setHeadline1();
+  void setHeadline2();
+  void setHeadline3();
 
 }

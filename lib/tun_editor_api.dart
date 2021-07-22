@@ -31,13 +31,30 @@ class TunEditorApi {
   void undo() {
     _channel.invokeMethod("undo");
   }
-
   void redo() {
     _channel.invokeMethod("redo");
   }
 
   void setBold() {
     _channel.invokeMethod("setBold");
+  }
+  void setItalic() {
+    _channel.invokeMethod("setItalic");
+  }
+  void setUnderline() {
+    _channel.invokeMethod("setUnderline");
+  }
+  void setStrikeThrough() {
+    _channel.invokeMethod("setStrikeThrough");
+  }
+  void setHeadline1() {
+    _channel.invokeMethod("setHeadline1");
+  }
+  void setHeadline2() {
+    _channel.invokeMethod("setHeadline2");
+  }
+  void setHeadline3() {
+    _channel.invokeMethod("setHeadline3");
   }
 
   Future<String> getHtml() async {
