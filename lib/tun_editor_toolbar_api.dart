@@ -44,6 +44,9 @@ class TunEditorToolbarApi {
       case "setHeadline3":
         _handler.setHeadline3();
         break;
+      case "clearStyle":
+        _handler.clearStyle();
+        break;
 
       default:
         throw MissingPluginException(
@@ -54,7 +57,7 @@ class TunEditorToolbarApi {
 
 }
 
-mixin TunEditorToolbarHandler on ValueNotifier<TunEditorValue> {
+mixin TunEditorToolbarHandler on ChangeNotifier {
 
   void undo();
   void redo();
@@ -66,5 +69,6 @@ mixin TunEditorToolbarHandler on ValueNotifier<TunEditorValue> {
   void setHeadline1();
   void setHeadline2();
   void setHeadline3();
+  void clearStyle();
 
 }

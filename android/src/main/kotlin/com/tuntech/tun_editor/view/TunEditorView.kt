@@ -131,6 +131,8 @@ internal class TunEditorView(
         // headline's font size.
         lastHeadlineFontSize = if (areToolbarItemFontSize.style.isChecked && lastHeadlineFontSize != fontSize) {
             areToolbarItemFontSize.style.setChecked(false)
+            val fontSizeStyle = (areToolbarItemFontSize.style as? ARE_Style_FontSize) ?: return
+            fontSizeStyle.onFontSizeChange(FONT_SIZE_NORMAL)
             FONT_SIZE_NORMAL
         } else {
             // Set new headline.

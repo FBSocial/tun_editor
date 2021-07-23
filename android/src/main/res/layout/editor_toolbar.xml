@@ -1,82 +1,175 @@
 <?xml version="1.0" encoding="utf-8"?>
-<HorizontalScrollView android:layout_width="match_parent"
+<LinearLayout
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+    android:orientation="vertical"
+    xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <LinearLayout
-        android:orientation="horizontal"
+        android:id="@+id/ll_text_type"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
-        <Button
-            android:id="@+id/action_undo"
-            android:layout_width="wrap_content"
-            android:layout_height="48dp"
-            android:text="Undo"
-            android:paddingHorizontal="20dp"
-            android:contentDescription="@null" />
-        <Button
-            android:id="@+id/action_redo"
-            android:layout_width="wrap_content"
-            android:layout_height="48dp"
-            android:text="Redo"
-            android:paddingHorizontal="20dp"
-            android:contentDescription="@null" />
-        <Button
-            android:id="@+id/action_bold"
-            android:layout_width="wrap_content"
-            android:layout_height="48dp"
-            android:text="Bold"
-            android:paddingHorizontal="20dp"
-            android:contentDescription="@null" />
-        <Button
-            android:id="@+id/action_italic"
-            android:layout_width="wrap_content"
-            android:layout_height="48dp"
-            android:text="Italic"
-            android:paddingHorizontal="20dp"
-            android:contentDescription="@null" />
-        <Button
-            android:id="@+id/action_underline"
-            android:layout_width="wrap_content"
-            android:layout_height="48dp"
-            android:text="Underline"
-            android:paddingHorizontal="20dp"
-            android:contentDescription="@null" />
-        <Button
-            android:id="@+id/action_strike_through"
-            android:layout_width="wrap_content"
-            android:layout_height="48dp"
-            android:text="Through"
-            android:paddingHorizontal="20dp"
-            android:contentDescription="@null" />
-        <Button
-            android:id="@+id/action_headline_1"
-            android:layout_width="wrap_content"
-            android:layout_height="48dp"
-            android:text="Headline1"
-            android:paddingHorizontal="20dp"
-            android:contentDescription="@null" />
-        <Button
-            android:id="@+id/action_headline_2"
-            android:layout_width="wrap_content"
-            android:layout_height="48dp"
-            android:text="Headline2"
-            android:paddingHorizontal="20dp"
-            android:contentDescription="@null" />
-        <Button
-            android:id="@+id/action_headline_3"
-            android:layout_width="wrap_content"
-            android:layout_height="48dp"
-            android:text="Headline3"
-            android:paddingHorizontal="20dp"
-            android:contentDescription="@null" />
-        <Button
-            android:id="@+id/action_clear"
-            android:layout_width="wrap_content"
-            android:layout_height="48dp"
-            android:text="Clear"
-            android:paddingHorizontal="20dp"
-            android:contentDescription="@null" />
+        android:layout_height="48dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:background="@drawable/bg_toolbar"
+        android:paddingHorizontal="16dp"
+        android:layout_marginHorizontal="8dp" >
+
+        <ImageButton
+            android:id="@+id/ib_headline_1"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:src="@drawable/toolbar_h1"
+            android:background="@android:color/transparent" />
+
+        <ImageButton
+            android:id="@+id/ib_headline_2"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:src="@drawable/toolbar_h2"
+            android:background="@android:color/transparent" />
+
+        <ImageButton
+            android:id="@+id/ib_headline_3"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:src="@drawable/toolbar_h3"
+            android:background="@android:color/transparent" />
+
+        <ImageButton
+            android:id="@+id/ib_list"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:src="@drawable/toolbar_list"
+            android:background="@android:color/transparent" />
+
+        <ImageButton
+            android:id="@+id/ib_ordered_list"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:src="@drawable/toolbar_ordered_list"
+            android:background="@android:color/transparent" />
+
+        <ImageButton
+            android:id="@+id/ib_divider"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:src="@drawable/toolbar_divider"
+            android:background="@android:color/transparent" />
+
+        <ImageButton
+            android:id="@+id/ib_quote"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:src="@drawable/toolbar_quote"
+            android:background="@android:color/transparent" />
+
+        <ImageButton
+            android:id="@+id/ib_code_block"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:src="@drawable/toolbar_code_block"
+            android:background="@android:color/transparent" />
     </LinearLayout>
 
-</HorizontalScrollView>
+    <LinearLayout
+        android:id="@+id/ll_text_style"
+        android:layout_width="wrap_content"
+        android:layout_height="48dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:background="@drawable/bg_toolbar"
+        android:paddingHorizontal="16dp"
+        android:layout_marginHorizontal="8dp" >
+
+        <ImageButton
+            android:id="@+id/ib_bold"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:src="@drawable/toolbar_bold"
+            android:background="@android:color/transparent" />
+
+        <ImageButton
+            android:id="@+id/ib_italic"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:src="@drawable/toolbar_italic"
+            android:background="@android:color/transparent" />
+
+        <ImageButton
+            android:id="@+id/ib_underline"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:src="@drawable/toolbar_underline"
+            android:background="@android:color/transparent" />
+
+        <ImageButton
+            android:id="@+id/ib_strike_through"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:src="@drawable/toolbar_strike_through"
+            android:background="@android:color/transparent" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="16dp"
+        android:layout_marginTop="4dp"
+        android:background="@android:color/white" >
+
+        <ImageButton
+            android:id="@+id/ib_at"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:src="@drawable/toolbar_at"
+            android:background="@android:color/transparent" />
+
+        <ImageButton
+            android:id="@+id/ib_image"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:src="@drawable/toolbar_image"
+            android:background="@android:color/transparent"
+            android:layout_marginStart="8dp" />
+
+        <ImageButton
+            android:id="@+id/ib_emoji"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:src="@drawable/toolbar_emoji"
+            android:background="@android:color/transparent"
+            android:layout_marginStart="8dp" />
+
+        <ImageButton
+            android:id="@+id/ib_text_type"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:src="@drawable/toolbar_font_type"
+            android:background="@android:color/transparent"
+            android:layout_marginStart="8dp" />
+
+        <ImageButton
+            android:id="@+id/ib_text_style"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:src="@drawable/toolbar_font_style"
+            android:background="@android:color/transparent"
+            android:layout_marginStart="8dp" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <ImageButton
+            android:layout_width="50dp"
+            android:layout_height="36dp"
+            android:src="@drawable/toolbar_send_disabled"
+            android:background="@drawable/btn_send_background" />
+    </LinearLayout>
+</LinearLayout>

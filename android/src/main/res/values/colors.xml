@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="color_accent">#FF5765EA</color>
+    <color name="divider">#FFF2F2F2</color>
+    <color name="bg_focused">#FFEEEFF0</color>
+</resources>

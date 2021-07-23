@@ -24,7 +24,7 @@ class FullPageEditorState extends State<FullPageEditor> {
   void initState() {
     super.initState();
   
-    _controller = TunEditorController.document(text: "")
+    _controller = TunEditorController.basic()
         ..addListener(() async {
           final String htmlText = await _controller.getHtml();
           setState(() {
@@ -57,7 +57,7 @@ class FullPageEditorState extends State<FullPageEditor> {
                 ),
               ),
               Container(
-                height: 50,
+                height: 100,
                 child: Text(
                   _previewText,
                 ),

@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-import 'package:tun_editor/tun_editor_value.dart';
 
 class TunEditorApi {
 
@@ -56,6 +55,9 @@ class TunEditorApi {
   void setHeadline3() {
     _channel.invokeMethod("setHeadline3");
   }
+  void clearStyle() {
+    _channel.invokeMethod("clearStyle");
+  }
 
   Future<String> getHtml() async {
     final String res = await _channel.invokeMethod("getHtml");
@@ -64,6 +66,6 @@ class TunEditorApi {
 
 }
 
-mixin TunEditorHandler on ValueNotifier<TunEditorValue> {
+mixin TunEditorHandler on ChangeNotifier {
   void onTextChange(String text);
 }

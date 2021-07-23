@@ -1,9 +1,12 @@
 package com.tuntech.tun_editor.view
 
 import android.content.Context
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.Button
+import android.widget.ImageButton
+import android.widget.LinearLayout
 import com.tuntech.tun_editor.R
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodCall
@@ -20,57 +23,45 @@ internal class TunEditorToolbarView(
     // UI related.
     private val toolbar: View = LayoutInflater.from(context).inflate(
         R.layout.editor_toolbar, null)
-    private lateinit var btnUndo: Button
-    private lateinit var btnRedo: Button
-    private lateinit var btnSetBold: Button
-    private lateinit var btnSetItalic: Button
-    private lateinit var btnSetUnderline: Button
-    private lateinit var btnSetStrikeThrough: Button
-    private lateinit var btnSetHeadline1: Button
-    private lateinit var btnSetHeadline2: Button
-    private lateinit var btnSetHeadline3: Button
+
+    private var isShowTextType = false
+    private var isShowTextStyle = false
 
     private val methodChannel = MethodChannel(messenger, "tun/editor/toolbar/${id}")
 
     init {
-        methodChannel.setMethodCallHandler(this)
-
-        btnUndo = toolbar.findViewById<Button>(R.id.action_undo)
-        btnRedo = toolbar.findViewById<Button>(R.id.action_redo)
-        btnSetBold = toolbar.findViewById<Button>(R.id.action_bold)
-        btnSetItalic = toolbar.findViewById<Button>(R.id.action_italic)
-        btnSetUnderline = toolbar.findViewById<Button>(R.id.action_underline)
-        btnSetStrikeThrough = toolbar.findViewById<Button>(R.id.action_strike_through)
-        btnSetHeadline1 = toolbar.findViewById<Button>(R.id.action_headline_1)
-        btnSetHeadline2 = toolbar.findViewById<Button>(R.id.action_headline_2)
-        btnSetHeadline3 = toolbar.findViewById<Button>(R.id.action_headline_3)
-        btnUndo.setOnClickListener {
-            methodChannel.invokeMethod("undo", null)
-        }
-        btnRedo.setOnClickListener {
-            methodChannel.invokeMethod("redo", null)
-        }
-        btnSetBold.setOnClickListener {
+        toolbar.findViewById<ImageButton>(R.id.ib_bold).setOnClickListener {
             methodChannel.invokeMethod("setBold", null)
         }
-        btnSetItalic.setOnClickListener {
+        toolbar.findViewById<ImageButton>(R.id.ib_italic).setOnClickListener {
             methodChannel.invokeMethod("setItalic", null)
         }
-        btnSetUnderline.setOnClickListener {
+        toolbar.findViewById<ImageButton>(R.id.ib_underline).setOnClickListener {
             methodChannel.invokeMethod("setUnderline", null)
         }
-        btnSetStrikeThrough.setOnClickListener {
+        toolbar.findViewById<ImageButton>(R.id.ib_strike_through).setOnClickListener {
             methodChannel.invokeMethod("setStrikeThrough", null)
         }
-        btnSetHeadline1.setOnClickListener {
+        toolbar.findViewById<ImageButton>(R.id.ib_headline_1).setOnClickListener {
             methodChannel.invokeMethod("setHeadline1", null)
         }
-        btnSetHeadline2.setOnClickListener {
+        toolbar.findViewById<ImageButton>(R.id.ib_headline_2).setOnClickListener {
             methodChannel.invokeMethod("setHeadline2", null)
         }
-        btnSetHeadline3.setOnClickListener {
+        toolbar.findViewById<ImageButton>(R.id.ib_headline_3).setOnClickListener {
             methodChannel.invokeMethod("setHeadline3", null)
         }
+        toolbar.findViewById<ImageButton>(R.id.ib_text_type).setOnClickListener {
+            toggleTextType()
+        }
+        toolbar.findViewById<ImageButton>(R.id.ib_text_style).setOnClickListener {
+            toggleTextStyle()
+        }
+//        toolbar.actionClearStyle.setOnClickListener {
+//            methodChannel.invokeMethod("clearStyle", null)
+//        }
+
+        methodChannel.setMethodCallHandler(this)
     }
 
     override fun getView(): View {
@@ -83,6 +74,28 @@ internal class TunEditorToolbarView(
     }
 
     override fun dispose() {
+    }
+
+    private fun toggleTextType() {
+        val isVisible = if (isShowTextType) {
+            toolbar.findViewById<LinearLayout>(R.id.ll_text_type).setBackgroundColor(Color.TRANSPARENT)
+            View.GONE
+        } else {
+            toolbar.findViewById<LinearLayout>(R.id.ll_text_type).setBackgroundResource(R.drawable.bg_toolbar)
+            View.VISIBLE
+        }
+        toolbar.findViewById<LinearLayout>(R.id.ll_text_type).visibility = isVisible
+    }
+
+    private fun toggleTextStyle() {
+        val isVisible = if (isShowTextStyle) {
+            toolbar.findViewById<LinearLayout>(R.id.ll_text_style).setBackgroundColor(Color.TRANSPARENT)
+            View.GONE
+        } else {
+            toolbar.findViewById<LinearLayout>(R.id.ll_text_style).setBackgroundResource(R.drawable.bg_toolbar)
+            View.VISIBLE
+        }
+        toolbar.findViewById<LinearLayout>(R.id.ll_text_style).visibility = isVisible
     }
 
 }
