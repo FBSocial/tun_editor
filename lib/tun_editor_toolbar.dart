@@ -9,6 +9,8 @@ class TunEditorToolbar extends StatefulWidget {
 
   final TunEditorController controller;
 
+  static double get fixedToolbarHeight => TunEditorToolbarState.TOOLBAR_HEIGHT_WITHOUT_SUB;
+
   const TunEditorToolbar({
     Key? key,
     required this.controller,
@@ -22,13 +24,18 @@ class TunEditorToolbar extends StatefulWidget {
 class TunEditorToolbarState extends State<TunEditorToolbar> {
 
   static const String VIEW_TYPE_TUN_EDITOR_TOOLBAR = "tun_editor_toolbar";
+  static const double TOOLBAR_HEIGHT_WITHOUT_SUB = 48;
+  static const double TOOLBAR_HEIGHT_WITH_SUB = 100;
 
   TunEditorController get controller => widget.controller;
 
+  double toolbarHeight = TOOLBAR_HEIGHT_WITHOUT_SUB;
+
   @override
   Widget build(BuildContext context) {
+    Widget child;
     if (Platform.isAndroid) {
-      return PlatformViewLink(
+      child = PlatformViewLink(
         viewType: VIEW_TYPE_TUN_EDITOR_TOOLBAR,
         surfaceFactory: (BuildContext context, PlatformViewController controller) {
           return AndroidViewSurface(
@@ -53,7 +60,7 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
         },
       );
     } else if (Platform.isIOS) {
-      return UiKitView(
+      child = UiKitView(
         viewType: VIEW_TYPE_TUN_EDITOR_TOOLBAR,
         layoutDirection: TextDirection.ltr,
         creationParams: {},
@@ -62,6 +69,11 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
     } else {
       throw UnsupportedError("Unsupported platform view");
     }
+
+    return SizedBox(
+      height: TOOLBAR_HEIGHT_WITH_SUB,
+      child: child,
+    );
   }
 
 }

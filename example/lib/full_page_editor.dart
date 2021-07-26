@@ -42,24 +42,30 @@ class FullPageEditorState extends State<FullPageEditor> {
           width: double.infinity,
           height: double.infinity,
           alignment: Alignment.center,
-          child: Column(
+          child: Stack(
             children: [
-              Expanded(
-                child: TunEditor(
-                  controller: _controller,
-                  placeHolder: "Hello World",
+              Container(
+                width: double.infinity,
+                height: double.infinity,
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: TunEditor(
+                        controller: _controller,
+                        placeHolder: "Hello World",
+                      ),
+                    ),
+                    SizedBox(height: TunEditorToolbar.fixedToolbarHeight),
+                  ],
                 ),
               ),
-              SizedBox(
-                height: 50,
+
+              Positioned(
+                bottom: 0,
+                left: 0,
+                right: 0,
                 child: TunEditorToolbar(
                   controller: _controller,
-                ),
-              ),
-              Container(
-                height: 100,
-                child: Text(
-                  _previewText,
                 ),
               ),
             ],
@@ -67,6 +73,13 @@ class FullPageEditorState extends State<FullPageEditor> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+  
+    super.dispose();
   }
 
 }

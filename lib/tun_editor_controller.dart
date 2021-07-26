@@ -8,6 +8,8 @@ class TunEditorController extends ChangeNotifier with TunEditorHandler, TunEdito
   TunEditorToolbarApi? _tunEditorToolbarApi;
   TunEditorApi? _tunEditorApi;
 
+  final List<ValueChanged<bool>> _subToolbarListeners = [];
+
   // Document.
   final Document document;
 
@@ -27,6 +29,14 @@ class TunEditorController extends ChangeNotifier with TunEditorHandler, TunEdito
     );
   }
 
+  void addSubToolbarListener(ValueChanged<bool> onSubToolbarToggle) {
+    this._subToolbarListeners.add(onSubToolbarToggle);
+  }
+
+  void removeSubToolbarListener(ValueChanged<bool> onSubToolbarToggle) {
+    this._subToolbarListeners.remove(onSubToolbarToggle);
+  }
+
   void attachTunEditor(int viewId) {
     _tunEditorApi = TunEditorApi(viewId, this);
   }
@@ -39,6 +49,14 @@ class TunEditorController extends ChangeNotifier with TunEditorHandler, TunEdito
   void updateSelection() {
   }
 
+  @override
+  void dispose() {
+    _subToolbarListeners.clear();
+
+    super.dispose();
+  }
+
+  // =========== Tun editor toolbar handler ===========
   @override
   void undo() => _tunEditorApi?.undo();
   @override
@@ -59,10 +77,20 @@ class TunEditorController extends ChangeNotifier with TunEditorHandler, TunEdito
   @override
   void setHeadline3() => _tunEditorApi?.setHeadline3();
   @override
+  void insertDivider() => _tunEditorApi?.insertDivider();
+  @override
   void clearStyle() => _tunEditorApi?.clearStyle();
+
+  @override
+  void onSubToolbarToggle(bool isShow) {
+    for (final listener in _subToolbarListeners) {
+      listener.call(isShow);
+    }
+  }
 
   Future<String> getHtml() => _tunEditorApi?.getHtml() ?? Future.value("");
 
+  // =========== Tun editor handler ===========
   @override
   void onTextChange(String text) {
     // document.delete(0, document.length);

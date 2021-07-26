@@ -5,6 +5,12 @@
     android:orientation="vertical"
     xmlns:android="http://schemas.android.com/apk/res/android" >
 
+    <View
+        android:id="@+id/view_placeholder"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:background="@android:color/transparent" />
+
     <LinearLayout
         android:id="@+id/ll_text_type"
         android:layout_width="wrap_content"
@@ -121,7 +127,6 @@
         android:paddingHorizontal="16dp"
         android:layout_marginTop="4dp"
         android:background="@android:color/white" >
-
         <ImageButton
             android:id="@+id/ib_at"
             android:layout_width="36dp"

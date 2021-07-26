@@ -34,6 +34,7 @@ internal class TunEditorView(
     private val areToolbarItemUnderline: ARE_ToolItem_Underline = ARE_ToolItem_Underline()
     private val areToolbarItemStrikethrough: ARE_ToolItem_Strikethrough = ARE_ToolItem_Strikethrough()
     private val areToolbarItemFontSize: ARE_ToolItem_FontSize = ARE_ToolItem_FontSize()
+    private val areToolbarItemHr: ARE_ToolItem_Hr = ARE_ToolItem_Hr()
 
     private val methodChannel: MethodChannel = MethodChannel(messenger, "tun/editor/${id}")
 
@@ -55,6 +56,7 @@ internal class TunEditorView(
         areToolbar.addToolbarItem(areToolbarItemUnderline)
         areToolbar.addToolbarItem(areToolbarItemStrikethrough)
         areToolbar.addToolbarItem(areToolbarItemFontSize)
+        areToolbar.addToolbarItem(areToolbarItemHr)
 
         areEditor.setToolbar(areToolbar)
         areEditor.addTextChangedListener(object: TextWatcher {
@@ -108,6 +110,9 @@ internal class TunEditorView(
             }
             "setHeadline3" -> {
                 toggleHeadline(FONT_SIZE_HEADLINE_3)
+            }
+            "insertDivider" -> {
+                areToolbarItemHr.style.setChecked(true)
             }
 
             "clearStyle" -> {

@@ -30,6 +30,10 @@ internal class TunEditorToolbarView(
     private val methodChannel = MethodChannel(messenger, "tun/editor/toolbar/${id}")
 
     init {
+        toolbar.findViewById<View>(R.id.view_placeholder).visibility = View.VISIBLE
+        toolbar.findViewById<LinearLayout>(R.id.ll_text_type).visibility = View.GONE
+        toolbar.findViewById<LinearLayout>(R.id.ll_text_style).visibility = View.GONE
+
         toolbar.findViewById<ImageButton>(R.id.ib_bold).setOnClickListener {
             methodChannel.invokeMethod("setBold", null)
         }
@@ -42,6 +46,7 @@ internal class TunEditorToolbarView(
         toolbar.findViewById<ImageButton>(R.id.ib_strike_through).setOnClickListener {
             methodChannel.invokeMethod("setStrikeThrough", null)
         }
+
         toolbar.findViewById<ImageButton>(R.id.ib_headline_1).setOnClickListener {
             methodChannel.invokeMethod("setHeadline1", null)
         }
@@ -51,11 +56,17 @@ internal class TunEditorToolbarView(
         toolbar.findViewById<ImageButton>(R.id.ib_headline_3).setOnClickListener {
             methodChannel.invokeMethod("setHeadline3", null)
         }
+        toolbar.findViewById<ImageButton>(R.id.ib_divider).setOnClickListener {
+            methodChannel.invokeMethod("insertDivider", null)
+        }
+
         toolbar.findViewById<ImageButton>(R.id.ib_text_type).setOnClickListener {
             toggleTextType()
+            toggleSubToolbarPlaceHolder()
         }
         toolbar.findViewById<ImageButton>(R.id.ib_text_style).setOnClickListener {
             toggleTextStyle()
+            toggleSubToolbarPlaceHolder()
         }
 //        toolbar.actionClearStyle.setOnClickListener {
 //            methodChannel.invokeMethod("clearStyle", null)
@@ -84,7 +95,15 @@ internal class TunEditorToolbarView(
             toolbar.findViewById<LinearLayout>(R.id.ll_text_type).setBackgroundResource(R.drawable.bg_toolbar)
             View.VISIBLE
         }
+        // Toggle text type.
         toolbar.findViewById<LinearLayout>(R.id.ll_text_type).visibility = isVisible
+        isShowTextType = !isShowTextType
+
+        // Disabel text style.
+        toolbar.findViewById<LinearLayout>(R.id.ll_text_style).visibility = View.GONE
+        isShowTextStyle = false
+
+        methodChannel.invokeMethod("onSubToolbarToggle", isShowTextStyle || isShowTextType)
     }
 
     private fun toggleTextStyle() {
@@ -95,7 +114,24 @@ internal class TunEditorToolbarView(
             toolbar.findViewById<LinearLayout>(R.id.ll_text_style).setBackgroundResource(R.drawable.bg_toolbar)
             View.VISIBLE
         }
+        // Toggle text style.
         toolbar.findViewById<LinearLayout>(R.id.ll_text_style).visibility = isVisible
+        isShowTextStyle = !isShowTextStyle
+
+        // Disable text type.
+        toolbar.findViewById<LinearLayout>(R.id.ll_text_type).visibility = View.GONE
+        isShowTextType = false
+
+        methodChannel.invokeMethod("onSubToolbarToggle", isShowTextStyle || isShowTextType)
+    }
+
+    private fun toggleSubToolbarPlaceHolder() {
+        val isShowingSub = isShowTextStyle || isShowTextType
+        if (isShowingSub) {
+            toolbar.findViewById<View>(R.id.view_placeholder).visibility = View.GONE
+        } else {
+            toolbar.findViewById<View>(R.id.view_placeholder).visibility = View.VISIBLE
+        }
     }
 
 }

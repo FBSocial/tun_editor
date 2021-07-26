@@ -47,6 +47,13 @@ class TunEditorToolbarApi {
       case "clearStyle":
         _handler.clearStyle();
         break;
+      case "insertDivider":
+        _handler.insertDivider();
+        break;
+      case "onSubToolbarToggle":
+        final bool isShow = call.arguments as bool;
+        _handler.onSubToolbarToggle(isShow);
+        break;
 
       default:
         throw MissingPluginException(
@@ -69,6 +76,9 @@ mixin TunEditorToolbarHandler on ChangeNotifier {
   void setHeadline1();
   void setHeadline2();
   void setHeadline3();
+  void insertDivider();
   void clearStyle();
+
+  void onSubToolbarToggle(bool isShow);
 
 }

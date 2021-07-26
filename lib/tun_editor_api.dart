@@ -55,6 +55,9 @@ class TunEditorApi {
   void setHeadline3() {
     _channel.invokeMethod("setHeadline3");
   }
+  void insertDivider() {
+    _channel.invokeMethod("insertDivider");
+  }
   void clearStyle() {
     _channel.invokeMethod("clearStyle");
   }
