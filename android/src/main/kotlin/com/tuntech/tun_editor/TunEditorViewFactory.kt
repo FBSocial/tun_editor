@@ -11,7 +11,7 @@ class TunEditorViewFactory(
     private val messenger: BinaryMessenger
 ) : PlatformViewFactory(StandardMessageCodec.INSTANCE) {
     override fun create(context: Context, viewId: Int, args: Any?): PlatformView {
-        val creationParams = args as Map<String?, Any?>?
+        val creationParams = args as Map<String, Any?>?
         return TunEditorView(context, viewId, creationParams, messenger)
     }
 }

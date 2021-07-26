@@ -27,13 +27,44 @@ class TunEditorApi {
     }
   }
 
+  // Common tools.
   void undo() {
     _channel.invokeMethod("undo");
   }
   void redo() {
     _channel.invokeMethod("redo");
   }
+  void clearStyle() {
+    _channel.invokeMethod("clearStyle");
+  }
 
+  // Text types.
+  void setHeadline1() {
+    _channel.invokeMethod("setHeadline1");
+  }
+  void setHeadline2() {
+    _channel.invokeMethod("setHeadline2");
+  }
+  void setHeadline3() {
+    _channel.invokeMethod("setHeadline3");
+  }
+  void setList() {
+    _channel.invokeMethod("setList");
+  }
+  void setOrderedList() {
+    _channel.invokeMethod("setOrderedList");
+  }
+  void insertDivider() {
+    _channel.invokeMethod("insertDivider");
+  }
+  void setQuote() {
+    _channel.invokeMethod("setQuote");
+  }
+  void setCodeBlock() {
+    _channel.invokeMethod("setCodeBlock");
+  }
+
+  // Text styles.
   void setBold() {
     _channel.invokeMethod("setBold");
   }
@@ -45,21 +76,6 @@ class TunEditorApi {
   }
   void setStrikeThrough() {
     _channel.invokeMethod("setStrikeThrough");
-  }
-  void setHeadline1() {
-    _channel.invokeMethod("setHeadline1");
-  }
-  void setHeadline2() {
-    _channel.invokeMethod("setHeadline2");
-  }
-  void setHeadline3() {
-    _channel.invokeMethod("setHeadline3");
-  }
-  void insertDivider() {
-    _channel.invokeMethod("insertDivider");
-  }
-  void clearStyle() {
-    _channel.invokeMethod("clearStyle");
   }
 
   Future<String> getHtml() async {

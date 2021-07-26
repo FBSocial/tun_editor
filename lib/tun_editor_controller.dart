@@ -61,6 +61,25 @@ class TunEditorController extends ChangeNotifier with TunEditorHandler, TunEdito
   void undo() => _tunEditorApi?.undo();
   @override
   void redo() =>_tunEditorApi?.redo();
+  @override
+  void clearStyle() => _tunEditorApi?.clearStyle();
+
+  @override
+  void setHeadline1() => _tunEditorApi?.setHeadline1();
+  @override
+  void setHeadline2() => _tunEditorApi?.setHeadline2();
+  @override
+  void setHeadline3() => _tunEditorApi?.setHeadline3();
+  @override
+  void setList() => _tunEditorApi?.setList();
+  @override
+  void setOrderedList() => _tunEditorApi?.setOrderedList();
+  @override
+  void insertDivider() => _tunEditorApi?.insertDivider();
+  @override
+  void setQuote() => _tunEditorApi?.setQuote();
+  @override
+  void setCodeBlock() => _tunEditorApi?.setCodeBlock();
 
   @override
   void setBold() => _tunEditorApi?.setBold();
@@ -70,16 +89,6 @@ class TunEditorController extends ChangeNotifier with TunEditorHandler, TunEdito
   void setUnderline() => _tunEditorApi?.setUnderline();
   @override
   void setStrikeThrough() => _tunEditorApi?.setStrikeThrough();
-  @override
-  void setHeadline1() => _tunEditorApi?.setHeadline1();
-  @override
-  void setHeadline2() => _tunEditorApi?.setHeadline2();
-  @override
-  void setHeadline3() => _tunEditorApi?.setHeadline3();
-  @override
-  void insertDivider() => _tunEditorApi?.insertDivider();
-  @override
-  void clearStyle() => _tunEditorApi?.clearStyle();
 
   @override
   void onSubToolbarToggle(bool isShow) {

@@ -16,7 +16,7 @@ import io.flutter.plugin.platform.PlatformView
 internal class TunEditorView(
     context: Context,
     id: Int,
-    creationParams: Map<String?, Any?>?,
+    creationParams: Map<String, Any?>?,
     messenger: BinaryMessenger
 ) : PlatformView, MethodChannel.MethodCallHandler {
 
@@ -34,10 +34,15 @@ internal class TunEditorView(
     private val areToolbarItemUnderline: ARE_ToolItem_Underline = ARE_ToolItem_Underline()
     private val areToolbarItemStrikethrough: ARE_ToolItem_Strikethrough = ARE_ToolItem_Strikethrough()
     private val areToolbarItemFontSize: ARE_ToolItem_FontSize = ARE_ToolItem_FontSize()
+    private val areToolbarItemList: ARE_ToolItem_ListBullet = ARE_ToolItem_ListBullet()
+    private val areToolbarItemOrderedList: ARE_ToolItem_ListNumber = ARE_ToolItem_ListNumber()
     private val areToolbarItemHr: ARE_ToolItem_Hr = ARE_ToolItem_Hr()
+    private val areToolbarItemQuote: ARE_ToolItem_Quote = ARE_ToolItem_Quote()
+    private val areToolbarItemCodeBlock: ARE_ToolItem_Quote = ARE_ToolItem_Quote()
 
     private val methodChannel: MethodChannel = MethodChannel(messenger, "tun/editor/${id}")
 
+    private var isShowHeadline: Boolean = false
     private var lastHeadlineFontSize: Int = FONT_SIZE_NORMAL
 
     override fun getView(): View {
@@ -45,18 +50,25 @@ internal class TunEditorView(
     }
 
     override fun dispose() {
+        methodChannel.setMethodCallHandler(null)
     }
 
     init {
         methodChannel.setMethodCallHandler(this)
 
-        // Toolbar item.
+        // Text types.
+        areToolbar.addToolbarItem(areToolbarItemFontSize)
+        areToolbar.addToolbarItem(areToolbarItemList)
+        areToolbar.addToolbarItem(areToolbarItemOrderedList)
+        areToolbar.addToolbarItem(areToolbarItemHr)
+        areToolbar.addToolbarItem(areToolbarItemQuote)
+        areToolbar.addToolbarItem(areToolbarItemCodeBlock)
+
+        // Text styles.
         areToolbar.addToolbarItem(areToolbarItemBold)
         areToolbar.addToolbarItem(areToolbarItemItalic)
         areToolbar.addToolbarItem(areToolbarItemUnderline)
         areToolbar.addToolbarItem(areToolbarItemStrikethrough)
-        areToolbar.addToolbarItem(areToolbarItemFontSize)
-        areToolbar.addToolbarItem(areToolbarItemHr)
 
         areEditor.setToolbar(areToolbar)
         areEditor.addTextChangedListener(object: TextWatcher {
@@ -79,42 +91,13 @@ internal class TunEditorView(
 
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
         when (call.method) {
+            // Common tools.
             "undo" -> {
                 result.success(null)
             }
             "redo" -> {
                 result.success(null)
             }
-
-            "setBold" -> {
-                areToolbarItemBold.style.setChecked(!areToolbarItemBold.style.isChecked)
-                result.success(null)
-            }
-            "setItalic" -> {
-                areToolbarItemItalic.style.setChecked(!areToolbarItemItalic.style.isChecked)
-                result.success(null)
-            }
-            "setUnderline" -> {
-                areToolbarItemUnderline.style.setChecked(!areToolbarItemUnderline.style.isChecked)
-                result.success(null)
-            }
-            "setStrikeThrough" -> {
-                areToolbarItemStrikethrough.style.setChecked(!areToolbarItemStrikethrough.style.isChecked)
-                result.success(null)
-            }
-            "setHeadline1" -> {
-                toggleHeadline(FONT_SIZE_HEADLINE_1)
-            }
-            "setHeadline2" -> {
-                toggleHeadline(FONT_SIZE_HEADLINE_2)
-            }
-            "setHeadline3" -> {
-                toggleHeadline(FONT_SIZE_HEADLINE_3)
-            }
-            "insertDivider" -> {
-                areToolbarItemHr.style.setChecked(true)
-            }
-
             "clearStyle" -> {
                 // Disable all tool items.
                 for (tool in areToolbar.toolItems) {
@@ -124,27 +107,77 @@ internal class TunEditorView(
                 fontSizeStyle.onFontSizeChange(FONT_SIZE_NORMAL)
             }
 
+            // Text types.
+            "setHeadline1" -> {
+                toggleHeadline(FONT_SIZE_HEADLINE_1)
+            }
+            "setHeadline2" -> {
+                toggleHeadline(FONT_SIZE_HEADLINE_2)
+            }
+            "setHeadline3" -> {
+                toggleHeadline(FONT_SIZE_HEADLINE_3)
+            }
+            "setList" -> {
+                areToolbarItemList.getView(areToolbar.context).performClick()
+            }
+            "setOrderedList" -> {
+                areToolbarItemOrderedList.getView(areToolbar.context).performClick()
+            }
+            "insertDivider" -> {
+                areToolbarItemHr.getView(areToolbar.context).performClick()
+            }
+            "setQuote" -> {
+                areToolbarItemQuote.getView(areToolbar.context).performClick()
+            }
+            "setCodeBlock" -> {
+                areToolbarItemQuote.getView(areToolbar.context).performClick()
+            }
+
+            // Text styles.
+            "setBold" -> {
+                areToolbarItemBold.getView(areToolbar.context).performClick()
+                result.success(null)
+            }
+            "setItalic" -> {
+                areToolbarItemItalic.getView(areToolbar.context).performClick()
+                result.success(null)
+            }
+            "setUnderline" -> {
+                areToolbarItemUnderline.getView(areToolbar.context).performClick()
+                result.success(null)
+            }
+            "setStrikeThrough" -> {
+                areToolbarItemStrikethrough.getView(areToolbar.context).performClick()
+                result.success(null)
+            }
+
             "getHtml" -> {
                 val html = areEditor.html
                 result.success(html)
+            }
+
+            else -> {
+                println("missing plugin method: ${call.method}")
             }
         }
     }
 
     private fun toggleHeadline(fontSize: Int) {
-        // Disable headline if font size tool is enabled and new font size is same as last
-        // headline's font size.
-        lastHeadlineFontSize = if (areToolbarItemFontSize.style.isChecked && lastHeadlineFontSize != fontSize) {
-            areToolbarItemFontSize.style.setChecked(false)
-            val fontSizeStyle = (areToolbarItemFontSize.style as? ARE_Style_FontSize) ?: return
-            fontSizeStyle.onFontSizeChange(FONT_SIZE_NORMAL)
-            FONT_SIZE_NORMAL
+        val fontSizeStyle = (areToolbarItemFontSize.style as? ARE_Style_FontSize) ?: return
+        if (fontSize == lastHeadlineFontSize) {
+            // Toggle checked status if font size was not changed.
+            isShowHeadline = !isShowHeadline
+            lastHeadlineFontSize = if (isShowHeadline) {
+                fontSize
+            } else {
+                FONT_SIZE_NORMAL
+            }
+            fontSizeStyle.onFontSizeChange(lastHeadlineFontSize)
         } else {
-            // Set new headline.
-            areToolbarItemFontSize.style.setChecked(true)
-            val fontSizeStyle = (areToolbarItemFontSize.style as? ARE_Style_FontSize) ?: return
-            fontSizeStyle.onFontSizeChange(fontSize)
-            fontSize
+            // Update new font size if font size changed.
+            isShowHeadline = true
+            lastHeadlineFontSize = fontSize
+            fontSizeStyle.onFontSizeChange(lastHeadlineFontSize)
         }
     }
 

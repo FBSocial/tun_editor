@@ -11,11 +11,6 @@ import io.flutter.plugin.platform.PlatformViewRegistry
 
 /** TunEditorPlugin */
 class TunEditorPlugin: FlutterPlugin {
-  /// The MethodChannel that will the communication between Flutter and native Android
-  ///
-  /// This local reference serves to register the plugin with the Flutter Engine and unregister it
-  /// when the Flutter Engine is detached from the Activity
-  private lateinit var channel : MethodChannel
 
   override fun onAttachedToEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
     val messenger = binding.binaryMessenger
@@ -26,6 +21,5 @@ class TunEditorPlugin: FlutterPlugin {
   }
 
   override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
-    channel.setMethodCallHandler(null)
   }
 }
