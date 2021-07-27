@@ -106,4 +106,7 @@ class TunEditorController extends ChangeNotifier with TunEditorHandler, TunEdito
     // document.insert()
   }
 
+  @override
+  void onSelectionChanged(Map status) => _tunEditorToolbarApi?.onSelectionChanged(status);
+
 }

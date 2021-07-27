@@ -83,8 +83,37 @@ internal class TunEditorToolbarView(
     }
 
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
-//        when (call.method) {
-//        }
+        when (call.method) {
+            "onSelectionChanged" -> {
+                val status = call.arguments as? Map<*, *> ?: return
+
+                val isHeadline1 = status["isHeadline1"] as? Boolean ?: false
+                val isHeadline2 = status["isHeadline2"] as? Boolean ?: false
+                val isHeadline3 = status["isHeadline3"] as? Boolean ?: false
+                val isList = status["isList"] as? Boolean ?: false
+                val isOrderedList = status["isOrderedList"] as? Boolean ?: false
+                val isQuote = status["isQuote"] as? Boolean ?: false
+                val isCodeBlock = status["isCodeBlock"] as? Boolean ?: false
+
+                val isBold = status["isBold"] as? Boolean ?: false
+                val isItalic = status["isItalic"] as? Boolean ?: false
+                val isUnderline = status["isUnderline"] as? Boolean ?: false
+                val isStrikeThrough = status["isStrikeThrough"] as? Boolean ?: false
+
+                setHeadline1Status(isHeadline1)
+                setHeadline2Status(isHeadline2)
+                setHeadline3Status(isHeadline3)
+                setListStatus(isList)
+                setOrderedListStatus(isOrderedList)
+                setQuoteStatus(isQuote)
+                setCodeBlockStatus(isCodeBlock)
+
+                setBoldStatus(isBold)
+                setItalicStatus(isItalic)
+                setUnderlineStatus(isUnderline)
+                setStrikeThroughStatus(isStrikeThrough)
+            }
+        }
     }
 
     override fun dispose() {
@@ -96,119 +125,54 @@ internal class TunEditorToolbarView(
         llTextType.visibility = View.GONE
         llTextStyle.visibility = View.GONE
 
+        // Text type.
         ibHeadline1.setOnClickListener {
-            isHeadline1Enabled = !isHeadline1Enabled
-            if (isHeadline1Enabled) {
-                ibHeadline1.setBackgroundResource(R.drawable.bg_toolbar_item_focused)
-                ibHeadline2.setBackgroundColor(Color.TRANSPARENT)
-                ibHeadline3.setBackgroundColor(Color.TRANSPARENT)
-                isHeadline2Enabled = false
-                isHeadline3Enabled = false
-            } else {
-                ibHeadline1.setBackgroundColor(Color.TRANSPARENT)
-            }
+            setHeadline1Status(!isHeadline1Enabled)
             methodChannel.invokeMethod("setHeadline1", null)
         }
         ibHeadline2.setOnClickListener {
-            isHeadline2Enabled = !isHeadline2Enabled
-            if (isHeadline2Enabled) {
-                ibHeadline2.setBackgroundResource(R.drawable.bg_toolbar_item_focused)
-                ibHeadline1.setBackgroundColor(Color.TRANSPARENT)
-                ibHeadline3.setBackgroundColor(Color.TRANSPARENT)
-                isHeadline1Enabled = false
-                isHeadline3Enabled = false
-            } else {
-                ibHeadline2.setBackgroundColor(Color.TRANSPARENT)
-            }
+            setHeadline2Status(!isHeadline2Enabled)
             methodChannel.invokeMethod("setHeadline2", null)
         }
         ibHeadline3.setOnClickListener {
-            isHeadline3Enabled = !isHeadline3Enabled
-            if (isHeadline3Enabled) {
-                ibHeadline3.setBackgroundResource(R.drawable.bg_toolbar_item_focused)
-                ibHeadline1.setBackgroundColor(Color.TRANSPARENT)
-                ibHeadline2.setBackgroundColor(Color.TRANSPARENT)
-                isHeadline1Enabled = false
-                isHeadline2Enabled = false
-            } else {
-                ibHeadline3.setBackgroundColor(Color.TRANSPARENT)
-            }
+            setHeadline3Status(!isHeadline3Enabled)
             methodChannel.invokeMethod("setHeadline3", null)
         }
         ibList.setOnClickListener {
-            isListEnabled = !isListEnabled
-            if (isListEnabled) {
-                ibList.setBackgroundResource(R.drawable.bg_toolbar_item_focused)
-            } else {
-                ibList.setBackgroundColor(Color.TRANSPARENT)
-            }
+            setListStatus(isListEnabled)
             methodChannel.invokeMethod("setList", null)
         }
         ibOrderedList.setOnClickListener {
-            isOrderedListEnabled = !isOrderedListEnabled
-            if (isOrderedListEnabled) {
-                ibOrderedList.setBackgroundResource(R.drawable.bg_toolbar_item_focused)
-            } else {
-                ibOrderedList.setBackgroundColor(Color.TRANSPARENT)
-            }
+            setOrderedListStatus(!isOrderedListEnabled)
             methodChannel.invokeMethod("setOrderedList", null)
         }
         ibDivider.setOnClickListener {
             methodChannel.invokeMethod("insertDivider", null)
         }
         ibQuote.setOnClickListener {
-            isQuoteEnabled = !isQuoteEnabled
-            if (isQuoteEnabled) {
-                ibQuote.setBackgroundResource(R.drawable.bg_toolbar_item_focused)
-            } else {
-                ibQuote.setBackgroundColor(Color.TRANSPARENT)
-            }
+            setQuoteStatus(!isQuoteEnabled)
             methodChannel.invokeMethod("setQuote", null)
         }
         ibCodeBlock.setOnClickListener {
-            isCodeBlockEnabled = !isCodeBlockEnabled
-            if (isCodeBlockEnabled) {
-                ibCodeBlock.setBackgroundResource(R.drawable.bg_toolbar_item_focused)
-            } else {
-                ibCodeBlock.setBackgroundColor(Color.TRANSPARENT)
-            }
+            setCodeBlockStatus(!isCodeBlockEnabled)
             methodChannel.invokeMethod("setCodeBlock", null)
         }
 
+        // Text style.
         ibBold.setOnClickListener {
-            isBoldEnabled = !isBoldEnabled
-            if (isBoldEnabled) {
-                ibBold.setBackgroundResource(R.drawable.bg_toolbar_item_focused)
-            } else {
-                ibBold.setBackgroundColor(Color.TRANSPARENT)
-            }
+            setBoldStatus(!isBoldEnabled)
             methodChannel.invokeMethod("setBold", null)
         }
         ibItalic.setOnClickListener {
-            isItalicEnabled = !isItalicEnabled
-            if (isItalicEnabled) {
-                ibItalic.setBackgroundResource(R.drawable.bg_toolbar_item_focused)
-            } else {
-                ibItalic.setBackgroundColor(Color.TRANSPARENT)
-            }
+            setItalicStatus(!isItalicEnabled)
             methodChannel.invokeMethod("setItalic", null)
         }
         ibUnderline.setOnClickListener {
-            isUnderlineEnabled = !isUnderlineEnabled
-            if (isUnderlineEnabled) {
-                ibUnderline.setBackgroundResource(R.drawable.bg_toolbar_item_focused)
-            } else {
-                ibUnderline.setBackgroundColor(Color.TRANSPARENT)
-            }
+            setUnderlineStatus(!isUnderlineEnabled)
             methodChannel.invokeMethod("setUnderline", null)
         }
         ibStrikeThrough.setOnClickListener {
-            isStrikeThroughEnabled = !isStrikeThroughEnabled
-            if (isStrikeThroughEnabled) {
-                ibStrikeThrough.setBackgroundResource(R.drawable.bg_toolbar_item_focused)
-            } else {
-                ibStrikeThrough.setBackgroundColor(Color.TRANSPARENT)
-            }
+            setStrikeThroughStatus(!isStrikeThroughEnabled)
             methodChannel.invokeMethod("setStrikeThrough", null)
         }
 
@@ -268,6 +232,117 @@ internal class TunEditorToolbarView(
             toolbar.findViewById<View>(R.id.view_placeholder).visibility = View.GONE
         } else {
             toolbar.findViewById<View>(R.id.view_placeholder).visibility = View.VISIBLE
+        }
+    }
+
+    private fun setHeadline1Status(isChecked: Boolean) {
+        isHeadline1Enabled = isChecked
+        if (isChecked) {
+            ibHeadline1.setBackgroundResource(R.drawable.bg_toolbar_item_focused)
+            ibHeadline2.setBackgroundColor(Color.TRANSPARENT)
+            ibHeadline3.setBackgroundColor(Color.TRANSPARENT)
+            isHeadline2Enabled = false
+            isHeadline3Enabled = false
+        } else {
+            ibHeadline1.setBackgroundColor(Color.TRANSPARENT)
+        }
+    }
+
+    private fun setHeadline2Status(isChecked: Boolean) {
+        isHeadline2Enabled = isChecked
+        if (isChecked) {
+            ibHeadline2.setBackgroundResource(R.drawable.bg_toolbar_item_focused)
+            ibHeadline1.setBackgroundColor(Color.TRANSPARENT)
+            ibHeadline3.setBackgroundColor(Color.TRANSPARENT)
+            isHeadline1Enabled = false
+            isHeadline3Enabled = false
+        } else {
+            ibHeadline2.setBackgroundColor(Color.TRANSPARENT)
+        }
+    }
+
+    private fun setHeadline3Status(isChecked: Boolean) {
+        isHeadline3Enabled = isChecked
+        if (isChecked) {
+            ibHeadline3.setBackgroundResource(R.drawable.bg_toolbar_item_focused)
+            ibHeadline1.setBackgroundColor(Color.TRANSPARENT)
+            ibHeadline2.setBackgroundColor(Color.TRANSPARENT)
+            isHeadline1Enabled = false
+            isHeadline2Enabled = false
+        } else {
+            ibHeadline3.setBackgroundColor(Color.TRANSPARENT)
+        }
+    }
+
+    private fun setListStatus(isChecked: Boolean) {
+        isListEnabled = isChecked
+        if (isChecked) {
+            ibList.setBackgroundResource(R.drawable.bg_toolbar_item_focused)
+        } else {
+            ibList.setBackgroundColor(Color.TRANSPARENT)
+        }
+    }
+
+    private fun setOrderedListStatus(isChecked: Boolean) {
+        isOrderedListEnabled = isChecked
+        if (isChecked) {
+            ibOrderedList.setBackgroundResource(R.drawable.bg_toolbar_item_focused)
+        } else {
+            ibOrderedList.setBackgroundColor(Color.TRANSPARENT)
+        }
+    }
+
+    private fun setQuoteStatus(isChecked: Boolean) {
+        isQuoteEnabled = isChecked
+        if (isChecked) {
+            ibQuote.setBackgroundResource(R.drawable.bg_toolbar_item_focused)
+        } else {
+            ibQuote.setBackgroundColor(Color.TRANSPARENT)
+        }
+    }
+
+    private fun setCodeBlockStatus(isChecked: Boolean) {
+        isCodeBlockEnabled = isChecked
+        if (isChecked) {
+            ibCodeBlock.setBackgroundResource(R.drawable.bg_toolbar_item_focused)
+        } else {
+            ibCodeBlock.setBackgroundColor(Color.TRANSPARENT)
+        }
+    }
+
+    private fun setBoldStatus(isChecked: Boolean) {
+        isBoldEnabled = isChecked
+        if (isChecked) {
+            ibBold.setBackgroundResource(R.drawable.bg_toolbar_item_focused)
+        } else {
+            ibBold.setBackgroundColor(Color.TRANSPARENT)
+        }
+    }
+
+    private fun setItalicStatus(isChecked: Boolean) {
+        isItalicEnabled = isChecked
+        if (isChecked) {
+            ibItalic.setBackgroundResource(R.drawable.bg_toolbar_item_focused)
+        } else {
+            ibItalic.setBackgroundColor(Color.TRANSPARENT)
+        }
+    }
+
+    private fun setUnderlineStatus(isChecked: Boolean) {
+        isUnderlineEnabled = isChecked
+        if (isChecked) {
+            ibUnderline.setBackgroundResource(R.drawable.bg_toolbar_item_focused)
+        } else {
+            ibUnderline.setBackgroundColor(Color.TRANSPARENT)
+        }
+    }
+
+    private fun setStrikeThroughStatus(isChecked: Boolean) {
+        isStrikeThroughEnabled = isChecked
+        if (isChecked) {
+            ibStrikeThrough.setBackgroundResource(R.drawable.bg_toolbar_item_focused)
+        } else {
+            ibStrikeThrough.setBackgroundColor(Color.TRANSPARENT)
         }
     }
 

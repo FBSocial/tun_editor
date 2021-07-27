@@ -4,10 +4,12 @@ import android.content.Context
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
+import android.view.accessibility.AccessibilityEvent
 import com.chinalwb.are.AREditText
 import com.chinalwb.are.styles.toolbar.ARE_ToolbarDefault
 import com.chinalwb.are.styles.toolitems.*
 import com.chinalwb.are.styles.toolitems.styles.ARE_Style_FontSize
+import com.tuntech.tun_editor.utils.SelectionUtil
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
@@ -27,18 +29,21 @@ internal class TunEditorView(
         const val FONT_SIZE_NORMAL: Int = 18
     }
 
-    private val areEditor: AREditText = AREditText(context)
-    private val areToolbar: ARE_ToolbarDefault = ARE_ToolbarDefault(context)
-    private val areToolbarItemBold: ARE_ToolItem_Bold = ARE_ToolItem_Bold()
-    private val areToolbarItemItalic: ARE_ToolItem_Italic = ARE_ToolItem_Italic()
-    private val areToolbarItemUnderline: ARE_ToolItem_Underline = ARE_ToolItem_Underline()
-    private val areToolbarItemStrikethrough: ARE_ToolItem_Strikethrough = ARE_ToolItem_Strikethrough()
+    // Text type items.
     private val areToolbarItemFontSize: ARE_ToolItem_FontSize = ARE_ToolItem_FontSize()
     private val areToolbarItemList: ARE_ToolItem_ListBullet = ARE_ToolItem_ListBullet()
     private val areToolbarItemOrderedList: ARE_ToolItem_ListNumber = ARE_ToolItem_ListNumber()
     private val areToolbarItemHr: ARE_ToolItem_Hr = ARE_ToolItem_Hr()
     private val areToolbarItemQuote: ARE_ToolItem_Quote = ARE_ToolItem_Quote()
     private val areToolbarItemCodeBlock: ARE_ToolItem_Quote = ARE_ToolItem_Quote()
+
+    // Text style items.
+    private val areEditor: Editor = Editor(context)
+    private val areToolbar: ARE_ToolbarDefault = ARE_ToolbarDefault(context)
+    private val areToolbarItemBold: ARE_ToolItem_Bold = ARE_ToolItem_Bold()
+    private val areToolbarItemItalic: ARE_ToolItem_Italic = ARE_ToolItem_Italic()
+    private val areToolbarItemUnderline: ARE_ToolItem_Underline = ARE_ToolItem_Underline()
+    private val areToolbarItemStrikethrough: ARE_ToolItem_Strikethrough = ARE_ToolItem_Strikethrough()
 
     private val methodChannel: MethodChannel = MethodChannel(messenger, "tun/editor/${id}")
 
@@ -83,6 +88,10 @@ internal class TunEditorView(
                 methodChannel.invokeMethod("onTextChange", s?.toString() ?: "")
             }
         })
+        areEditor.setOnSelectionChanged { selStart, selEnd ->
+            val res = SelectionUtil.checkSelectionStyle(areEditor.editableText, selStart, selEnd)
+            methodChannel.invokeMethod("onSelectionChanged", res)
+        }
         if (creationParams?.containsKey("place_holder") == true) {
             val placeHolder: String = (creationParams["place_holder"] as? String) ?: ""
             areEditor.hint = placeHolder

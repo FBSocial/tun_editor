@@ -16,8 +16,12 @@ class TunEditorApi {
   Future<bool?> _onMethodCall(MethodCall call) async {
     switch (call.method) {
       case "onTextChange":
-        print("on text change: ${call.arguments}");
+        // print("on text change: ${call.arguments}");
         _handler.onTextChange(call.arguments);
+        break;
+
+      case "onSelectionChanged":
+        _handler.onSelectionChanged(call.arguments);
         break;
 
       default:
@@ -87,4 +91,5 @@ class TunEditorApi {
 
 mixin TunEditorHandler on ChangeNotifier {
   void onTextChange(String text);
+  void onSelectionChanged(Map<dynamic, dynamic> status);
 }

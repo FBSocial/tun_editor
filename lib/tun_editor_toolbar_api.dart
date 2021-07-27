@@ -13,6 +13,10 @@ class TunEditorToolbarApi {
     _channel.setMethodCallHandler(_onMethodCall);
   }
 
+  void onSelectionChanged(Map status) {
+    _channel.invokeMethod("onSelectionChanged", status);
+  }
+
   Future<bool?> _onMethodCall(MethodCall call) async {
     switch (call.method) {
       // Common.
