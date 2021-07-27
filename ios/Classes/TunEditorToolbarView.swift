@@ -1,5 +1,7 @@
 import Flutter
 import UIKit
+import SwiftUI
+
 
 class TunEditorToolbarViewFactory: NSObject, FlutterPlatformViewFactory {
 
@@ -44,23 +46,26 @@ class TunEditorToolbarView: NSObject, FlutterPlatformView {
     }
 
     func createNativeView(view _view: UIView) {
-        let toolbar = HStack(
-            alignment: .center,
-            spacing: 20,
-            content: {
-                Button {
-                    Text("Undo")
-                }
-                Button {
-                    Text("Undo")
-                }
-                Button {
-                    Text("Bold")
-                }
-            }
-        )
-        // .frame(height: 100, maxWidth: .infinity)
-        _view.addSubview(toolbar)
+        let label = UILabel()
+        label.text = "Undo"
+        label.textColor = UIColor.systemPink
+        label.textAlignment = .center
+        label.frame = CGRect(x: 0, y: 0, width: 180, height: 48)
+        _view.addSubview(label)
     }
+    
+    @objc func undo() {
+        print("undo")
+    }
+    
+    func redo() {
+        print("redo")
+    }
+    
+    func setBold() {
+        print("setBold")
+    }
+
+
 
 }
