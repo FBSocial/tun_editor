@@ -82,9 +82,18 @@ class TunEditorApi {
     _channel.invokeMethod("setStrikeThrough");
   }
 
+  void setHtml() {
+    _channel.invokeMethod("setHtml");
+  }
   Future<String> getHtml() async {
     final String res = await _channel.invokeMethod("getHtml");
     return res;
+  }
+  void updateSelection(TextSelection selection) {
+    _channel.invokeMethod('updateSelection', {
+      'selStart': selection.baseOffset,
+      'selEnd': selection.extentOffset,
+    });
   }
 
 }

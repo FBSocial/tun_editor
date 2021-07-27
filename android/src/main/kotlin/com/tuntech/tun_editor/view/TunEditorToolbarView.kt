@@ -176,6 +176,10 @@ internal class TunEditorToolbarView(
             methodChannel.invokeMethod("setStrikeThrough", null)
         }
 
+        // Toolbar items.
+        ibAt.setOnClickListener {
+            methodChannel.invokeMethod("onAtClick", null)
+        }
         ibTextType.setOnClickListener {
             toggleTextType()
             toggleSubToolbarPlaceHolder()

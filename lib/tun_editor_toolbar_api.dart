@@ -29,6 +29,9 @@ class TunEditorToolbarApi {
       case "clearStyle":
         _handler.clearStyle();
         break;
+      case "onAtClick":
+        _handler.testInsertAt();
+        break;
 
       // Text types.
       case "setHeadline1":
@@ -88,6 +91,7 @@ mixin TunEditorToolbarHandler on ChangeNotifier {
   void undo();
   void redo();
   void clearStyle();
+  void testInsertAt();
 
   void setHeadline1();
   void setHeadline2();

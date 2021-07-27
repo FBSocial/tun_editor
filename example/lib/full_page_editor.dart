@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tun_editor/models/documents/document.dart';
 import 'package:tun_editor/tun_editor.dart';
 import 'package:tun_editor/tun_editor_controller.dart';
 import 'package:tun_editor/tun_editor_toolbar.dart';
@@ -37,6 +38,18 @@ class FullPageEditorState extends State<FullPageEditor> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+      appBar: AppBar(
+        title: GestureDetector(
+          child: Text("Editor"),
+          onTap: () {
+            debugPrint("On title click");
+            _controller.updateSelection(TextSelection(
+              baseOffset: 2,
+              extentOffset: 10,
+            ), ChangeSource.LOCAL);
+          },
+        ),
+      ),
       body: SafeArea(
         child: Container(
           width: double.infinity,

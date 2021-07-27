@@ -160,9 +160,18 @@ internal class TunEditorView(
                 result.success(null)
             }
 
+            "setHtml" -> {
+                areEditor.editableText.insert(areEditor.length(), "@Jeffrey Wu")
+            }
             "getHtml" -> {
                 val html = areEditor.html
                 result.success(html)
+            }
+            "updateSelection" -> {
+                val args = call.arguments as? Map<*, *> ?: return
+                val selStart = args["selStart"] as? Int ?: 0
+                val selEnd = args["selEnd"] as? Int ?: 0
+                areEditor.setSelection(selStart, selEnd)
             }
 
             else -> {

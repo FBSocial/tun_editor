@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tun_editor/models/documents/attribute.dart';
 import 'package:tun_editor/models/documents/document.dart';
 import 'package:tun_editor/tun_editor_api.dart';
 import 'package:tun_editor/tun_editor_toolbar_api.dart';
@@ -29,6 +30,41 @@ class TunEditorController extends ChangeNotifier with TunEditorHandler, TunEdito
     );
   }
 
+  @override
+  void dispose() {
+    _subToolbarListeners.clear();
+
+    super.dispose();
+  }
+
+  /// Update [_selection] with given new [textSelection].
+  /// Nothing will happen if invalid [textSelection] is provided.
+  void updateSelection(TextSelection textSelection, ChangeSource source) {
+    if (textSelection.baseOffset < 0 || textSelection.extentOffset < 0) {
+      return;
+    }
+    _selection = textSelection;
+    _tunEditorApi?.updateSelection(textSelection);
+  }
+
+  // TODO Format text.
+  void formatText(int index, int len, Attribute? attribute) {
+  }
+
+  // TODO Replace text.
+  void replaceText(int index, int len, Object? data, TextSelection? textSelection, {
+    bool ignoreFocus = false,
+    bool autoAppendNewlineAfterImage = true
+  }) {
+  }
+
+  // TODO Insert.
+  void insert(int index, Object? data, {
+    int replaceLength = 0,
+    bool autoAppendNewlineAfterImage = true,
+  }) {
+  }
+
   void addSubToolbarListener(ValueChanged<bool> onSubToolbarToggle) {
     this._subToolbarListeners.add(onSubToolbarToggle);
   }
@@ -45,17 +81,6 @@ class TunEditorController extends ChangeNotifier with TunEditorHandler, TunEdito
     _tunEditorToolbarApi = TunEditorToolbarApi(viewId, this);
   }
 
-  // TODO Update selection
-  void updateSelection() {
-  }
-
-  @override
-  void dispose() {
-    _subToolbarListeners.clear();
-
-    super.dispose();
-  }
-
   // =========== Tun editor toolbar handler ===========
   @override
   void undo() => _tunEditorApi?.undo();
@@ -63,6 +88,8 @@ class TunEditorController extends ChangeNotifier with TunEditorHandler, TunEdito
   void redo() =>_tunEditorApi?.redo();
   @override
   void clearStyle() => _tunEditorApi?.clearStyle();
+  @override
+  void testInsertAt() => _tunEditorApi?.setHtml();
 
   @override
   void setHeadline1() => _tunEditorApi?.setHeadline1();
@@ -107,6 +134,11 @@ class TunEditorController extends ChangeNotifier with TunEditorHandler, TunEdito
   }
 
   @override
-  void onSelectionChanged(Map status) => _tunEditorToolbarApi?.onSelectionChanged(status);
+  void onSelectionChanged(Map status) {
+    final selStart = status["selStart"] as int;
+    final selEnd = status["selEnd"] as int;
+    _selection = TextSelection(baseOffset: selStart, extentOffset: selEnd);
+    _tunEditorToolbarApi?.onSelectionChanged(status);
+  }
 
 }
