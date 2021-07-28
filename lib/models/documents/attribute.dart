@@ -16,6 +16,17 @@ class Attribute<T> {
   final AttributeScope scope;
   final T value;
 
+  /// Wrap [key] with [value] for keys which has multiple status.
+  String get uniqueKey {
+    if (key == 'header') {
+      return '$key$value';
+    }
+    if (key == 'list') {
+      return '$key-$value';
+    }
+    return key;
+  }
+
   static final Map<String, Attribute> _registry = LinkedHashMap.of({
     Attribute.bold.key: Attribute.bold,
     Attribute.italic.key: Attribute.italic,

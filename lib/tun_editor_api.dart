@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:tun_editor/models/documents/attribute.dart';
 
 class TunEditorApi {
 
@@ -9,18 +10,18 @@ class TunEditorApi {
   TunEditorApi(
     int id,
     this._handler,
-  ) : _channel = MethodChannel("tun/editor/$id") {
+  ) : _channel = MethodChannel('tun/editor/$id') {
     _channel.setMethodCallHandler(_onMethodCall);
   }
 
   Future<bool?> _onMethodCall(MethodCall call) async {
     switch (call.method) {
-      case "onTextChange":
-        // print("on text change: ${call.arguments}");
+      case 'onTextChange':
+        // print('on text change: ${call.arguments}');
         _handler.onTextChange(call.arguments);
         break;
 
-      case "onSelectionChanged":
+      case 'onSelectionChanged':
         _handler.onSelectionChanged(call.arguments);
         break;
 
@@ -33,60 +34,67 @@ class TunEditorApi {
 
   // Common tools.
   void undo() {
-    _channel.invokeMethod("undo");
+    _channel.invokeMethod('undo');
   }
   void redo() {
-    _channel.invokeMethod("redo");
+    _channel.invokeMethod('redo');
   }
   void clearStyle() {
-    _channel.invokeMethod("clearStyle");
+    _channel.invokeMethod('clearStyle');
+  }
+  void formatText(int index, int len, Attribute attribute) {
+    _channel.invokeMethod('formatText', {
+      'attribute': attribute.uniqueKey,
+      'index': index,
+      'len': len,
+    });
   }
 
   // Text types.
   void setHeadline1() {
-    _channel.invokeMethod("setHeadline1");
+    _channel.invokeMethod('setHeadline1');
   }
   void setHeadline2() {
-    _channel.invokeMethod("setHeadline2");
+    _channel.invokeMethod('setHeadline2');
   }
   void setHeadline3() {
-    _channel.invokeMethod("setHeadline3");
+    _channel.invokeMethod('setHeadline3');
   }
   void setList() {
-    _channel.invokeMethod("setList");
+    _channel.invokeMethod('setList');
   }
   void setOrderedList() {
-    _channel.invokeMethod("setOrderedList");
+    _channel.invokeMethod('setOrderedList');
   }
   void insertDivider() {
-    _channel.invokeMethod("insertDivider");
+    _channel.invokeMethod('insertDivider');
   }
   void setQuote() {
-    _channel.invokeMethod("setQuote");
+    _channel.invokeMethod('setQuote');
   }
   void setCodeBlock() {
-    _channel.invokeMethod("setCodeBlock");
+    _channel.invokeMethod('setCodeBlock');
   }
 
   // Text styles.
   void setBold() {
-    _channel.invokeMethod("setBold");
+    _channel.invokeMethod('setBold');
   }
   void setItalic() {
-    _channel.invokeMethod("setItalic");
+    _channel.invokeMethod('setItalic');
   }
   void setUnderline() {
-    _channel.invokeMethod("setUnderline");
+    _channel.invokeMethod('setUnderline');
   }
   void setStrikeThrough() {
-    _channel.invokeMethod("setStrikeThrough");
+    _channel.invokeMethod('setStrikeThrough');
   }
 
   void setHtml() {
-    _channel.invokeMethod("setHtml");
+    _channel.invokeMethod('setHtml');
   }
   Future<String> getHtml() async {
-    final String res = await _channel.invokeMethod("getHtml");
+    final String res = await _channel.invokeMethod('getHtml');
     return res;
   }
   void updateSelection(TextSelection selection) {

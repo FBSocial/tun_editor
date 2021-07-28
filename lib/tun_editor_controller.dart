@@ -47,8 +47,8 @@ class TunEditorController extends ChangeNotifier with TunEditorHandler, TunEdito
     _tunEditorApi?.updateSelection(textSelection);
   }
 
-  // TODO Format text.
-  void formatText(int index, int len, Attribute? attribute) {
+  void formatText(int index, int len, Attribute attribute) {
+    _tunEditorApi?.formatText(index, len, attribute);
   }
 
   // TODO Replace text.

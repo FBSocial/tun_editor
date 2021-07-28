@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tun_editor/models/documents/attribute.dart';
 import 'package:tun_editor/models/documents/document.dart';
 import 'package:tun_editor/tun_editor.dart';
 import 'package:tun_editor/tun_editor_controller.dart';
@@ -42,11 +43,7 @@ class FullPageEditorState extends State<FullPageEditor> {
         title: GestureDetector(
           child: Text("Editor"),
           onTap: () {
-            debugPrint("On title click");
-            _controller.updateSelection(TextSelection(
-              baseOffset: 2,
-              extentOffset: 10,
-            ), ChangeSource.LOCAL);
+            _controller.formatText(0, 6, Attribute.ul);
           },
         ),
       ),

@@ -9,6 +9,7 @@ import com.chinalwb.are.AREditText
 import com.chinalwb.are.styles.toolbar.ARE_ToolbarDefault
 import com.chinalwb.are.styles.toolitems.*
 import com.chinalwb.are.styles.toolitems.styles.ARE_Style_FontSize
+import com.chinalwb.are.styles.toolitems.styles.ARE_Style_ListBullet
 import com.tuntech.tun_editor.utils.SelectionUtil
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodCall
@@ -173,6 +174,19 @@ internal class TunEditorView(
                 val selEnd = args["selEnd"] as? Int ?: 0
                 areEditor.setSelection(selStart, selEnd)
             }
+            "formatText" -> {
+                val args = call.arguments as? Map<*, *> ?: return
+                val attr = args["attribute"] as? String ?: return
+                var index = args["index"] as? Int ?: 0
+                var len = args["len"] as? Int ?: 0
+                if (index < 0) {
+                    index = 0
+                }
+                if (len > areEditor.length()) {
+                    len = areEditor.length()
+                }
+                formatText(attr, index, len)
+            }
 
             else -> {
                 println("missing plugin method: ${call.method}")
@@ -196,6 +210,101 @@ internal class TunEditorView(
             isShowHeadline = true
             lastHeadlineFontSize = fontSize
             fontSizeStyle.onFontSizeChange(lastHeadlineFontSize)
+        }
+    }
+
+    private fun formatText(attr: String, index: Int, len: Int) {
+        when (attr) {
+            "header1" -> {
+                val fontSizeStyle = (areToolbarItemFontSize.style as? ARE_Style_FontSize) ?: return
+                val oldChecked = fontSizeStyle.isChecked
+
+                fontSizeStyle.onFontSizeChange(FONT_SIZE_HEADLINE_1)
+                fontSizeStyle.setChecked(true)
+
+                fontSizeStyle.applyStyle(areEditor.editableText, index, index + len)
+
+                fontSizeStyle.setChecked(oldChecked)
+                fontSizeStyle.onFontSizeChange(lastHeadlineFontSize)
+            }
+            "header2" -> {
+                val fontSizeStyle = (areToolbarItemFontSize.style as? ARE_Style_FontSize) ?: return
+                val oldChecked = fontSizeStyle.isChecked
+
+                fontSizeStyle.onFontSizeChange(FONT_SIZE_HEADLINE_2)
+                fontSizeStyle.setChecked(true)
+
+                fontSizeStyle.applyStyle(areEditor.editableText, index, index + len)
+
+                fontSizeStyle.setChecked(oldChecked)
+                fontSizeStyle.onFontSizeChange(lastHeadlineFontSize)
+            }
+            "header3" -> {
+                val fontSizeStyle = (areToolbarItemFontSize.style as? ARE_Style_FontSize) ?: return
+                val oldChecked = fontSizeStyle.isChecked
+
+                fontSizeStyle.onFontSizeChange(FONT_SIZE_HEADLINE_3)
+                fontSizeStyle.setChecked(true)
+
+                fontSizeStyle.applyStyle(areEditor.editableText, index, index + len)
+
+                fontSizeStyle.setChecked(oldChecked)
+                fontSizeStyle.onFontSizeChange(lastHeadlineFontSize)
+            }
+            "list-bullet" -> {
+                // FIXME List format not work.
+                val listStyle = (areToolbarItemList.style as? ARE_Style_ListBullet) ?: return
+                println("format list bullet")
+
+                val oldChecked = listStyle.isChecked
+                listStyle.setChecked(true)
+                listStyle.applyStyle(areEditor.editableText, index, index + len)
+                listStyle.setChecked(oldChecked)
+            }
+            "list-ordered" -> {
+                // FIXME List format not work.
+                val oldChecked = areToolbarItemOrderedList.style.isChecked
+                areToolbarItemOrderedList.style.setChecked(true)
+                areToolbarItemOrderedList.style.applyStyle(areEditor.editableText, index, index + len)
+                areToolbarItemOrderedList.style.setChecked(oldChecked)
+            }
+            "blockquote" -> {
+                val oldChecked = areToolbarItemQuote.style.isChecked
+                areToolbarItemQuote.style.setChecked(true)
+                areToolbarItemQuote.style.applyStyle(areEditor.editableText, index, index + len)
+                areToolbarItemQuote.style.setChecked(oldChecked)
+            }
+            "code-block" -> {
+                // TODO Add code block format.
+            }
+
+            "bold" -> {
+                val oldChecked = areToolbarItemBold.style.isChecked
+                areToolbarItemBold.style.setChecked(true)
+                areToolbarItemBold.style.applyStyle(areEditor.editableText, index, index + len)
+                areToolbarItemBold.style.setChecked(oldChecked)
+            }
+            "italic" -> {
+                val oldChecked = areToolbarItemItalic.style.isChecked
+                areToolbarItemItalic.style.setChecked(true)
+                areToolbarItemItalic.style.applyStyle(areEditor.editableText, index, index + len)
+                areToolbarItemItalic.style.setChecked(oldChecked)
+            }
+            "underline" -> {
+                val oldChecked = areToolbarItemUnderline.style.isChecked
+                areToolbarItemUnderline.style.setChecked(true)
+                areToolbarItemUnderline.style.applyStyle(areEditor.editableText, index, index + len)
+                areToolbarItemUnderline.style.setChecked(oldChecked)
+            }
+            "strike" -> {
+                val oldChecked = areToolbarItemStrikethrough.style.isChecked
+                areToolbarItemStrikethrough.style.setChecked(true)
+                areToolbarItemStrikethrough.style.applyStyle(areEditor.editableText, index, index + len)
+                areToolbarItemStrikethrough.style.setChecked(oldChecked)
+            }
+            else -> {
+                println("missing attribute: $attr")
+            }
         }
     }
 
