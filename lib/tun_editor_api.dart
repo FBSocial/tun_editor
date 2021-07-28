@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:tun_editor/models/documents/attribute.dart';
@@ -25,8 +23,9 @@ class TunEditorApi {
         final count = args["count"] as int;
         final oldText = args["oldText"] as String;
         final newText = args["newText"] as String;
-        debugPrint("onTextChang: $start, $before, $count");
-        _handler.onTextChange(start, before, count, oldText, newText);
+        final style = args["style"] as String;
+        debugPrint("onTextChang: $start, $before, $count, $style");
+        _handler.onTextChange(start, before, count, oldText, newText, style);
         break;
 
       case 'onSelectionChanged':
@@ -49,13 +48,6 @@ class TunEditorApi {
   }
   void clearStyle() {
     _channel.invokeMethod('clearStyle');
-  }
-  void formatText(int index, int len, Attribute attribute) {
-    _channel.invokeMethod('formatText', {
-      'attribute': attribute.uniqueKey,
-      'index': index,
-      'len': len,
-    });
   }
 
   // Text types.
@@ -111,6 +103,34 @@ class TunEditorApi {
       'selEnd': selection.extentOffset,
     });
   }
+  void formatText(int index, int len, Attribute attribute) {
+    _channel.invokeMethod('formatText', {
+      'attribute': attribute.uniqueKey,
+      'index': index,
+      'len': len,
+    });
+  }
+  void replaceText(int index, int len, Object? data, {
+    bool ignoreFocus = false,
+    bool autoAppendNewlineAfterImage = true
+  }) {
+    _channel.invokeMethod('replaceText', {
+      'index': index,
+      'len': len,
+      'data': data,
+    });
+  }
+  void insert(int index, Object? data, {
+    int replaceLength = 0,
+    bool autoAppendNewlineAfterImage = true,
+  }) {
+    _channel.invokeMethod('insert', {
+      'index': index,
+      'data': data,
+      'replaceLength': replaceLength,
+      'autoAppendNewlineAfterImage': autoAppendNewlineAfterImage,
+    });
+  }
 
 }
 
@@ -118,6 +138,7 @@ mixin TunEditorHandler on ChangeNotifier {
   void onTextChange(
     int start, int before, int count,
     String oldText, String newText,
+    String style,
   );
   void onSelectionChanged(Map<dynamic, dynamic> status);
 }

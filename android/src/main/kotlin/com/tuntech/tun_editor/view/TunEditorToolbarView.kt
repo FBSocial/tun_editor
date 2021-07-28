@@ -112,6 +112,10 @@ internal class TunEditorToolbarView(
                 setItalicStatus(isItalic)
                 setUnderlineStatus(isUnderline)
                 setStrikeThroughStatus(isStrikeThrough)
+                result.success(null)
+            }
+            else -> {
+                result.notImplemented()
             }
         }
     }

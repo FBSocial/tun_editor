@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:tun_editor/models/documents/attribute.dart';
 import 'package:tun_editor/models/documents/document.dart';
+import 'package:tun_editor/models/documents/style.dart';
+import 'package:tun_editor/models/quill_delta.dart';
 import 'package:tun_editor/tun_editor_api.dart';
 import 'package:tun_editor/tun_editor_toolbar_api.dart';
 
@@ -51,18 +53,42 @@ class TunEditorController extends ChangeNotifier with TunEditorHandler, TunEdito
     _tunEditorApi?.formatText(index, len, attribute);
   }
 
-  // TODO Replace text.
+  // Replace text.
   void replaceText(int index, int len, Object? data, TextSelection? textSelection, {
     bool ignoreFocus = false,
     bool autoAppendNewlineAfterImage = true
   }) {
+    document.replace(index, len, data);
+    _tunEditorApi?.replaceText(
+        index, len, data,
+        ignoreFocus: ignoreFocus,
+        autoAppendNewlineAfterImage: autoAppendNewlineAfterImage,
+    );
+
+    if (textSelection == null) {
+      updateSelection(
+          TextSelection.collapsed(offset: index + (data is String ? data.length : 0)),
+          ChangeSource.LOCAL,
+      );
+    } else {
+      updateSelection(textSelection, ChangeSource.LOCAL);
+    }
   }
 
-  // TODO Insert.
+  // Insert.
   void insert(int index, Object? data, {
     int replaceLength = 0,
     bool autoAppendNewlineAfterImage = true,
   }) {
+    _tunEditorApi?.insert(
+        index, data,
+        replaceLength: replaceLength,
+        autoAppendNewlineAfterImage: autoAppendNewlineAfterImage,
+    );
+    updateSelection(
+        TextSelection.collapsed(offset: index + (data is String ? data.length : 0)),
+        ChangeSource.LOCAL,
+    );
   }
 
   void addSubToolbarListener(ValueChanged<bool> onSubToolbarToggle) {
@@ -131,24 +157,47 @@ class TunEditorController extends ChangeNotifier with TunEditorHandler, TunEdito
   void onTextChange(
     int start, int before, int count,
     String oldText, String newText,
+    String style,
   ) {
+    final attrs = _getAttributes(style);
     if (before <= 0) {
       // Insert.
-      document.insert(start, newText.substring(start, start + count));
-      notifyListeners();
+      final delta = Delta()
+          ..retain(start)
+          ..insert(newText.substring(start, start + count), attrs);
+      document.compose(delta, ChangeSource.LOCAL);
+      // document.insert(start, newText.substring(start, start + count));
+      // notifyListeners();
 
     } else {
       if (count <= 0) {
         // Delete.
-        document .delete(start, before);
-        notifyListeners();
+        final delta = Delta()
+            ..retain(start)
+            ..delete(before);
+        document.compose(delta, ChangeSource.LOCAL);
+        // document .delete(start, before);
+        // notifyListeners();
 
       } else {
         // Replace.
-        document.replace(start, before, newText.substring(start, start + count));
-        notifyListeners();
+        final insertDelta = Delta()
+            ..retain(start + before)
+            ..insert(newText.substring(start, start + count), attrs);
+        final deleteDelta = Delta()
+            ..retain(start)
+            ..delete(before);
+        document.compose(insertDelta, ChangeSource.LOCAL);
+        document.compose(deleteDelta, ChangeSource.LOCAL);
+        // final delta = Delta()
+        //     ..retain(start + before)
+        //     ..delete(before);
+        // delta.insert(newText.substring(start, start + count), styleVal.toJson());
+        // document.replace(start, before, newText.substring(start, start + count));
+        // notifyListeners();
       }
     }
+    notifyListeners();
   }
 
   @override
@@ -157,6 +206,18 @@ class TunEditorController extends ChangeNotifier with TunEditorHandler, TunEdito
     final selEnd = status["selEnd"] as int;
     _selection = TextSelection(baseOffset: selStart, extentOffset: selEnd);
     _tunEditorToolbarApi?.onSelectionChanged(status);
+  }
+
+  Map<String, dynamic>? _getAttributes(String styleStr) {
+    Style style = Style();
+    switch (styleStr) {
+      case 'header1':
+        break;
+      case 'bold':
+        style = style.put(Attribute.bold);
+        break;
+    }
+    return style.toJson();
   }
 
 }

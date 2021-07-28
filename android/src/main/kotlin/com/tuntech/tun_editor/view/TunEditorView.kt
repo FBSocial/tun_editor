@@ -4,8 +4,6 @@ import android.content.Context
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
-import android.view.accessibility.AccessibilityEvent
-import com.chinalwb.are.AREditText
 import com.chinalwb.are.styles.toolbar.ARE_ToolbarDefault
 import com.chinalwb.are.styles.toolitems.*
 import com.chinalwb.are.styles.toolitems.styles.ARE_Style_FontSize
@@ -49,6 +47,8 @@ internal class TunEditorView(
 
     // Method channel.
     private val methodChannel: MethodChannel = MethodChannel(messenger, "tun/editor/${id}")
+
+    private var currentStyle: String = ""
 
     // Headline related.
     private var isShowHeadline: Boolean = false
@@ -97,6 +97,7 @@ internal class TunEditorView(
                 args["count"] = count
                 args["oldText"] = oldText
                 args["newText"] = s?.toString() ?: ""
+                args["style"] = currentStyle
                 methodChannel.invokeMethod("onTextChange", args)
             }
             override fun afterTextChanged(s: Editable?) {
@@ -104,6 +105,7 @@ internal class TunEditorView(
         })
         areEditor.setOnSelectionChanged { selStart, selEnd ->
             val res = SelectionUtil.checkSelectionStyle(areEditor.editableText, selStart, selEnd)
+            currentStyle = res["style"] as? String ?: ""
             methodChannel.invokeMethod("onSelectionChanged", res)
         }
         if (creationParams?.containsKey("place_holder") == true) {
@@ -128,32 +130,41 @@ internal class TunEditorView(
                 }
                 val fontSizeStyle = (areToolbarItemFontSize.style as? ARE_Style_FontSize) ?: return
                 fontSizeStyle.onFontSizeChange(FONT_SIZE_NORMAL)
+                result.success(null)
             }
 
             // Text types.
             "setHeadline1" -> {
                 toggleHeadline(FONT_SIZE_HEADLINE_1)
+                result.success(null)
             }
             "setHeadline2" -> {
                 toggleHeadline(FONT_SIZE_HEADLINE_2)
+                result.success(null)
             }
             "setHeadline3" -> {
                 toggleHeadline(FONT_SIZE_HEADLINE_3)
+                result.success(null)
             }
             "setList" -> {
                 areToolbarItemList.getView(areToolbar.context).performClick()
+                result.success(null)
             }
             "setOrderedList" -> {
                 areToolbarItemOrderedList.getView(areToolbar.context).performClick()
+                result.success(null)
             }
             "insertDivider" -> {
                 areToolbarItemHr.getView(areToolbar.context).performClick()
+                result.success(null)
             }
             "setQuote" -> {
                 areToolbarItemQuote.getView(areToolbar.context).performClick()
+                result.success(null)
             }
             "setCodeBlock" -> {
                 areToolbarItemQuote.getView(areToolbar.context).performClick()
+                result.success(null)
             }
 
             // Text styles.
@@ -176,6 +187,7 @@ internal class TunEditorView(
 
             "setHtml" -> {
                 areEditor.editableText.insert(areEditor.length(), "@Jeffrey Wu")
+                result.success(null)
             }
             "getHtml" -> {
                 val html = areEditor.html
@@ -186,6 +198,7 @@ internal class TunEditorView(
                 val selStart = args["selStart"] as? Int ?: 0
                 val selEnd = args["selEnd"] as? Int ?: 0
                 areEditor.setSelection(selStart, selEnd)
+                result.success(null)
             }
             "formatText" -> {
                 val args = call.arguments as? Map<*, *> ?: return
@@ -199,10 +212,43 @@ internal class TunEditorView(
                     len = areEditor.length()
                 }
                 formatText(attr, index, len)
+                result.success(null)
+            }
+            "replaceText" -> {
+                val args = call.arguments as? Map<*, *> ?: return
+                val index = args["index"] as? Int ?: 0
+                val len = args["len"] as? Int ?: 0
+                val data = args["data"] as? String ?: ""
+                val ignoreFocus = args["ignoreFocus"] as Boolean? ?: false
+                val autoAppendNewLineAfterImage = args["autoAppendNewLineAfterImage"] as Boolean? ?: true
+                if (index > areEditor.length()) {
+                    return
+                }
+                areEditor.text =
+                    areEditor.editableText.replace(index, index + len, data)
+            }
+            "insert" -> {
+                val args = call.arguments as? Map<*, *> ?: return
+                val index = args["index"] as? Int ?: 0
+                val data = args["data"] as? String ?: ""
+                val replaceLength = args["replaceLength"] as? Int ?: 0
+                val autoAppendNewLineAfterImage = args["autoAppendNewLineAfterImage"] as Boolean? ?: true
+
+                if (index > areEditor.length()) {
+                    return
+                }
+                if (replaceLength > 0) {
+                    areEditor.text =
+                        areEditor.editableText.replace(index, index + replaceLength, data)
+                } else {
+                    areEditor.text = areEditor.editableText.insert(index, data)
+                }
+                println("new text: ${areEditor.text} $index $data")
             }
 
             else -> {
                 println("missing plugin method: ${call.method}")
+                result.notImplemented()
             }
         }
     }
@@ -267,7 +313,6 @@ internal class TunEditorView(
             "list-bullet" -> {
                 // FIXME List format not work.
                 val listStyle = (areToolbarItemList.style as? ARE_Style_ListBullet) ?: return
-                println("format list bullet")
 
                 val oldChecked = listStyle.isChecked
                 listStyle.setChecked(true)

@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:tun_editor/models/documents/attribute.dart';
 import 'package:tun_editor/models/documents/document.dart';
+import 'package:tun_editor/models/documents/style.dart';
+import 'package:tun_editor/models/quill_delta.dart';
 import 'package:tun_editor/tun_editor.dart';
 import 'package:tun_editor/tun_editor_controller.dart';
 import 'package:tun_editor/tun_editor_toolbar.dart';
@@ -28,7 +30,10 @@ class FullPageEditorState extends State<FullPageEditor> {
   void initState() {
     super.initState();
   
-    _controller = TunEditorController.basic();
+    _controller = TunEditorController(
+        document: Document(),
+        selection: TextSelection.collapsed(offset: 0),
+    );
     _controller.document.changes.listen((event) {
       final delta1 = json.encode(event.item1.toJson());
       final delta2 = json.encode(event.item2.toJson());
@@ -47,7 +52,9 @@ class FullPageEditorState extends State<FullPageEditor> {
         title: GestureDetector(
           child: Text("Editor"),
           onTap: () {
-            _controller.formatText(0, 6, Attribute.ul);
+            // _controller.formatText(0, 6, Attribute.ul);
+            _controller.insert(2, 'Bye Bye');
+            // _controller.replaceText(6, 5, 'Jeffrey Wu', null);
           },
         ),
       ),

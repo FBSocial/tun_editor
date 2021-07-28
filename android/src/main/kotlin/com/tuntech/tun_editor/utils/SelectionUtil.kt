@@ -27,7 +27,26 @@ object SelectionUtil {
         res["isItalic"] = isItalic(editable, selStart, selEnd)
         res["isUnderline"] = isUnderline(editable, selStart, selEnd)
         res["isStrikeThrough"] = isStrikeThrough(editable, selStart, selEnd)
+
+        val uniqueStyle: String = when {
+            res["isHeadline1"] == true -> "header1"
+            res["isHeadline2"] == true -> "header1"
+            res["isHeadline3"] == true -> "header1"
+            res["isList"] == true -> "list-bullet"
+            res["isOrderedList"] == true -> "list-ordered"
+            res["isQuote"] == true -> "blockquote"
+            res["isCodeBlock"] == true -> "code-block"
+            res["isBold"] == true -> "bold"
+            res["isItalic"] == true -> "italic"
+            res["isUnderline"] == true -> "underline"
+            res["isStrikeThrough"] == true -> "strike"
+            else -> ""
+        }
+        res["style"] = uniqueStyle
         return res
+    }
+
+    fun getUniqueStyle() {
     }
 
     private fun isBold(editable: Editable, selStart: Int, selEnd: Int): Boolean {
