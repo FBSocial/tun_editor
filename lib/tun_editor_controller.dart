@@ -128,13 +128,31 @@ class TunEditorController extends ChangeNotifier with TunEditorHandler, TunEdito
 
   // =========== Tun editor handler ===========
   @override
-  void onTextChange(String text) {
-    // document.delete(0, document.length);
-    // document.insert()
+  void onTextChange(
+    int start, int before, int count,
+    String oldText, String newText,
+  ) {
+    if (before <= 0) {
+      // Insert.
+      document.insert(start, newText.substring(start, start + count));
+      notifyListeners();
+
+    } else {
+      if (count <= 0) {
+        // Delete.
+        document .delete(start, before);
+        notifyListeners();
+
+      } else {
+        // Replace.
+        document.replace(start, before, newText.substring(start, start + count));
+        notifyListeners();
+      }
+    }
   }
 
   @override
-  void onSelectionChanged(Map status) {
+  void onSelectionChanged(Map<dynamic, dynamic> status) {
     final selStart = status["selStart"] as int;
     final selEnd = status["selEnd"] as int;
     _selection = TextSelection(baseOffset: selStart, extentOffset: selEnd);

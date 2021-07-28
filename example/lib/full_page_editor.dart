@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:tun_editor/models/documents/attribute.dart';
 import 'package:tun_editor/models/documents/document.dart';
@@ -26,13 +28,15 @@ class FullPageEditorState extends State<FullPageEditor> {
   void initState() {
     super.initState();
   
-    _controller = TunEditorController.basic()
-        ..addListener(() async {
-          final String htmlText = await _controller.getHtml();
-          setState(() {
-            _previewText = htmlText;
-          });
-        });
+    _controller = TunEditorController.basic();
+    _controller.document.changes.listen((event) {
+      final delta1 = json.encode(event.item1.toJson());
+      final delta2 = json.encode(event.item2.toJson());
+      debugPrint('event: $delta1 - $delta2');
+
+      final doc = json.encode(_controller.document.toDelta().toJson());
+      debugPrint('document: $doc');
+    });
   }
 
   @override

@@ -15,6 +15,7 @@ import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.platform.PlatformView
+import java.util.*
 
 internal class TunEditorView(
     context: Context,
@@ -46,10 +47,15 @@ internal class TunEditorView(
     private val areToolbarItemUnderline: ARE_ToolItem_Underline = ARE_ToolItem_Underline()
     private val areToolbarItemStrikethrough: ARE_ToolItem_Strikethrough = ARE_ToolItem_Strikethrough()
 
+    // Method channel.
     private val methodChannel: MethodChannel = MethodChannel(messenger, "tun/editor/${id}")
 
+    // Headline related.
     private var isShowHeadline: Boolean = false
     private var lastHeadlineFontSize: Int = FONT_SIZE_NORMAL
+
+    // Text watcher related.
+    private var oldText: String = ""
 
     override fun getView(): View {
         return areEditor
@@ -82,11 +88,18 @@ internal class TunEditorView(
                 s: CharSequence?, start: Int,
                 count: Int, after: Int
             ) {
+                oldText = s?.toString() ?: ""
             }
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                val args = HashMap<String, Any>()
+                args["start"] = start
+                args["before"] = before
+                args["count"] = count
+                args["oldText"] = oldText
+                args["newText"] = s?.toString() ?: ""
+                methodChannel.invokeMethod("onTextChange", args)
             }
             override fun afterTextChanged(s: Editable?) {
-                methodChannel.invokeMethod("onTextChange", s?.toString() ?: "")
             }
         })
         areEditor.setOnSelectionChanged { selStart, selEnd ->

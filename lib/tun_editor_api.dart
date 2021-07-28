@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:tun_editor/models/documents/attribute.dart';
@@ -17,8 +19,14 @@ class TunEditorApi {
   Future<bool?> _onMethodCall(MethodCall call) async {
     switch (call.method) {
       case 'onTextChange':
-        // print('on text change: ${call.arguments}');
-        _handler.onTextChange(call.arguments);
+        final args = call.arguments as Map<dynamic, dynamic>;
+        final start = args["start"] as int;
+        final before = args["before"] as int;
+        final count = args["count"] as int;
+        final oldText = args["oldText"] as String;
+        final newText = args["newText"] as String;
+        debugPrint("onTextChang: $start, $before, $count");
+        _handler.onTextChange(start, before, count, oldText, newText);
         break;
 
       case 'onSelectionChanged':
@@ -107,6 +115,9 @@ class TunEditorApi {
 }
 
 mixin TunEditorHandler on ChangeNotifier {
-  void onTextChange(String text);
+  void onTextChange(
+    int start, int before, int count,
+    String oldText, String newText,
+  );
   void onSelectionChanged(Map<dynamic, dynamic> status);
 }
