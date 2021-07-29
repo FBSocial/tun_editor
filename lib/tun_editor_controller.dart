@@ -209,18 +209,18 @@ class TunEditorController extends ChangeNotifier with TunEditorHandler, TunEdito
     }
     notifyListeners();
 
-    if (start + count >= 1) {
-      final lastChar = newText.substring(start + count - 1, start + count);
-      if (lastChar == '\n') {
-        // Delay 500ms for waitting onSelectionChanged triggered.
-        await Future.delayed(Duration(milliseconds: 200));
-        debugPrint('clear text style and type in new line');
-        _tunEditorApi?.clearTextType();
-        _tunEditorApi?.clearTextStyle();
-        _tunEditorToolbarApi?.clearTextType();
-        _tunEditorToolbarApi?.clearTextStyle();
-      }
-    }
+    // if (start + count >= 1) {
+    //   final lastChar = newText.substring(start + count - 1, start + count);
+    //   if (lastChar == '\n') {
+    //     // Delay 500ms for waitting onSelectionChanged triggered.
+    //     await Future.delayed(Duration(milliseconds: 200));
+    //     debugPrint('clear text style and type in new line');
+    //     _tunEditorApi?.clearTextType();
+    //     _tunEditorApi?.clearTextStyle();
+    //     _tunEditorToolbarApi?.clearTextType();
+    //     _tunEditorToolbarApi?.clearTextStyle();
+    //   }
+    // }
   }
 
   @override
