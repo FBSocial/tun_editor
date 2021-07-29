@@ -4,6 +4,7 @@ import android.content.Context
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
+import com.chinalwb.are.Util
 import com.chinalwb.are.styles.toolbar.ARE_ToolbarDefault
 import com.chinalwb.are.styles.toolitems.*
 import com.chinalwb.are.styles.toolitems.styles.ARE_Style_FontSize
@@ -251,6 +252,18 @@ internal class TunEditorView(
                 areEditor.setSelection(selStart, selEnd)
                 result.success(null)
             }
+            "formatSelectionLines" -> {
+                // Work for line formatter.
+                val attr = call.arguments as? String ?: ""
+                val lines = Util.getCurrentSelectionLines(areEditor)
+                val startIndex = Util.getThisLineStart(areEditor, lines[0])
+                val endIndex = Util.getThisLineEnd(areEditor, lines[1])
+                if (startIndex > endIndex || startIndex == -1 || endIndex == -1) {
+                    println("invalid start or end index in lines: $startIndex $endIndex")
+                    return
+                }
+                formatText(attr, startIndex, endIndex - startIndex)
+            }
             "formatText" -> {
                 val args = call.arguments as? Map<*, *> ?: return
                 val attr = args["attribute"] as? String ?: return
@@ -317,16 +330,16 @@ internal class TunEditorView(
             } else {
                 FONT_SIZE_NORMAL
             }
-            fontSizeStyle.onFontSizeChange(lastHeadlineFontSize)
         } else {
             // Update new font size if font size changed.
             isShowHeadline = true
             lastHeadlineFontSize = fontSize
-            fontSizeStyle.onFontSizeChange(lastHeadlineFontSize)
         }
+        fontSizeStyle.onFontSizeChange(lastHeadlineFontSize)
     }
 
     private fun formatText(attr: String, index: Int, len: Int) {
+        println("format text: $attr $index $len")
         when (attr) {
             "header1" -> {
                 val fontSizeStyle = (areToolbarItemFontSize.style as? ARE_Style_FontSize) ?: return

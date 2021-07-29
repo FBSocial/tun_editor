@@ -49,8 +49,9 @@ class TunEditorController extends ChangeNotifier with TunEditorHandler, TunEdito
     _tunEditorApi?.updateSelection(textSelection);
   }
 
-  void formatSelection(Attribute attribute) {
-    formatText(selection.start, selection.end - selection.start, attribute);
+  void formatSelectionLines(Attribute attribute) {
+    // formatText(selection.start, selection.end - selection.start, attribute);
+    _tunEditorApi?.formatSelectionLines(attribute);
   }
 
   void formatText(int index, int len, Attribute attribute) {
@@ -125,8 +126,8 @@ class TunEditorController extends ChangeNotifier with TunEditorHandler, TunEdito
 
   @override
   void setHeadline1() {
-    _tunEditorApi?.setHeadline1();
-    formatSelection(Attribute.h1);
+    // _tunEditorApi?.setHeadline1();
+    formatSelectionLines(Attribute.h1);
   }
   @override
   void setHeadline2() => _tunEditorApi?.setHeadline2();
@@ -163,11 +164,11 @@ class TunEditorController extends ChangeNotifier with TunEditorHandler, TunEdito
 
   // =========== Tun editor handler ===========
   @override
-  void onTextChange(
+  Future<void> onTextChange(
     int start, int before, int count,
     String oldText, String newText,
     String style,
-  ) {
+  ) async {
     final attrs = _getAttributes(style);
     if (before <= 0) {
       // Insert.
@@ -211,6 +212,8 @@ class TunEditorController extends ChangeNotifier with TunEditorHandler, TunEdito
     if (start + count >= 1) {
       final lastChar = newText.substring(start + count - 1, start + count);
       if (lastChar == '\n') {
+        // Delay 500ms for waitting onSelectionChanged triggered.
+        await Future.delayed(Duration(milliseconds: 200));
         debugPrint('clear text style and type in new line');
         _tunEditorApi?.clearTextType();
         _tunEditorApi?.clearTextStyle();

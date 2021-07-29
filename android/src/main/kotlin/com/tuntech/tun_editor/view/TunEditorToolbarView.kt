@@ -341,7 +341,6 @@ internal class TunEditorToolbarView(
     }
 
     private fun setBoldStatus(isChecked: Boolean) {
-        println("set bold status: $isChecked")
         isBoldEnabled = isChecked
         if (isChecked) {
             ibBold.setBackgroundResource(R.drawable.bg_toolbar_item_focused)

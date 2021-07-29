@@ -110,6 +110,9 @@ class TunEditorApi {
       'selEnd': selection.extentOffset,
     });
   }
+  void formatSelectionLines(Attribute attribute) {
+    _channel.invokeMethod('formatSelectionLines', attribute.uniqueKey);
+  }
   void formatText(int index, int len, Attribute attribute) {
     _channel.invokeMethod('formatText', {
       'attribute': attribute.uniqueKey,
@@ -142,7 +145,7 @@ class TunEditorApi {
 }
 
 mixin TunEditorHandler on ChangeNotifier {
-  void onTextChange(
+  Future<void> onTextChange(
     int start, int before, int count,
     String oldText, String newText,
     String style,
