@@ -35,6 +35,8 @@ class TunEditorController extends ChangeNotifier with TunEditorHandler, TunEdito
   @override
   void dispose() {
     _subToolbarListeners.clear();
+    _tunEditorApi = null;
+    _tunEditorToolbarApi = null;
 
     super.dispose();
   }
@@ -47,11 +49,6 @@ class TunEditorController extends ChangeNotifier with TunEditorHandler, TunEdito
     }
     _selection = textSelection;
     _tunEditorApi?.updateSelection(textSelection);
-  }
-
-  void formatSelectionLines(Attribute attribute) {
-    // formatText(selection.start, selection.end - selection.start, attribute);
-    _tunEditorApi?.formatSelectionLines(attribute);
   }
 
   void formatText(int index, int len, Attribute attribute) {
@@ -114,53 +111,24 @@ class TunEditorController extends ChangeNotifier with TunEditorHandler, TunEdito
 
   // =========== Tun editor toolbar handler ===========
   @override
-  void undo() => _tunEditorApi?.undo();
-  @override
-  void redo() =>_tunEditorApi?.redo();
-  @override
-  void clearTextType() => _tunEditorApi?.clearTextType();
-  @override
-  void clearTextStyle() => _tunEditorApi?.clearTextStyle();
-  @override
-  void testInsertAt() => _tunEditorApi?.setHtml();
-
-  @override
-  void setHeadline1() {
-    // _tunEditorApi?.setHeadline1();
-    formatSelectionLines(Attribute.h1);
+  void onAtClick() {
   }
   @override
-  void setHeadline2() => _tunEditorApi?.setHeadline2();
+  void onImageClick() {
+  }
   @override
-  void setHeadline3() => _tunEditorApi?.setHeadline3();
-  @override
-  void setList() => _tunEditorApi?.setList();
-  @override
-  void setOrderedList() => _tunEditorApi?.setOrderedList();
-  @override
-  void insertDivider() => _tunEditorApi?.insertDivider();
-  @override
-  void setQuote() => _tunEditorApi?.setQuote();
-  @override
-  void setCodeBlock() => _tunEditorApi?.setCodeBlock();
-
-  @override
-  void setBold() => _tunEditorApi?.setBold();
-  @override
-  void setItalic() => _tunEditorApi?.setItalic();
-  @override
-  void setUnderline() => _tunEditorApi?.setUnderline();
-  @override
-  void setStrikeThrough() => _tunEditorApi?.setStrikeThrough();
-
+  void onEmojiClick() {
+  }
   @override
   void onSubToolbarToggle(bool isShow) {
     for (final listener in _subToolbarListeners) {
       listener.call(isShow);
     }
   }
-
-  Future<String> getHtml() => _tunEditorApi?.getHtml() ?? Future.value("");
+  @override
+  void setTextType(String textType) {
+    _tunEditorApi?.setTextType(textType);
+  }
 
   // =========== Tun editor handler ===========
   @override
@@ -176,8 +144,6 @@ class TunEditorController extends ChangeNotifier with TunEditorHandler, TunEdito
           ..retain(start)
           ..insert(newText.substring(start, start + count), attrs);
       document.compose(delta, ChangeSource.LOCAL);
-      // document.insert(start, newText.substring(start, start + count));
-      // notifyListeners();
 
     } else {
       if (count <= 0) {
@@ -186,8 +152,6 @@ class TunEditorController extends ChangeNotifier with TunEditorHandler, TunEdito
             ..retain(start)
             ..delete(before);
         document.compose(delta, ChangeSource.LOCAL);
-        // document .delete(start, before);
-        // notifyListeners();
 
       } else {
         // Replace.
@@ -199,28 +163,9 @@ class TunEditorController extends ChangeNotifier with TunEditorHandler, TunEdito
             ..delete(before);
         document.compose(insertDelta, ChangeSource.LOCAL);
         document.compose(deleteDelta, ChangeSource.LOCAL);
-        // final delta = Delta()
-        //     ..retain(start + before)
-        //     ..delete(before);
-        // delta.insert(newText.substring(start, start + count), styleVal.toJson());
-        // document.replace(start, before, newText.substring(start, start + count));
-        // notifyListeners();
       }
     }
     notifyListeners();
-
-    // if (start + count >= 1) {
-    //   final lastChar = newText.substring(start + count - 1, start + count);
-    //   if (lastChar == '\n') {
-    //     // Delay 500ms for waitting onSelectionChanged triggered.
-    //     await Future.delayed(Duration(milliseconds: 200));
-    //     debugPrint('clear text style and type in new line');
-    //     _tunEditorApi?.clearTextType();
-    //     _tunEditorApi?.clearTextStyle();
-    //     _tunEditorToolbarApi?.clearTextType();
-    //     _tunEditorToolbarApi?.clearTextStyle();
-    //   }
-    // }
   }
 
   @override

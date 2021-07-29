@@ -1,19 +1,17 @@
 package com.tuntech.tun_editor.view
 
 import android.content.Context
-import android.graphics.Color
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
-import android.view.ViewGroup
 import android.widget.ScrollView
-import com.chinalwb.are.Util
 import com.tuntech.tun_editor.utils.SelectionUtil
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.platform.PlatformView
 import java.util.*
+import kotlin.collections.ArrayList
 
 internal class TunEditorView(
     context: Context,
@@ -27,6 +25,21 @@ internal class TunEditorView(
         const val FONT_SIZE_HEADLINE_2: Int = 40
         const val FONT_SIZE_HEADLINE_3: Int = 32
         const val FONT_SIZE_NORMAL: Int = 18
+
+        const val INVOKE_METHOD_ON_TEXT_CHANGE = "onTextChange"
+        const val INVOKE_METHOD_ON_SELECTION_CHANGED = "onSelectionChanged"
+
+        const val HANDLE_METHOD_UNDO = "undo"
+        const val HANDLE_METHOD_REDO = "redo"
+        const val HANDLE_METHOD_CLEAR_TEXT_TYPE = "clearTextType"
+        const val HANDLE_METHOD_CLEAR_TEXT_STYLE = "clearTextStyle"
+        const val HANDLE_METHOD_SET_TEXT_TYPE = "setTextType"
+        const val HANDLE_METHOD_SET_TEXT_STYLE = "setTextStyle"
+        const val HANDLE_METHOD_UPDATE_SELECTION = "updateSelection"
+        const val HANDLE_METHOD_FORMAT_TEXT = "formatText"
+        const val HANDLE_METHOD_REPLACE_TEXT = "replaceText"
+        const val HANDLE_METHOD_INSERT = "insert"
+        const val HANDLE_METHOD_INSERT_IMAGE = "insertImage"
     }
 
     // View.
@@ -50,10 +63,6 @@ internal class TunEditorView(
     }
 
     init {
-        areEditor.layoutParams = ViewGroup.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.MATCH_PARENT
-        )
         scrollView.isFillViewport = true
         scrollView.addView(areEditor)
 
@@ -74,7 +83,7 @@ internal class TunEditorView(
                 args["oldText"] = oldText
                 args["newText"] = s?.toString() ?: ""
                 args["style"] = currentStyle
-                methodChannel.invokeMethod("onTextChange", args)
+                methodChannel.invokeMethod(INVOKE_METHOD_ON_TEXT_CHANGE, args)
             }
             override fun afterTextChanged(s: Editable?) {
             }
@@ -83,7 +92,7 @@ internal class TunEditorView(
             val res = SelectionUtil.checkSelectionStyle(areEditor.editableText, selStart, selEnd)
             currentStyle = res["style"] as? String ?: ""
             println("on selection changed $selStart, $selEnd: $currentStyle")
-            methodChannel.invokeMethod("onSelectionChanged", res)
+            methodChannel.invokeMethod(INVOKE_METHOD_ON_SELECTION_CHANGED, res)
         }
         if (creationParams?.containsKey("place_holder") == true) {
             val placeHolder: String = (creationParams["place_holder"] as? String) ?: ""
@@ -94,93 +103,40 @@ internal class TunEditorView(
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
         when (call.method) {
             // Common tools.
-            "undo" -> {
+            HANDLE_METHOD_UNDO -> {
                 result.success(null)
             }
-            "redo" -> {
+            HANDLE_METHOD_REDO -> {
                 result.success(null)
             }
-            "clearTextType" -> {
+            HANDLE_METHOD_CLEAR_TEXT_TYPE -> {
                 areEditor.clearTextType()
                 result.success(null)
             }
-            "clearTextStyle" -> {
+            HANDLE_METHOD_CLEAR_TEXT_STYLE -> {
                 areEditor.clearTextStyle()
                 result.success(null)
             }
-
-            // Text types.
-            "setHeadline1" -> {
-                areEditor.setTextType(Editor.TEXT_TYPE_HEADLINE1)
+            HANDLE_METHOD_SET_TEXT_TYPE -> {
+                val textType: String = call.arguments as? String ?: Editor.TEXT_TYPE_NORMAL
+                areEditor.setTextType(textType)
                 result.success(null)
             }
-            "setHeadline2" -> {
-                areEditor.setTextType(Editor.TEXT_TYPE_HEADLINE2)
+            HANDLE_METHOD_SET_TEXT_STYLE -> {
+                val textStyle: List<String> = (call.arguments as? List<*> ?: ArrayList<String>()).map {
+                    return@map it as String? ?: ""
+                }
+                areEditor.setTextStyle(textStyle)
                 result.success(null)
             }
-            "setHeadline3" -> {
-                areEditor.setTextType(Editor.TEXT_TYPE_HEADLINE3)
-                result.success(null)
-            }
-            "setList" -> {
-                areEditor.setTextType(Editor.TEXT_TYPE_LIST_BULLET)
-                result.success(null)
-            }
-            "setOrderedList" -> {
-                areEditor.setTextType(Editor.TEXT_TYPE_LIST_ORDERED)
-                result.success(null)
-            }
-            "insertDivider" -> {
-                // TODO Insert divider.
-                result.success(null)
-            }
-            "setQuote" -> {
-                areEditor.setTextType(Editor.TEXT_TYPE_QUOTE)
-                result.success(null)
-            }
-            "setCodeBlock" -> {
-                areEditor.setTextType(Editor.TEXT_TYPE_CODE_BLOCK)
-                result.success(null)
-            }
-
-            // Text styles.
-            "setBold" -> {
-                areEditor.setTextStyle(listOf(Editor.TEXT_STYLE_BOLD))
-                result.success(null)
-            }
-            "setItalic" -> {
-                areEditor.setTextStyle(listOf(Editor.TEXT_STYLE_ITALIC))
-                result.success(null)
-            }
-            "setUnderline" -> {
-                areEditor.setTextStyle(listOf(Editor.TEXT_STYLE_UNDERLINE))
-                result.success(null)
-            }
-            "setStrikeThrough" -> {
-                areEditor.setTextStyle(listOf(Editor.TEXT_STYLE_STRIKE_THROUGH))
-                result.success(null)
-            }
-
-            "updateSelection" -> {
+            HANDLE_METHOD_UPDATE_SELECTION -> {
                 val args = call.arguments as? Map<*, *> ?: return
                 val selStart = args["selStart"] as? Int ?: 0
                 val selEnd = args["selEnd"] as? Int ?: 0
                 areEditor.setSelection(selStart, selEnd)
                 result.success(null)
             }
-            "formatSelectionLines" -> {
-                // Work for line formatter.
-                val attr = call.arguments as? String ?: ""
-                val lines = Util.getCurrentSelectionLines(areEditor)
-                val startIndex = Util.getThisLineStart(areEditor, lines[0])
-                val endIndex = Util.getThisLineEnd(areEditor, lines[1])
-                if (startIndex > endIndex || startIndex == -1 || endIndex == -1) {
-                    println("invalid start or end index in lines: $startIndex $endIndex")
-                    return
-                }
-                areEditor.formatText(attr, startIndex, endIndex - startIndex)
-            }
-            "formatText" -> {
+            HANDLE_METHOD_FORMAT_TEXT -> {
                 val args = call.arguments as? Map<*, *> ?: return
                 val attr = args["attribute"] as? String ?: return
                 var index = args["index"] as? Int ?: 0
@@ -194,7 +150,7 @@ internal class TunEditorView(
                 areEditor.formatText(attr, index, len)
                 result.success(null)
             }
-            "replaceText" -> {
+            HANDLE_METHOD_REPLACE_TEXT -> {
                 val args = call.arguments as? Map<*, *> ?: return
                 val index = args["index"] as? Int ?: 0
                 val len = args["len"] as? Int ?: 0
@@ -206,8 +162,9 @@ internal class TunEditorView(
                 }
                 areEditor.text =
                     areEditor.editableText.replace(index, index + len, data)
+                result.success(null)
             }
-            "insert" -> {
+            HANDLE_METHOD_INSERT -> {
                 val args = call.arguments as? Map<*, *> ?: return
                 val index = args["index"] as? Int ?: 0
                 val data = args["data"] as? String ?: ""
@@ -224,8 +181,9 @@ internal class TunEditorView(
                     areEditor.text = areEditor.editableText.insert(index, data)
                 }
                 println("new text: ${areEditor.text} $index $data")
+                result.success(null)
             }
-            "insertImage" -> {
+            HANDLE_METHOD_INSERT_IMAGE -> {
                 // TODO Insert image.
             }
 

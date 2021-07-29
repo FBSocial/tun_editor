@@ -56,62 +56,17 @@ class TunEditorApi {
   void clearTextStyle() {
     _channel.invokeMethod('clearTextStyle');
   }
-
-  // Text types.
-  void setHeadline1() {
-    _channel.invokeMethod('setHeadline1');
+  void setTextType(String textType) {
+    _channel.invokeMethod('setTextType', textType);
   }
-  void setHeadline2() {
-    _channel.invokeMethod('setHeadline2');
-  }
-  void setHeadline3() {
-    _channel.invokeMethod('setHeadline3');
-  }
-  void setList() {
-    _channel.invokeMethod('setList');
-  }
-  void setOrderedList() {
-    _channel.invokeMethod('setOrderedList');
-  }
-  void insertDivider() {
-    _channel.invokeMethod('insertDivider');
-  }
-  void setQuote() {
-    _channel.invokeMethod('setQuote');
-  }
-  void setCodeBlock() {
-    _channel.invokeMethod('setCodeBlock');
-  }
-
-  // Text styles.
-  void setBold() {
-    _channel.invokeMethod('setBold');
-  }
-  void setItalic() {
-    _channel.invokeMethod('setItalic');
-  }
-  void setUnderline() {
-    _channel.invokeMethod('setUnderline');
-  }
-  void setStrikeThrough() {
-    _channel.invokeMethod('setStrikeThrough');
-  }
-
-  void setHtml() {
-    _channel.invokeMethod('setHtml');
-  }
-  Future<String> getHtml() async {
-    final String res = await _channel.invokeMethod('getHtml');
-    return res;
+  void setTextStyle(String textStyle) {
+    _channel.invokeMethod('setTextStyle', textStyle);
   }
   void updateSelection(TextSelection selection) {
     _channel.invokeMethod('updateSelection', {
       'selStart': selection.baseOffset,
       'selEnd': selection.extentOffset,
     });
-  }
-  void formatSelectionLines(Attribute attribute) {
-    _channel.invokeMethod('formatSelectionLines', attribute.uniqueKey);
   }
   void formatText(int index, int len, Attribute attribute) {
     _channel.invokeMethod('formatText', {
@@ -140,6 +95,8 @@ class TunEditorApi {
       'replaceLength': replaceLength,
       'autoAppendNewlineAfterImage': autoAppendNewlineAfterImage,
     });
+  }
+  void insertImage() {
   }
 
 }

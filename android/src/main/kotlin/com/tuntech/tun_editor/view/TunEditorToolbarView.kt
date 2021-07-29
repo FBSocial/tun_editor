@@ -19,6 +19,16 @@ internal class TunEditorToolbarView(
     messenger: BinaryMessenger
 ) : PlatformView, MethodChannel.MethodCallHandler {
 
+    companion object {
+        const val INVOKE_METHOD_ON_AT_CLICK = "onAtClick"
+        const val INVOKE_METHOD_ON_IMAGE_CLICK = "onImageClick"
+        const val INVOKE_METHOD_ON_EMOJI = "onEmojiClick"
+        const val INVOKE_METHOD_ON_SUB_TOOLBAR_TOGGLE = "onSubToolbarToggle"
+        const val INVOKE_METHOD_SET_TEXT_TYPE = "setTextType"
+
+        const val HANDLE_METHOD_ON_SELECTION_CHANGED = "onSelectionChanged"
+    }
+
     // UI related.
     // FIXME use correct parent view.
     private val toolbar: View = LayoutInflater.from(context).inflate(R.layout.editor_toolbar, null)
@@ -56,13 +66,7 @@ internal class TunEditorToolbarView(
     private var isShowTextStyle = false
 
     // Text types state.
-    private var isHeadline1Enabled = false
-    private var isHeadline2Enabled = false
-    private var isHeadline3Enabled = false
-    private var isListEnabled = false
-    private var isOrderedListEnabled = false
-    private var isQuoteEnabled = false
-    private var isCodeBlockEnabled = false
+    private var currentTextType: String = Editor.TEXT_TYPE_NORMAL
 
     // Text style state.
     private var isBoldEnabled = false
@@ -84,50 +88,28 @@ internal class TunEditorToolbarView(
 
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
         when (call.method) {
-            "onSelectionChanged" -> {
+            HANDLE_METHOD_ON_SELECTION_CHANGED -> {
                 val status = call.arguments as? Map<*, *> ?: return
 
-                val isHeadline1 = status["isHeadline1"] as? Boolean ?: false
-                val isHeadline2 = status["isHeadline2"] as? Boolean ?: false
-                val isHeadline3 = status["isHeadline3"] as? Boolean ?: false
-                val isList = status["isList"] as? Boolean ?: false
-                val isOrderedList = status["isOrderedList"] as? Boolean ?: false
-                val isQuote = status["isQuote"] as? Boolean ?: false
-                val isCodeBlock = status["isCodeBlock"] as? Boolean ?: false
+                // Refresh text type.
+                currentTextType = when {
+                    status["isHeadline1"] == true -> Editor.TEXT_TYPE_HEADLINE1
+                    status["isHeadline2"] == true -> Editor.TEXT_TYPE_HEADLINE1
+                    status["isHeadline3"] == true -> Editor.TEXT_TYPE_HEADLINE1
+                    status["isList"] == true -> Editor.TEXT_TYPE_HEADLINE1
+                    status["isOrderedList"] == true -> Editor.TEXT_TYPE_HEADLINE1
+                    status["isQuote"] == true -> Editor.TEXT_TYPE_HEADLINE1
+                    status["isCodeBlock"] == true -> Editor.TEXT_TYPE_HEADLINE1
+                    else -> Editor.TEXT_TYPE_NORMAL
+                }
+                refreshTextTypeView()
 
+                // Refresh text style.
                 val isBold = status["isBold"] as? Boolean ?: false
                 val isItalic = status["isItalic"] as? Boolean ?: false
                 val isUnderline = status["isUnderline"] as? Boolean ?: false
                 val isStrikeThrough = status["isStrikeThrough"] as? Boolean ?: false
-
-                setHeadline1Status(isHeadline1)
-                setHeadline2Status(isHeadline2)
-                setHeadline3Status(isHeadline3)
-                setListStatus(isList)
-                setOrderedListStatus(isOrderedList)
-                setQuoteStatus(isQuote)
-                setCodeBlockStatus(isCodeBlock)
-
-                setBoldStatus(isBold)
-                setItalicStatus(isItalic)
-                setUnderlineStatus(isUnderline)
-                setStrikeThroughStatus(isStrikeThrough)
                 result.success(null)
-            }
-            "clearTextType" -> {
-                setHeadline1Status(false)
-                setHeadline2Status(false)
-                setHeadline3Status(false)
-                setListStatus(false)
-                setOrderedListStatus(false)
-                setQuoteStatus(false)
-                setCodeBlockStatus(false)
-            }
-            "clearTextStyle" -> {
-                setBoldStatus(false)
-                setItalicStatus(false)
-                setUnderlineStatus(false)
-                setStrikeThroughStatus(false)
             }
 
             else -> {
@@ -147,76 +129,61 @@ internal class TunEditorToolbarView(
 
         // Text type.
         ibHeadline1.setOnClickListener {
-            setHeadline1Status(!isHeadline1Enabled)
-            methodChannel.invokeMethod("setHeadline1", isHeadline1Enabled)
+            toggleTextType(Editor.TEXT_TYPE_HEADLINE1)
         }
         ibHeadline2.setOnClickListener {
-            setHeadline2Status(!isHeadline2Enabled)
-            methodChannel.invokeMethod("setHeadline2", isHeadline2Enabled)
+            toggleTextType(Editor.TEXT_TYPE_HEADLINE2)
         }
         ibHeadline3.setOnClickListener {
-            setHeadline3Status(!isHeadline3Enabled)
-            methodChannel.invokeMethod("setHeadline3", isHeadline3Enabled)
+            toggleTextType(Editor.TEXT_TYPE_HEADLINE3)
         }
         ibList.setOnClickListener {
-            setListStatus(isListEnabled)
-            methodChannel.invokeMethod("setList", isListEnabled)
+            toggleTextType(Editor.TEXT_TYPE_LIST_BULLET)
         }
         ibOrderedList.setOnClickListener {
-            setOrderedListStatus(!isOrderedListEnabled)
-            methodChannel.invokeMethod("setOrderedList", isOrderedListEnabled)
+            toggleTextType(Editor.TEXT_TYPE_LIST_ORDERED)
         }
         ibDivider.setOnClickListener {
-            methodChannel.invokeMethod("insertDivider", null)
+            // TODO Divider.
         }
         ibQuote.setOnClickListener {
-            setQuoteStatus(!isQuoteEnabled)
-            methodChannel.invokeMethod("setQuote", isQuoteEnabled)
+            toggleTextType(Editor.TEXT_TYPE_QUOTE)
         }
         ibCodeBlock.setOnClickListener {
-            setCodeBlockStatus(!isCodeBlockEnabled)
-            methodChannel.invokeMethod("setCodeBlock", isCodeBlockEnabled)
+            toggleTextType(Editor.TEXT_TYPE_CODE_BLOCK)
         }
 
         // Text style.
         ibBold.setOnClickListener {
-            setBoldStatus(!isBoldEnabled)
-            methodChannel.invokeMethod("setBold", isBoldEnabled)
         }
         ibItalic.setOnClickListener {
-            setItalicStatus(!isItalicEnabled)
-            methodChannel.invokeMethod("setItalic", isItalicEnabled)
         }
         ibUnderline.setOnClickListener {
-            setUnderlineStatus(!isUnderlineEnabled)
-            methodChannel.invokeMethod("setUnderline", isUnderlineEnabled)
         }
         ibStrikeThrough.setOnClickListener {
-            setStrikeThroughStatus(!isStrikeThroughEnabled)
-            methodChannel.invokeMethod("setStrikeThrough", isItalicEnabled)
         }
 
         // Toolbar items.
         ibAt.setOnClickListener {
-            methodChannel.invokeMethod("onAtClick", null)
+            methodChannel.invokeMethod(INVOKE_METHOD_ON_AT_CLICK, null)
         }
         ibImage.setOnClickListener {
-            methodChannel.invokeMethod("onImageClick", null)
+            methodChannel.invokeMethod(INVOKE_METHOD_ON_IMAGE_CLICK, null)
         }
         ibEmoji.setOnClickListener {
-            methodChannel.invokeMethod("onEmojiClick", null)
+            methodChannel.invokeMethod(INVOKE_METHOD_ON_EMOJI, null)
         }
         ibTextType.setOnClickListener {
-            toggleTextType()
+            toggleSubToolbarTextType()
             toggleSubToolbarPlaceHolder()
         }
         ibTextStyle.setOnClickListener {
-            toggleTextStyle()
+            toggleSubToolbarTextStyle()
             toggleSubToolbarPlaceHolder()
         }
     }
 
-    private fun toggleTextType() {
+    private fun toggleSubToolbarTextType() {
         val isVisible = if (isShowTextType) {
             ibTextType.setBackgroundColor(Color.TRANSPARENT)
             View.GONE
@@ -233,10 +200,10 @@ internal class TunEditorToolbarView(
         ibTextStyle.setBackgroundColor(Color.TRANSPARENT)
         isShowTextStyle = false
 
-        methodChannel.invokeMethod("onSubToolbarToggle", isShowTextStyle || isShowTextType)
+        methodChannel.invokeMethod(INVOKE_METHOD_ON_SUB_TOOLBAR_TOGGLE, isShowTextStyle || isShowTextType)
     }
 
-    private fun toggleTextStyle() {
+    private fun toggleSubToolbarTextStyle() {
         val isVisible = if (isShowTextStyle) {
             ibTextStyle.setBackgroundColor(Color.TRANSPARENT)
             View.GONE
@@ -253,7 +220,7 @@ internal class TunEditorToolbarView(
         ibTextType.setBackgroundColor(Color.TRANSPARENT)
         isShowTextType = false
 
-        methodChannel.invokeMethod("onSubToolbarToggle", isShowTextStyle || isShowTextType)
+        methodChannel.invokeMethod(INVOKE_METHOD_ON_SUB_TOOLBAR_TOGGLE, isShowTextStyle || isShowTextType)
     }
 
     private fun toggleSubToolbarPlaceHolder() {
@@ -265,114 +232,56 @@ internal class TunEditorToolbarView(
         }
     }
 
-    private fun setHeadline1Status(isChecked: Boolean) {
-        isHeadline1Enabled = isChecked
-        if (isChecked) {
-            ibHeadline1.setBackgroundResource(R.drawable.bg_toolbar_item_focused)
-            ibHeadline2.setBackgroundColor(Color.TRANSPARENT)
-            ibHeadline3.setBackgroundColor(Color.TRANSPARENT)
-            isHeadline2Enabled = false
-            isHeadline3Enabled = false
+    private fun toggleTextType(textType: String) {
+        if (currentTextType == textType) {
+            // Reset normal text type.
+            currentTextType = Editor.TEXT_TYPE_NORMAL
+            refreshTextTypeView()
+            methodChannel.invokeMethod(INVOKE_METHOD_SET_TEXT_TYPE, Editor.TEXT_TYPE_NORMAL)
         } else {
-            ibHeadline1.setBackgroundColor(Color.TRANSPARENT)
+            // Set new text type.
+            currentTextType = textType
+            refreshTextTypeView()
+            methodChannel.invokeMethod(INVOKE_METHOD_SET_TEXT_TYPE, textType)
         }
     }
 
-    private fun setHeadline2Status(isChecked: Boolean) {
-        isHeadline2Enabled = isChecked
-        if (isChecked) {
-            ibHeadline2.setBackgroundResource(R.drawable.bg_toolbar_item_focused)
-            ibHeadline1.setBackgroundColor(Color.TRANSPARENT)
-            ibHeadline3.setBackgroundColor(Color.TRANSPARENT)
-            isHeadline1Enabled = false
-            isHeadline3Enabled = false
-        } else {
-            ibHeadline2.setBackgroundColor(Color.TRANSPARENT)
-        }
-    }
+    private fun refreshTextTypeView() {
+        // Disable all text type.
+        val disabledColor = Color.TRANSPARENT
+        val enabledBg = R.drawable.bg_toolbar_item_focused
 
-    private fun setHeadline3Status(isChecked: Boolean) {
-        isHeadline3Enabled = isChecked
-        if (isChecked) {
-            ibHeadline3.setBackgroundResource(R.drawable.bg_toolbar_item_focused)
-            ibHeadline1.setBackgroundColor(Color.TRANSPARENT)
-            ibHeadline2.setBackgroundColor(Color.TRANSPARENT)
-            isHeadline1Enabled = false
-            isHeadline2Enabled = false
-        } else {
-            ibHeadline3.setBackgroundColor(Color.TRANSPARENT)
-        }
-    }
+        ibHeadline1.setBackgroundColor(disabledColor)
+        ibHeadline2.setBackgroundColor(disabledColor)
+        ibHeadline3.setBackgroundColor(disabledColor)
+        ibList.setBackgroundColor(disabledColor)
+        ibOrderedList.setBackgroundColor(disabledColor)
+        ibQuote.setBackgroundColor(disabledColor)
+        ibCodeBlock.setBackgroundColor(disabledColor)
 
-    private fun setListStatus(isChecked: Boolean) {
-        isListEnabled = isChecked
-        if (isChecked) {
-            ibList.setBackgroundResource(R.drawable.bg_toolbar_item_focused)
-        } else {
-            ibList.setBackgroundColor(Color.TRANSPARENT)
-        }
-    }
-
-    private fun setOrderedListStatus(isChecked: Boolean) {
-        isOrderedListEnabled = isChecked
-        if (isChecked) {
-            ibOrderedList.setBackgroundResource(R.drawable.bg_toolbar_item_focused)
-        } else {
-            ibOrderedList.setBackgroundColor(Color.TRANSPARENT)
-        }
-    }
-
-    private fun setQuoteStatus(isChecked: Boolean) {
-        isQuoteEnabled = isChecked
-        if (isChecked) {
-            ibQuote.setBackgroundResource(R.drawable.bg_toolbar_item_focused)
-        } else {
-            ibQuote.setBackgroundColor(Color.TRANSPARENT)
-        }
-    }
-
-    private fun setCodeBlockStatus(isChecked: Boolean) {
-        isCodeBlockEnabled = isChecked
-        if (isChecked) {
-            ibCodeBlock.setBackgroundResource(R.drawable.bg_toolbar_item_focused)
-        } else {
-            ibCodeBlock.setBackgroundColor(Color.TRANSPARENT)
-        }
-    }
-
-    private fun setBoldStatus(isChecked: Boolean) {
-        isBoldEnabled = isChecked
-        if (isChecked) {
-            ibBold.setBackgroundResource(R.drawable.bg_toolbar_item_focused)
-        } else {
-            ibBold.setBackgroundColor(Color.TRANSPARENT)
-        }
-    }
-
-    private fun setItalicStatus(isChecked: Boolean) {
-        isItalicEnabled = isChecked
-        if (isChecked) {
-            ibItalic.setBackgroundResource(R.drawable.bg_toolbar_item_focused)
-        } else {
-            ibItalic.setBackgroundColor(Color.TRANSPARENT)
-        }
-    }
-
-    private fun setUnderlineStatus(isChecked: Boolean) {
-        isUnderlineEnabled = isChecked
-        if (isChecked) {
-            ibUnderline.setBackgroundResource(R.drawable.bg_toolbar_item_focused)
-        } else {
-            ibUnderline.setBackgroundColor(Color.TRANSPARENT)
-        }
-    }
-
-    private fun setStrikeThroughStatus(isChecked: Boolean) {
-        isStrikeThroughEnabled = isChecked
-        if (isChecked) {
-            ibStrikeThrough.setBackgroundResource(R.drawable.bg_toolbar_item_focused)
-        } else {
-            ibStrikeThrough.setBackgroundColor(Color.TRANSPARENT)
+        // Enable current text type.
+        when (currentTextType) {
+            Editor.TEXT_TYPE_HEADLINE1 -> {
+                ibHeadline1.setBackgroundResource(enabledBg)
+            }
+            Editor.TEXT_TYPE_HEADLINE2 -> {
+                ibHeadline2.setBackgroundResource(enabledBg)
+            }
+            Editor.TEXT_TYPE_HEADLINE3 -> {
+                ibHeadline3.setBackgroundResource(enabledBg)
+            }
+            Editor.TEXT_TYPE_LIST_BULLET -> {
+                ibList.setBackgroundResource(enabledBg)
+            }
+            Editor.TEXT_TYPE_LIST_ORDERED -> {
+                ibOrderedList.setBackgroundResource(enabledBg)
+            }
+            Editor.TEXT_TYPE_QUOTE -> {
+                ibQuote.setBackgroundResource(enabledBg)
+            }
+            Editor.TEXT_TYPE_CODE_BLOCK -> {
+                ibCodeBlock.setBackgroundResource(enabledBg)
+            }
         }
     }
 
