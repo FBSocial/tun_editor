@@ -129,6 +129,10 @@ class TunEditorController extends ChangeNotifier with TunEditorHandler, TunEdito
   void setTextType(String textType) {
     _tunEditorApi?.setTextType(textType);
   }
+  @override
+  void setTextStyle(List<dynamic> textStyle) {
+    _tunEditorApi?.setTextStyle(textStyle);
+  }
 
   // =========== Tun editor handler ===========
   @override

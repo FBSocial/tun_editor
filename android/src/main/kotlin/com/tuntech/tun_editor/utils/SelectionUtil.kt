@@ -4,6 +4,7 @@ import android.graphics.Typeface
 import android.text.Editable
 import android.text.style.*
 import com.chinalwb.are.spans.AreUnderlineSpan
+import com.tuntech.tun_editor.view.Editor
 import com.tuntech.tun_editor.view.TunEditorView
 
 object SelectionUtil {
@@ -204,7 +205,7 @@ object SelectionUtil {
             )
             for (i in styleSpans.indices) {
                 if (styleSpans[i] is AbsoluteSizeSpan) {
-                    if ((styleSpans[i] as AbsoluteSizeSpan).size == TunEditorView.FONT_SIZE_HEADLINE_1) {
+                    if ((styleSpans[i] as AbsoluteSizeSpan).size == Editor.FONT_SIZE_HEADLINE_1) {
                         headlineExist = true
                     }
                 }
@@ -217,13 +218,13 @@ object SelectionUtil {
             )
             for (i in styleSpans.indices) {
                 if (styleSpans[i] is AbsoluteSizeSpan) {
-                    if ((styleSpans[i] as AbsoluteSizeSpan).size == TunEditorView.FONT_SIZE_HEADLINE_1) {
+                    if ((styleSpans[i] as AbsoluteSizeSpan).size == Editor.FONT_SIZE_HEADLINE_1) {
                         if (editable.getSpanStart(styleSpans[i]) <= selStart
                             && editable.getSpanEnd(styleSpans[i]) >= selEnd
                         ) {
                             headlineExist = true
                         }
-                    } else if ((styleSpans[i] as AbsoluteSizeSpan).size == TunEditorView.FONT_SIZE_HEADLINE_1) {
+                    } else if ((styleSpans[i] as AbsoluteSizeSpan).size == Editor.FONT_SIZE_HEADLINE_1) {
                         if (editable.getSpanStart(styleSpans[i]) <= selStart
                             && editable.getSpanEnd(styleSpans[i]) >= selEnd
                         ) {
@@ -245,7 +246,7 @@ object SelectionUtil {
             )
             for (i in styleSpans.indices) {
                 if (styleSpans[i] is AbsoluteSizeSpan) {
-                    if ((styleSpans[i] as AbsoluteSizeSpan).size == TunEditorView.FONT_SIZE_HEADLINE_1) {
+                    if ((styleSpans[i] as AbsoluteSizeSpan).size == Editor.FONT_SIZE_HEADLINE_1) {
                         headlineExist = true
                     }
                 }
@@ -258,13 +259,13 @@ object SelectionUtil {
             )
             for (i in styleSpans.indices) {
                 if (styleSpans[i] is AbsoluteSizeSpan) {
-                    if ((styleSpans[i] as AbsoluteSizeSpan).size == TunEditorView.FONT_SIZE_HEADLINE_2) {
+                    if ((styleSpans[i] as AbsoluteSizeSpan).size == Editor.FONT_SIZE_HEADLINE_2) {
                         if (editable.getSpanStart(styleSpans[i]) <= selStart
                             && editable.getSpanEnd(styleSpans[i]) >= selEnd
                         ) {
                             headlineExist = true
                         }
-                    } else if ((styleSpans[i] as AbsoluteSizeSpan).size == TunEditorView.FONT_SIZE_HEADLINE_2) {
+                    } else if ((styleSpans[i] as AbsoluteSizeSpan).size == Editor.FONT_SIZE_HEADLINE_2) {
                         if (editable.getSpanStart(styleSpans[i]) <= selStart
                             && editable.getSpanEnd(styleSpans[i]) >= selEnd
                         ) {
@@ -286,7 +287,7 @@ object SelectionUtil {
             )
             for (i in styleSpans.indices) {
                 if (styleSpans[i] is AbsoluteSizeSpan) {
-                    if ((styleSpans[i] as AbsoluteSizeSpan).size == TunEditorView.FONT_SIZE_HEADLINE_3) {
+                    if ((styleSpans[i] as AbsoluteSizeSpan).size == Editor.FONT_SIZE_HEADLINE_3) {
                         headlineExist = true
                     }
                 }
@@ -299,13 +300,13 @@ object SelectionUtil {
             )
             for (i in styleSpans.indices) {
                 if (styleSpans[i] is AbsoluteSizeSpan) {
-                    if ((styleSpans[i] as AbsoluteSizeSpan).size == TunEditorView.FONT_SIZE_HEADLINE_3) {
+                    if ((styleSpans[i] as AbsoluteSizeSpan).size == Editor.FONT_SIZE_HEADLINE_3) {
                         if (editable.getSpanStart(styleSpans[i]) <= selStart
                             && editable.getSpanEnd(styleSpans[i]) >= selEnd
                         ) {
                             headlineExist = true
                         }
-                    } else if ((styleSpans[i] as AbsoluteSizeSpan).size == TunEditorView.FONT_SIZE_HEADLINE_3) {
+                    } else if ((styleSpans[i] as AbsoluteSizeSpan).size == Editor.FONT_SIZE_HEADLINE_3) {
                         if (editable.getSpanStart(styleSpans[i]) <= selStart
                             && editable.getSpanEnd(styleSpans[i]) >= selEnd
                         ) {

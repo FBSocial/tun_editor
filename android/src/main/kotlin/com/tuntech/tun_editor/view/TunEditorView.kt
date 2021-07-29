@@ -21,11 +21,6 @@ internal class TunEditorView(
 ) : PlatformView, MethodChannel.MethodCallHandler {
 
     companion object {
-        const val FONT_SIZE_HEADLINE_1: Int = 48
-        const val FONT_SIZE_HEADLINE_2: Int = 40
-        const val FONT_SIZE_HEADLINE_3: Int = 32
-        const val FONT_SIZE_NORMAL: Int = 18
-
         const val INVOKE_METHOD_ON_TEXT_CHANGE = "onTextChange"
         const val INVOKE_METHOD_ON_SELECTION_CHANGED = "onSelectionChanged"
 

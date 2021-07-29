@@ -5,6 +5,7 @@ import android.graphics.Color
 import android.graphics.Typeface
 import android.os.Build
 import android.text.Editable
+import android.text.Spannable
 import android.text.Spanned
 import android.text.TextWatcher
 import android.text.style.*
@@ -14,6 +15,7 @@ import android.util.TypedValue
 import android.view.inputmethod.EditorInfo
 import androidx.appcompat.widget.AppCompatEditText
 import com.chinalwb.are.Util
+import com.chinalwb.are.spans.AreQuoteSpan
 import com.chinalwb.are.spans.ListBulletSpan
 import com.chinalwb.are.spans.ListNumberSpan
 
@@ -95,33 +97,11 @@ class Editor: AppCompatEditText {
     fun setTextStyle(styleList: List<String>) {
         mTextStyleList.clear()
         mTextStyleList.addAll(styleList)
+        formatSelectionCursor(styleList)
     }
 
     fun clearTextStyle() {
         mTextStyleList.clear()
-    }
-
-    private fun formatSelectionLines(textType: String) {
-        // Calculate the whole line's start index and end index.
-        val startLine = layout.getLineForOffset(selectionStart)
-        val endLine  = layout.getLineForOffset(selectionEnd)
-        val startIndex = Util.getThisLineStart(this, startLine)
-        val endIndex = Util.getThisLineEnd(this, endLine)
-
-        // Remove all span first.
-        editableText.getSpans(startIndex, endIndex, AbsoluteSizeSpan::class.java).forEach {
-            editableText.removeSpan(it)
-        }
-        editableText.getSpans(startIndex, endIndex, ListBulletSpan::class.java).forEach {
-            editableText.removeSpan(it)
-        }
-        editableText.getSpans(startIndex, endIndex, ListNumberSpan::class.java).forEach {
-            editableText.removeSpan(it)
-        }
-        editableText.getSpans(startIndex, endIndex, QuoteSpan::class.java).forEach {
-            editableText.removeSpan(it)
-        }
-        formatText(textType, startIndex, startIndex + endIndex)
     }
 
     fun formatText(attr: String, index: Int, len: Int) {
@@ -172,6 +152,44 @@ class Editor: AppCompatEditText {
         })
     }
 
+    private fun formatSelectionLines(textType: String) {
+        // Calculate the whole line's start index and end index.
+        val startLine = layout.getLineForOffset(selectionStart)
+        val endLine  = layout.getLineForOffset(selectionEnd)
+        val startIndex = Util.getThisLineStart(this, startLine)
+        var endIndex = Util.getThisLineEnd(this, endLine)
+        if (endIndex > 0) {
+            endIndex--
+        }
+
+        // Remove all span first.
+        removeAllSpans(startIndex, endIndex)
+        applyTextType(startIndex, endIndex, textType)
+    }
+
+    private fun formatSelectionCursor(styleList: List<String>) {
+        removeAllSpans(selectionStart, selectionEnd)
+        for (style in styleList) {
+            applyTextStyle(selectionStart, selectionEnd, style)
+        }
+    }
+
+    private fun removeAllSpans(start: Int, end: Int) {
+        // Remove all span first.
+        editableText.getSpans(start, end, AbsoluteSizeSpan::class.java).forEach {
+            editableText.removeSpan(it)
+        }
+        editableText.getSpans(start, end, ListBulletSpan::class.java).forEach {
+            editableText.removeSpan(it)
+        }
+        editableText.getSpans(start, end, ListNumberSpan::class.java).forEach {
+            editableText.removeSpan(it)
+        }
+        editableText.getSpans(start, end, AreQuoteSpan::class.java).forEach {
+            editableText.removeSpan(it)
+        }
+    }
+
     // Apply text type to the all lines between start and end.
     private fun applyTextType(start: Int, end: Int, textType: String) {
         Log.d(TAG, "apply text type: $mTextType, $start, $end")
@@ -213,8 +231,8 @@ class Editor: AppCompatEditText {
             }
             TEXT_TYPE_QUOTE -> {
                 applySpan(editableText, startIndex, endIndex, {
-                    return@applySpan QuoteSpan()
-                }, QuoteSpan::class.java)
+                    return@applySpan AreQuoteSpan()
+                }, AreQuoteSpan::class.java)
             }
             TEXT_TYPE_CODE_BLOCK -> {
                 // TODO Code block span.

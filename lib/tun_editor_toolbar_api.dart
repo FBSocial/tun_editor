@@ -36,6 +36,9 @@ class TunEditorToolbarApi {
       case 'setTextType':
         _handler.setTextType(call.arguments as String);
         break;
+      case 'setTextStyle':
+        _handler.setTextStyle(call.arguments as List<dynamic>);
+        break;
 
       default:
         throw MissingPluginException(
@@ -53,5 +56,6 @@ mixin TunEditorToolbarHandler on ChangeNotifier {
   void onEmojiClick();
   void onSubToolbarToggle(bool isShow);
   void setTextType(String textType);
+  void setTextStyle(List<dynamic> textStyle);
 
 }

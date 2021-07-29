@@ -59,7 +59,7 @@ class TunEditorApi {
   void setTextType(String textType) {
     _channel.invokeMethod('setTextType', textType);
   }
-  void setTextStyle(String textStyle) {
+  void setTextStyle(List<dynamic> textStyle) {
     _channel.invokeMethod('setTextStyle', textStyle);
   }
   void updateSelection(TextSelection selection) {

@@ -25,6 +25,8 @@ internal class TunEditorToolbarView(
         const val INVOKE_METHOD_ON_EMOJI = "onEmojiClick"
         const val INVOKE_METHOD_ON_SUB_TOOLBAR_TOGGLE = "onSubToolbarToggle"
         const val INVOKE_METHOD_SET_TEXT_TYPE = "setTextType"
+        const val INVOKE_METHOD_SET_TEXT_STYLE = "setTextStyle"
+        const val INVOKE_METHOD_INSERT_DIVIDER = "insertDivider"
 
         const val HANDLE_METHOD_ON_SELECTION_CHANGED = "onSelectionChanged"
     }
@@ -65,14 +67,9 @@ internal class TunEditorToolbarView(
     private var isShowTextType = false
     private var isShowTextStyle = false
 
-    // Text types state.
+    // Text type and text style state.
     private var currentTextType: String = Editor.TEXT_TYPE_NORMAL
-
-    // Text style state.
-    private var isBoldEnabled = false
-    private var isItalicEnabled = false
-    private var isUnderlineEnabled = false
-    private var isStrikeThroughEnabled = false
+    private var currentTextStyleList: ArrayList<String> = ArrayList()
 
     private val methodChannel = MethodChannel(messenger, "tun/editor/toolbar/${id}")
 
@@ -104,11 +101,21 @@ internal class TunEditorToolbarView(
                 }
                 refreshTextTypeView()
 
-                // Refresh text style.
-                val isBold = status["isBold"] as? Boolean ?: false
-                val isItalic = status["isItalic"] as? Boolean ?: false
-                val isUnderline = status["isUnderline"] as? Boolean ?: false
-                val isStrikeThrough = status["isStrikeThrough"] as? Boolean ?: false
+                // // Refresh text style.
+                // currentTextStyleList.clear()
+                // if (status["isBold"] == true) {
+                //     currentTextStyleList.add(Editor.TEXT_STYLE_BOLD)
+                // }
+                // if (status["isItalic"] == true) {
+                //     currentTextStyleList.add(Editor.TEXT_STYLE_ITALIC)
+                // }
+                // if (status["isUnderline"] == true) {
+                //     currentTextStyleList.add(Editor.TEXT_STYLE_UNDERLINE)
+                // }
+                // if (status["isStrikeThrough"] == true) {
+                //     currentTextStyleList.add(Editor.TEXT_STYLE_STRIKE_THROUGH)
+                // }
+                // refreshTextStyleView()
                 result.success(null)
             }
 
@@ -144,7 +151,7 @@ internal class TunEditorToolbarView(
             toggleTextType(Editor.TEXT_TYPE_LIST_ORDERED)
         }
         ibDivider.setOnClickListener {
-            // TODO Divider.
+            methodChannel.invokeMethod(INVOKE_METHOD_INSERT_DIVIDER, null)
         }
         ibQuote.setOnClickListener {
             toggleTextType(Editor.TEXT_TYPE_QUOTE)
@@ -155,12 +162,16 @@ internal class TunEditorToolbarView(
 
         // Text style.
         ibBold.setOnClickListener {
+            toggleTextStyle(Editor.TEXT_STYLE_BOLD)
         }
         ibItalic.setOnClickListener {
+            toggleTextStyle(Editor.TEXT_STYLE_ITALIC)
         }
         ibUnderline.setOnClickListener {
+            toggleTextStyle(Editor.TEXT_STYLE_UNDERLINE)
         }
         ibStrikeThrough.setOnClickListener {
+            toggleTextStyle(Editor.TEXT_STYLE_STRIKE_THROUGH)
         }
 
         // Toolbar items.
@@ -246,11 +257,23 @@ internal class TunEditorToolbarView(
         }
     }
 
+    private fun toggleTextStyle(textStyle: String) {
+        if (currentTextStyleList.contains(textStyle)) {
+            // Remove text style.
+            currentTextStyleList.remove(textStyle)
+        } else {
+            // Append text style.
+            currentTextStyleList.add(textStyle)
+        }
+        refreshTextStyleView()
+        methodChannel.invokeMethod(INVOKE_METHOD_SET_TEXT_STYLE, currentTextStyleList)
+    }
+
     private fun refreshTextTypeView() {
-        // Disable all text type.
         val disabledColor = Color.TRANSPARENT
         val enabledBg = R.drawable.bg_toolbar_item_focused
 
+        // Disable all text type.
         ibHeadline1.setBackgroundColor(disabledColor)
         ibHeadline2.setBackgroundColor(disabledColor)
         ibHeadline3.setBackgroundColor(disabledColor)
@@ -282,6 +305,32 @@ internal class TunEditorToolbarView(
             Editor.TEXT_TYPE_CODE_BLOCK -> {
                 ibCodeBlock.setBackgroundResource(enabledBg)
             }
+        }
+    }
+
+    private fun refreshTextStyleView() {
+        val disabledColor = Color.TRANSPARENT
+        val enabledBg = R.drawable.bg_toolbar_item_focused
+
+        if (currentTextStyleList.contains(Editor.TEXT_STYLE_BOLD)) {
+            ibBold.setBackgroundResource(enabledBg)
+        } else {
+            ibBold.setBackgroundColor(disabledColor)
+        }
+        if (currentTextStyleList.contains(Editor.TEXT_STYLE_ITALIC)) {
+            ibItalic.setBackgroundResource(enabledBg)
+        } else {
+            ibItalic.setBackgroundColor(disabledColor)
+        }
+        if (currentTextStyleList.contains(Editor.TEXT_STYLE_UNDERLINE)) {
+            ibUnderline.setBackgroundResource(enabledBg)
+        } else {
+            ibUnderline.setBackgroundColor(disabledColor)
+        }
+        if (currentTextStyleList.contains(Editor.TEXT_STYLE_STRIKE_THROUGH)) {
+            ibStrikeThrough.setBackgroundResource(enabledBg)
+        } else {
+            ibStrikeThrough.setBackgroundColor(disabledColor)
         }
     }
 
