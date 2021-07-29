@@ -2,11 +2,9 @@ package com.tuntech.tun_editor.utils
 
 import android.graphics.Typeface
 import android.text.Editable
-import android.text.style.CharacterStyle
-import android.text.style.QuoteSpan
-import android.text.style.StrikethroughSpan
-import android.text.style.StyleSpan
+import android.text.style.*
 import com.chinalwb.are.spans.AreUnderlineSpan
+import com.tuntech.tun_editor.view.TunEditorView
 
 object SelectionUtil {
 
@@ -198,15 +196,126 @@ object SelectionUtil {
     }
 
     private fun isHeadline1(editable: Editable, selStart: Int, selEnd: Int): Boolean {
-        return false
+        var headlineExist = false
+        if (selStart > 0 && selStart == selEnd) {
+            val styleSpans = editable.getSpans(
+                selStart - 1, selStart,
+                CharacterStyle::class.java
+            )
+            for (i in styleSpans.indices) {
+                if (styleSpans[i] is AbsoluteSizeSpan) {
+                    if ((styleSpans[i] as AbsoluteSizeSpan).size == TunEditorView.FONT_SIZE_HEADLINE_1) {
+                        headlineExist = true
+                    }
+                }
+            }
+        } else {
+            // Selection is a range
+            val styleSpans = editable.getSpans(
+                selStart, selEnd,
+                CharacterStyle::class.java
+            )
+            for (i in styleSpans.indices) {
+                if (styleSpans[i] is AbsoluteSizeSpan) {
+                    if ((styleSpans[i] as AbsoluteSizeSpan).size == TunEditorView.FONT_SIZE_HEADLINE_1) {
+                        if (editable.getSpanStart(styleSpans[i]) <= selStart
+                            && editable.getSpanEnd(styleSpans[i]) >= selEnd
+                        ) {
+                            headlineExist = true
+                        }
+                    } else if ((styleSpans[i] as AbsoluteSizeSpan).size == TunEditorView.FONT_SIZE_HEADLINE_1) {
+                        if (editable.getSpanStart(styleSpans[i]) <= selStart
+                            && editable.getSpanEnd(styleSpans[i]) >= selEnd
+                        ) {
+                            headlineExist = true
+                        }
+                    }
+                }
+            }
+        }
+        return headlineExist
     }
 
     private fun isHeadline2(editable: Editable, selStart: Int, selEnd: Int): Boolean {
-        return false
+        var headlineExist = false
+        if (selStart > 0 && selStart == selEnd) {
+            val styleSpans = editable.getSpans(
+                selStart - 1, selStart,
+                CharacterStyle::class.java
+            )
+            for (i in styleSpans.indices) {
+                if (styleSpans[i] is AbsoluteSizeSpan) {
+                    if ((styleSpans[i] as AbsoluteSizeSpan).size == TunEditorView.FONT_SIZE_HEADLINE_1) {
+                        headlineExist = true
+                    }
+                }
+            }
+        } else {
+            // Selection is a range
+            val styleSpans = editable.getSpans(
+                selStart, selEnd,
+                CharacterStyle::class.java
+            )
+            for (i in styleSpans.indices) {
+                if (styleSpans[i] is AbsoluteSizeSpan) {
+                    if ((styleSpans[i] as AbsoluteSizeSpan).size == TunEditorView.FONT_SIZE_HEADLINE_2) {
+                        if (editable.getSpanStart(styleSpans[i]) <= selStart
+                            && editable.getSpanEnd(styleSpans[i]) >= selEnd
+                        ) {
+                            headlineExist = true
+                        }
+                    } else if ((styleSpans[i] as AbsoluteSizeSpan).size == TunEditorView.FONT_SIZE_HEADLINE_2) {
+                        if (editable.getSpanStart(styleSpans[i]) <= selStart
+                            && editable.getSpanEnd(styleSpans[i]) >= selEnd
+                        ) {
+                            headlineExist = true
+                        }
+                    }
+                }
+            }
+        }
+        return headlineExist
     }
 
     private fun isHeadline3(editable: Editable, selStart: Int, selEnd: Int): Boolean {
-        return false
+        var headlineExist = false
+        if (selStart > 0 && selStart == selEnd) {
+            val styleSpans = editable.getSpans(
+                selStart - 1, selStart,
+                CharacterStyle::class.java
+            )
+            for (i in styleSpans.indices) {
+                if (styleSpans[i] is AbsoluteSizeSpan) {
+                    if ((styleSpans[i] as AbsoluteSizeSpan).size == TunEditorView.FONT_SIZE_HEADLINE_3) {
+                        headlineExist = true
+                    }
+                }
+            }
+        } else {
+            // Selection is a range
+            val styleSpans = editable.getSpans(
+                selStart, selEnd,
+                CharacterStyle::class.java
+            )
+            for (i in styleSpans.indices) {
+                if (styleSpans[i] is AbsoluteSizeSpan) {
+                    if ((styleSpans[i] as AbsoluteSizeSpan).size == TunEditorView.FONT_SIZE_HEADLINE_3) {
+                        if (editable.getSpanStart(styleSpans[i]) <= selStart
+                            && editable.getSpanEnd(styleSpans[i]) >= selEnd
+                        ) {
+                            headlineExist = true
+                        }
+                    } else if ((styleSpans[i] as AbsoluteSizeSpan).size == TunEditorView.FONT_SIZE_HEADLINE_3) {
+                        if (editable.getSpanStart(styleSpans[i]) <= selStart
+                            && editable.getSpanEnd(styleSpans[i]) >= selEnd
+                        ) {
+                            headlineExist = true
+                        }
+                    }
+                }
+            }
+        }
+        return headlineExist
     }
 
     private fun isList(editable: Editable, selStart: Int, selEnd: Int): Boolean {

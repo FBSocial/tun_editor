@@ -114,6 +114,22 @@ internal class TunEditorToolbarView(
                 setStrikeThroughStatus(isStrikeThrough)
                 result.success(null)
             }
+            "clearTextType" -> {
+                setHeadline1Status(false)
+                setHeadline2Status(false)
+                setHeadline3Status(false)
+                setListStatus(false)
+                setOrderedListStatus(false)
+                setQuoteStatus(false)
+                setCodeBlockStatus(false)
+            }
+            "clearTextStyle" -> {
+                setBoldStatus(false)
+                setItalicStatus(false)
+                setUnderlineStatus(false)
+                setStrikeThroughStatus(false)
+            }
+
             else -> {
                 result.notImplemented()
             }
@@ -132,57 +148,63 @@ internal class TunEditorToolbarView(
         // Text type.
         ibHeadline1.setOnClickListener {
             setHeadline1Status(!isHeadline1Enabled)
-            methodChannel.invokeMethod("setHeadline1", null)
+            methodChannel.invokeMethod("setHeadline1", isHeadline1Enabled)
         }
         ibHeadline2.setOnClickListener {
             setHeadline2Status(!isHeadline2Enabled)
-            methodChannel.invokeMethod("setHeadline2", null)
+            methodChannel.invokeMethod("setHeadline2", isHeadline2Enabled)
         }
         ibHeadline3.setOnClickListener {
             setHeadline3Status(!isHeadline3Enabled)
-            methodChannel.invokeMethod("setHeadline3", null)
+            methodChannel.invokeMethod("setHeadline3", isHeadline3Enabled)
         }
         ibList.setOnClickListener {
             setListStatus(isListEnabled)
-            methodChannel.invokeMethod("setList", null)
+            methodChannel.invokeMethod("setList", isListEnabled)
         }
         ibOrderedList.setOnClickListener {
             setOrderedListStatus(!isOrderedListEnabled)
-            methodChannel.invokeMethod("setOrderedList", null)
+            methodChannel.invokeMethod("setOrderedList", isOrderedListEnabled)
         }
         ibDivider.setOnClickListener {
             methodChannel.invokeMethod("insertDivider", null)
         }
         ibQuote.setOnClickListener {
             setQuoteStatus(!isQuoteEnabled)
-            methodChannel.invokeMethod("setQuote", null)
+            methodChannel.invokeMethod("setQuote", isQuoteEnabled)
         }
         ibCodeBlock.setOnClickListener {
             setCodeBlockStatus(!isCodeBlockEnabled)
-            methodChannel.invokeMethod("setCodeBlock", null)
+            methodChannel.invokeMethod("setCodeBlock", isCodeBlockEnabled)
         }
 
         // Text style.
         ibBold.setOnClickListener {
             setBoldStatus(!isBoldEnabled)
-            methodChannel.invokeMethod("setBold", null)
+            methodChannel.invokeMethod("setBold", isBoldEnabled)
         }
         ibItalic.setOnClickListener {
             setItalicStatus(!isItalicEnabled)
-            methodChannel.invokeMethod("setItalic", null)
+            methodChannel.invokeMethod("setItalic", isItalicEnabled)
         }
         ibUnderline.setOnClickListener {
             setUnderlineStatus(!isUnderlineEnabled)
-            methodChannel.invokeMethod("setUnderline", null)
+            methodChannel.invokeMethod("setUnderline", isUnderlineEnabled)
         }
         ibStrikeThrough.setOnClickListener {
             setStrikeThroughStatus(!isStrikeThroughEnabled)
-            methodChannel.invokeMethod("setStrikeThrough", null)
+            methodChannel.invokeMethod("setStrikeThrough", isItalicEnabled)
         }
 
         // Toolbar items.
         ibAt.setOnClickListener {
             methodChannel.invokeMethod("onAtClick", null)
+        }
+        ibImage.setOnClickListener {
+            methodChannel.invokeMethod("onImageClick", null)
+        }
+        ibEmoji.setOnClickListener {
+            methodChannel.invokeMethod("onEmojiClick", null)
         }
         ibTextType.setOnClickListener {
             toggleTextType()
@@ -319,6 +341,7 @@ internal class TunEditorToolbarView(
     }
 
     private fun setBoldStatus(isChecked: Boolean) {
+        println("set bold status: $isChecked")
         isBoldEnabled = isChecked
         if (isChecked) {
             ibBold.setBackgroundResource(R.drawable.bg_toolbar_item_focused)

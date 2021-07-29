@@ -1,10 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:tun_editor/models/documents/attribute.dart';
 import 'package:tun_editor/models/documents/document.dart';
-import 'package:tun_editor/models/documents/style.dart';
-import 'package:tun_editor/models/quill_delta.dart';
 import 'package:tun_editor/tun_editor.dart';
 import 'package:tun_editor/tun_editor_controller.dart';
 import 'package:tun_editor/tun_editor_toolbar.dart';
@@ -41,6 +38,10 @@ class FullPageEditorState extends State<FullPageEditor> {
 
       final doc = json.encode(_controller.document.toDelta().toJson());
       debugPrint('document: $doc');
+
+      setState(() {
+        _previewText = doc;
+      });
     });
   }
 
@@ -63,31 +64,24 @@ class FullPageEditorState extends State<FullPageEditor> {
           width: double.infinity,
           height: double.infinity,
           alignment: Alignment.center,
-          child: Stack(
+          child: Column(
             children: [
-              Container(
-                width: double.infinity,
-                height: double.infinity,
-                child: Column(
-                  children: [
-                    Expanded(
-                      child: TunEditor(
-                        controller: _controller,
-                        placeHolder: "Hello World",
-                      ),
-                    ),
-                    SizedBox(height: TunEditorToolbar.fixedToolbarHeight),
-                  ],
+              Expanded(
+                child: TunEditor(
+                  controller: _controller,
+                  placeHolder: "Hello World",
                 ),
               ),
-
-              Positioned(
-                bottom: 0,
-                left: 0,
-                right: 0,
-                child: TunEditorToolbar(
-                  controller: _controller,
+              SizedBox(
+                height: 50,
+                child: SingleChildScrollView(
+                  child: Text(
+                    _previewText,
+                  ),
                 ),
+              ),
+              TunEditorToolbar(
+                controller: _controller,
               ),
             ],
           ),

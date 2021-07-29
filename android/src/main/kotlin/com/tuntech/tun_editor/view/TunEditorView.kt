@@ -45,6 +45,8 @@ internal class TunEditorView(
     private val areToolbarItemUnderline: ARE_ToolItem_Underline = ARE_ToolItem_Underline()
     private val areToolbarItemStrikethrough: ARE_ToolItem_Strikethrough = ARE_ToolItem_Strikethrough()
 
+    private val areToolbarItemImage: ARE_ToolItem_Image = ARE_ToolItem_Image()
+
     // Method channel.
     private val methodChannel: MethodChannel = MethodChannel(messenger, "tun/editor/${id}")
 
@@ -106,6 +108,7 @@ internal class TunEditorView(
         areEditor.setOnSelectionChanged { selStart, selEnd ->
             val res = SelectionUtil.checkSelectionStyle(areEditor.editableText, selStart, selEnd)
             currentStyle = res["style"] as? String ?: ""
+            println("on selection changed $selStart, $selEnd: $currentStyle")
             methodChannel.invokeMethod("onSelectionChanged", res)
         }
         if (creationParams?.containsKey("place_holder") == true) {
@@ -123,13 +126,21 @@ internal class TunEditorView(
             "redo" -> {
                 result.success(null)
             }
-            "clearStyle" -> {
-                // Disable all tool items.
-                for (tool in areToolbar.toolItems) {
-                    tool.style.setChecked(false)
-                }
+            "clearTextType" -> {
+                // Headline.
                 val fontSizeStyle = (areToolbarItemFontSize.style as? ARE_Style_FontSize) ?: return
                 fontSizeStyle.onFontSizeChange(FONT_SIZE_NORMAL)
+                areToolbarItemList.style.setChecked(false)
+                areToolbarItemOrderedList.style.setChecked(false)
+                areToolbarItemQuote.style.setChecked(false)
+                result.success(null)
+            }
+            "clearTextStyle" -> {
+                // Disable all tool items.
+                areToolbarItemBold.style.setChecked(false)
+                areToolbarItemItalic.style.setChecked(false)
+                areToolbarItemUnderline.style.setChecked(false)
+                areToolbarItemStrikethrough.style.setChecked(false)
                 result.success(null)
             }
 
@@ -148,10 +159,20 @@ internal class TunEditorView(
             }
             "setList" -> {
                 areToolbarItemList.getView(areToolbar.context).performClick()
+                currentStyle = if (areToolbarItemList.style.isChecked) {
+                    "list-bullet"
+                } else {
+                    ""
+                }
                 result.success(null)
             }
             "setOrderedList" -> {
                 areToolbarItemOrderedList.getView(areToolbar.context).performClick()
+                currentStyle = if (areToolbarItemOrderedList.style.isChecked) {
+                    "list-ordered"
+                } else {
+                    ""
+                }
                 result.success(null)
             }
             "insertDivider" -> {
@@ -160,28 +181,58 @@ internal class TunEditorView(
             }
             "setQuote" -> {
                 areToolbarItemQuote.getView(areToolbar.context).performClick()
+                currentStyle = if (areToolbarItemQuote.style.isChecked) {
+                    "blockquote"
+                } else {
+                    ""
+                }
                 result.success(null)
             }
             "setCodeBlock" -> {
                 areToolbarItemQuote.getView(areToolbar.context).performClick()
+                currentStyle = if (areToolbarItemCodeBlock.style.isChecked) {
+                    "code-block"
+                } else {
+                    ""
+                }
                 result.success(null)
             }
 
             // Text styles.
             "setBold" -> {
                 areToolbarItemBold.getView(areToolbar.context).performClick()
+                currentStyle = if (areToolbarItemBold.style.isChecked) {
+                    "bold"
+                } else {
+                    ""
+                }
                 result.success(null)
             }
             "setItalic" -> {
                 areToolbarItemItalic.getView(areToolbar.context).performClick()
+                currentStyle = if (areToolbarItemItalic.style.isChecked) {
+                    "italic"
+                } else {
+                    ""
+                }
                 result.success(null)
             }
             "setUnderline" -> {
                 areToolbarItemUnderline.getView(areToolbar.context).performClick()
+                currentStyle = if (areToolbarItemUnderline.style.isChecked) {
+                    "underline"
+                } else {
+                    ""
+                }
                 result.success(null)
             }
             "setStrikeThrough" -> {
                 areToolbarItemStrikethrough.getView(areToolbar.context).performClick()
+                currentStyle = if (areToolbarItemStrikethrough.style.isChecked) {
+                    "strike"
+                } else {
+                    ""
+                }
                 result.success(null)
             }
 
@@ -244,6 +295,9 @@ internal class TunEditorView(
                     areEditor.text = areEditor.editableText.insert(index, data)
                 }
                 println("new text: ${areEditor.text} $index $data")
+            }
+            "insertImage" -> {
+                areToolbarItemImage.getView(areToolbar.context).performClick()
             }
 
             else -> {

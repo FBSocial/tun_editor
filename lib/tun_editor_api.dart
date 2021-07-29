@@ -24,8 +24,12 @@ class TunEditorApi {
         final oldText = args["oldText"] as String;
         final newText = args["newText"] as String;
         final style = args["style"] as String;
-        debugPrint("onTextChang: $start, $before, $count, $style");
-        _handler.onTextChange(start, before, count, oldText, newText, style);
+        debugPrint("onTextChange: $start, $before, $count, $style");
+        try {
+          _handler.onTextChange(start, before, count, oldText, newText, style);
+        } catch(e, s) {
+          print('on text change: $e, $s');
+        }
         break;
 
       case 'onSelectionChanged':
@@ -46,8 +50,11 @@ class TunEditorApi {
   void redo() {
     _channel.invokeMethod('redo');
   }
-  void clearStyle() {
-    _channel.invokeMethod('clearStyle');
+  void clearTextType() {
+    _channel.invokeMethod('clearTextType');
+  }
+  void clearTextStyle() {
+    _channel.invokeMethod('clearTextStyle');
   }
 
   // Text types.

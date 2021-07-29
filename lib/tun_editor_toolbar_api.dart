@@ -9,70 +9,80 @@ class TunEditorToolbarApi {
   TunEditorToolbarApi(
     int id,
     this._handler
-  ) : _channel = MethodChannel("tun/editor/toolbar/$id") {
+  ) : _channel = MethodChannel('tun/editor/toolbar/$id') {
     _channel.setMethodCallHandler(_onMethodCall);
   }
 
   void onSelectionChanged(Map status) {
-    _channel.invokeMethod("onSelectionChanged", status);
+    _channel.invokeMethod('onSelectionChanged', status);
+  }
+
+  void clearTextType() {
+    _channel.invokeMethod('clearTextType');
+  }
+  void clearTextStyle() {
+    _channel.invokeMethod('clearTextStyle');
   }
 
   Future<bool?> _onMethodCall(MethodCall call) async {
     switch (call.method) {
       // Common.
-      case "undo":
+      case 'undo':
         _handler.undo();
         break;
-      case "redo":
+      case 'redo':
         _handler.redo();
         break;
-      case "clearStyle":
-        _handler.clearStyle();
+      case 'clearTextType':
+        _handler.clearTextType();
         break;
-      case "onAtClick":
+      case 'clearTextStyle':
+        _handler.clearTextStyle();
+        break;
+      case 'onAtClick':
         _handler.testInsertAt();
         break;
 
       // Text types.
-      case "setHeadline1":
+      case 'setHeadline1':
         _handler.setHeadline1();
         break;
-      case "setHeadline2":
+      case 'setHeadline2':
         _handler.setHeadline2();
         break;
-      case "setHeadline3":
+      case 'setHeadline3':
         _handler.setHeadline3();
         break;
-      case "setList":
+      case 'setList':
         _handler.setList();
         break;
-      case "setOrderedList":
+      case 'setOrderedList':
         _handler.setOrderedList();
         break;
-      case "insertDivider":
+      case 'insertDivider':
         _handler.insertDivider();
         break;
-      case "setQuote":
+      case 'setQuote':
         _handler.setQuote();
         break;
-      case "setCodeBlock":
+      case 'setCodeBlock':
         _handler.setCodeBlock();
         break;
 
       // Text styles.
-      case "setBold":
+      case 'setBold':
         _handler.setBold();
         break;
-      case "setItalic":
+      case 'setItalic':
         _handler.setItalic();
         break;
-      case "setUnderline":
+      case 'setUnderline':
         _handler.setUnderline();
         break;
-      case "setStrikeThrough":
+      case 'setStrikeThrough':
         _handler.setStrikeThrough();
         break;
-      case "onSubToolbarToggle":
+      case 'onSubToolbarToggle':
         final bool isShow = call.arguments as bool;
         _handler.onSubToolbarToggle(isShow);
         break;
@@ -90,7 +100,8 @@ mixin TunEditorToolbarHandler on ChangeNotifier {
 
   void undo();
   void redo();
-  void clearStyle();
+  void clearTextType();
+  void clearTextStyle();
   void testInsertAt();
 
   void setHeadline1();

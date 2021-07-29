@@ -49,6 +49,10 @@ class TunEditorController extends ChangeNotifier with TunEditorHandler, TunEdito
     _tunEditorApi?.updateSelection(textSelection);
   }
 
+  void formatSelection(Attribute attribute) {
+    formatText(selection.start, selection.end - selection.start, attribute);
+  }
+
   void formatText(int index, int len, Attribute attribute) {
     _tunEditorApi?.formatText(index, len, attribute);
   }
@@ -113,12 +117,17 @@ class TunEditorController extends ChangeNotifier with TunEditorHandler, TunEdito
   @override
   void redo() =>_tunEditorApi?.redo();
   @override
-  void clearStyle() => _tunEditorApi?.clearStyle();
+  void clearTextType() => _tunEditorApi?.clearTextType();
+  @override
+  void clearTextStyle() => _tunEditorApi?.clearTextStyle();
   @override
   void testInsertAt() => _tunEditorApi?.setHtml();
 
   @override
-  void setHeadline1() => _tunEditorApi?.setHeadline1();
+  void setHeadline1() {
+    _tunEditorApi?.setHeadline1();
+    formatSelection(Attribute.h1);
+  }
   @override
   void setHeadline2() => _tunEditorApi?.setHeadline2();
   @override
@@ -198,6 +207,17 @@ class TunEditorController extends ChangeNotifier with TunEditorHandler, TunEdito
       }
     }
     notifyListeners();
+
+    if (start + count >= 1) {
+      final lastChar = newText.substring(start + count - 1, start + count);
+      if (lastChar == '\n') {
+        debugPrint('clear text style and type in new line');
+        _tunEditorApi?.clearTextType();
+        _tunEditorApi?.clearTextStyle();
+        _tunEditorToolbarApi?.clearTextType();
+        _tunEditorToolbarApi?.clearTextStyle();
+      }
+    }
   }
 
   @override
@@ -211,10 +231,38 @@ class TunEditorController extends ChangeNotifier with TunEditorHandler, TunEdito
   Map<String, dynamic>? _getAttributes(String styleStr) {
     Style style = Style();
     switch (styleStr) {
-      case 'header1':
+      // case 'header1':
+      //   style = style.put(Attribute.h1);
+      //   break;
+      // case 'header2':
+      //   style = style.put(Attribute.h2);
+      //   break;
+      // case 'header3':
+      //   style = style.put(Attribute.h3);
+      //   break;
+      case 'list-bullet':
+        style = style.put(Attribute.ul);
+        break;
+      case 'list-ordered':
+        style = style.put(Attribute.ol);
+        break;
+      case 'blockquote':
+        style = style.put(Attribute.blockQuote);
+        break;
+      case 'code-block':
+        style = style.put(Attribute.codeBlock);
         break;
       case 'bold':
         style = style.put(Attribute.bold);
+        break;
+      case 'italic':
+        style = style.put(Attribute.italic);
+        break;
+      case 'underline':
+        style = style.put(Attribute.underline);
+        break;
+      case 'strike':
+        style = style.put(Attribute.strikeThrough);
         break;
     }
     return style.toJson();
