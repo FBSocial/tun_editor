@@ -29,6 +29,7 @@ class TunEditorViewFactory: NSObject, FlutterPlatformViewFactory {
 class TunEditorView: NSObject, FlutterPlatformView {
 
     private var _view: UIView
+    private var _editor: RichEditorView
     
     private var methodChannel: FlutterMethodChannel
 
@@ -40,6 +41,7 @@ class TunEditorView: NSObject, FlutterPlatformView {
     ) {
         
         _view = UIView()
+        _editor = RichEditorView(frame: UIScreen.main.bounds)
         methodChannel = FlutterMethodChannel(name: "tun/editor/\(viewId)", binaryMessenger: messenger)
 
         super.init()
@@ -53,14 +55,23 @@ class TunEditorView: NSObject, FlutterPlatformView {
     }
 
     func createNativeView(view _view: UIView) {
-        let editor = RichEditorView(frame: UIScreen.main.bounds)
-        editor.html = "<h1>My Awesome Editor</h1>Now I am editing in <em>style.</em>"
-        _view.addSubview(editor)
+        _editor.html = "<h1>My Awesome Editor</h1>Now I am editing in <em>style.</em>"
+        _view.addSubview(_editor)
     }
     
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-        print("on method call \(call.method)")
-        result(nil)
+        switch call.method {
+        case "undo":
+            if (_editor.undoManager?.canUndo == true) {
+                _editor.undoManager?.undo()
+            }
+        case "redo":
+            if (_editor.undoManager?.canRedo == true) {
+                _editor.undoManager?.redo()
+            }
+        default:
+            print("missing tun editor method")
+        }
     }
 
 }

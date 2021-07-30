@@ -31,6 +31,9 @@ class TunEditorToolbarView: NSObject, FlutterPlatformView {
     private var _view: UIView
     
     private var methodChannel: FlutterMethodChannel
+    
+    private var currentTextType: String = TextType.normal.rawValue
+    private var currentTextStyleList: [String] =  [String]()
 
     init(
         frame: CGRect,
@@ -71,14 +74,14 @@ class TunEditorToolbarView: NSObject, FlutterPlatformView {
         let ibTextType = UIButton(frame: CGRect(x: 0, y: 0, width: 36, height: 36))
         ibTextType.setTitle("T", for: .normal)
         ibTextType.setTitleColor(.black, for: .normal)
-        ibTextType.addTarget(self, action: #selector(toggleTextTypeView), for: .touchUpInside)
+        ibTextType.addTarget(self, action: #selector(toggleTextType), for: .touchUpInside)
         ibTextType.backgroundColor = .green
         ibTextType.layer.cornerRadius = 10
         
         let ibTextStyle = UIButton(frame: CGRect(x: 0, y: 0, width: 36, height: 36))
         ibTextStyle.setTitle("A", for: .normal)
         ibTextStyle.setTitleColor(.black, for: .normal)
-        ibTextStyle.addTarget(self, action: #selector(toggleTextStyleView), for: .touchUpInside)
+        ibTextStyle.addTarget(self, action: #selector(toggleTextStyle), for: .touchUpInside)
         ibTextStyle.backgroundColor = .green
         ibTextStyle.layer.cornerRadius = 10
         toolbarStack.addArrangedSubview(ibTextType)
@@ -132,30 +135,71 @@ class TunEditorToolbarView: NSObject, FlutterPlatformView {
         _view.addSubview(stack)
     }
     
-    public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-      result("iOS " + UIDevice.current.systemVersion)
-    }
-    
-    @objc func toggleTextTypeView() {
-        print("toggle text type")
-    }
-    
-    @objc func toggleTextStyleView() {
-        print("toggle text style")
-    }
-    
-    @objc func undo() {
-        print("undo")
-    }
-    
-    @objc func redo() {
-        print("redo")
-    }
-    
     @objc func setBold() {
         print("setBold")
+        debugPrint("set bold in debug")
         let styleList = ["bold"]
         methodChannel.invokeMethod("setTextStyle", arguments: styleList)
     }
+    
+    @objc func toggleTextType(_ textType: String) {
+        if (textType == currentTextType) {
+            // Remove text type.
+            currentTextType = TextType.normal.rawValue
+        } else {
+            // Set new text type.
+            currentTextType = textType
+        }
+        refreshTextTypeView()
+        methodChannel.invokeMethod("setTextType", arguments: currentTextType)
+    }
+    
+    @objc func toggleTextStyle(_ textStyle: String) {
+        if let index = (currentTextStyleList.firstIndex(of: textStyle)) {
+            currentTextStyleList.remove(at: index)
+        } else {
+            currentTextStyleList.append(textStyle)
+        }
+        refreshTextStyleView()
+        methodChannel.invokeMethod("setTextStyle", arguments: currentTextStyleList)
+    }
+    
+    @objc func refreshTextTypeView() {
+        // Disable all text type.
+        
+        // Enable current text type.
+        switch currentTextType {
+        case TextType.headline1.rawValue:
+            // TODO hightlight button
+            print("headline1")
+        default:
+            print("missing text type")
+        }
+    }
+    
+    @objc func refreshTextStyleView() {
+        // Disable all text style.
+        
+        // Enable actived text style.
+        switch currentTextType {
+        case TextStyle.bold.rawValue:
+            // TODO hightlight button
+            print("bold")
+        default:
+            print("missing text style")
+        }
+
+    }
+    
+    public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+        switch call.method {
+        case "onSelectionChanged":
+            print("on selection changed")
+            break
+        default:
+            print("missing channel method: \(call.method)")
+        }
+    }
+
 
 }
