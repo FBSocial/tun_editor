@@ -72,14 +72,14 @@ class FullPageEditorState extends State<FullPageEditor> {
                   placeHolder: "Hello World",
                 ),
               ),
-              SizedBox(
-                height: 50,
-                child: SingleChildScrollView(
-                  child: Text(
-                    _previewText,
-                  ),
-                ),
-              ),
+              // SizedBox(
+              //   height: 50,
+              //   child: SingleChildScrollView(
+              //     child: Text(
+              //       _previewText,
+              //     ),
+              //   ),
+              // ),
               TunEditorToolbar(
                 controller: _controller,
               ),

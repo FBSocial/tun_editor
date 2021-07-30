@@ -39,6 +39,7 @@ class Editor: AppCompatEditText {
         // Text style.
         const val TEXT_STYLE_BOLD = "bold"
         const val TEXT_STYLE_ITALIC = "italic"
+        const val TEXT_STYLE_BOLD_ITALIC = "bold_italic"
         const val TEXT_STYLE_UNDERLINE = "underline"
         const val TEXT_STYLE_STRIKE_THROUGH = "strike"
 
@@ -138,10 +139,14 @@ class Editor: AppCompatEditText {
             }
 
             TEXT_STYLE_BOLD, TEXT_STYLE_ITALIC, TEXT_STYLE_UNDERLINE, TEXT_STYLE_STRIKE_THROUGH -> {
-                applyTextStyle(index, index + len, TEXT_STYLE_BOLD, mTextStyleList.contains(
-                    TEXT_STYLE_BOLD))
-                applyTextStyle(index, index + len, TEXT_STYLE_ITALIC, mTextStyleList.contains(
-                    TEXT_STYLE_ITALIC))
+                applyTextStyle(index, index + len, TEXT_STYLE_BOLD, false)
+                if (mTextStyleList.contains(TEXT_STYLE_BOLD) && mTextStyleList.contains(TEXT_STYLE_ITALIC)) {
+                    applyTextStyle(index, index + len, TEXT_STYLE_BOLD_ITALIC, true)
+                } else if (mTextStyleList.contains(TEXT_STYLE_BOLD)) {
+                    applyTextStyle(index, index + len, TEXT_STYLE_BOLD, true)
+                } else if (mTextStyleList.contains(TEXT_STYLE_ITALIC)) {
+                    applyTextStyle(index, index + len, TEXT_STYLE_ITALIC, true)
+                }
                 applyTextStyle(index, index + len, TEXT_STYLE_UNDERLINE, mTextStyleList.contains(
                     TEXT_STYLE_UNDERLINE))
                 applyTextStyle(index, index + len, TEXT_STYLE_STRIKE_THROUGH, mTextStyleList.contains(
@@ -208,10 +213,14 @@ class Editor: AppCompatEditText {
                     applyTextType(startPos, endPos, TEXT_TYPE_QUOTE, mTextType == TEXT_TYPE_QUOTE)
                     applyTextType(startPos, endPos, TEXT_TYPE_CODE_BLOCK, mTextType == TEXT_TYPE_CODE_BLOCK)
 
-                    applyTextStyle(startPos, endPos, TEXT_STYLE_BOLD, mTextStyleList.contains(
-                        TEXT_STYLE_BOLD))
-                    applyTextStyle(startPos, endPos, TEXT_STYLE_ITALIC, mTextStyleList.contains(
-                        TEXT_STYLE_ITALIC))
+                    applyTextStyle(startPos, endPos, TEXT_STYLE_BOLD, false)
+                    if (mTextStyleList.contains(TEXT_STYLE_BOLD) && mTextStyleList.contains(TEXT_STYLE_ITALIC)) {
+                        applyTextStyle(startPos, endPos, TEXT_STYLE_BOLD_ITALIC, true)
+                    } else if (mTextStyleList.contains(TEXT_STYLE_BOLD)) {
+                        applyTextStyle(startPos, endPos, TEXT_STYLE_BOLD, true)
+                    } else if (mTextStyleList.contains(TEXT_STYLE_ITALIC)) {
+                        applyTextStyle(startPos, endPos, TEXT_STYLE_ITALIC, true)
+                    }
                     applyTextStyle(startPos, endPos, TEXT_STYLE_UNDERLINE, mTextStyleList.contains(
                         TEXT_STYLE_UNDERLINE))
                     applyTextStyle(startPos, endPos, TEXT_STYLE_STRIKE_THROUGH, mTextStyleList.contains(
@@ -253,10 +262,14 @@ class Editor: AppCompatEditText {
 
     private fun formatSelectionCursor() {
         // removeAllSpans(selectionStart, selectionEnd)
-        applyTextStyle(selectionStart, selectionEnd, TEXT_STYLE_BOLD, mTextStyleList.contains(
-            TEXT_STYLE_BOLD))
-        applyTextStyle(selectionStart, selectionEnd, TEXT_STYLE_ITALIC, mTextStyleList.contains(
-            TEXT_STYLE_ITALIC))
+        applyTextStyle(selectionStart, selectionEnd, TEXT_STYLE_BOLD, false)
+        if (mTextStyleList.contains(TEXT_STYLE_BOLD) && mTextStyleList.contains(TEXT_STYLE_ITALIC)) {
+            applyTextStyle(selectionStart, selectionEnd, TEXT_STYLE_BOLD_ITALIC, true)
+        } else if (mTextStyleList.contains(TEXT_STYLE_BOLD)) {
+            applyTextStyle(selectionStart, selectionEnd, TEXT_STYLE_BOLD, true)
+        } else if (mTextStyleList.contains(TEXT_STYLE_ITALIC)) {
+            applyTextStyle(selectionStart, selectionEnd, TEXT_STYLE_ITALIC, true)
+        }
         applyTextStyle(selectionStart, selectionEnd, TEXT_STYLE_UNDERLINE, mTextStyleList.contains(
             TEXT_STYLE_UNDERLINE))
         applyTextStyle(selectionStart, selectionEnd, TEXT_STYLE_STRIKE_THROUGH, mTextStyleList.contains(
@@ -348,6 +361,11 @@ class Editor: AppCompatEditText {
                 // editableText.setSpan(span, start, end, Spannable.SPAN_EXCLUSIVE_INCLUSIVE)
                 applySpan(editableText, start, end, isChecked, {
                     return@applySpan StyleSpan(Typeface.ITALIC)
+                }, StyleSpan::class.java)
+            }
+            TEXT_STYLE_BOLD_ITALIC -> {
+                applySpan(editableText, start, end, isChecked, {
+                    return@applySpan StyleSpan(Typeface.BOLD_ITALIC)
                 }, StyleSpan::class.java)
             }
             TEXT_STYLE_UNDERLINE -> {
@@ -522,7 +540,7 @@ class Editor: AppCompatEditText {
         }
     }
 
-    fun insertImage(src: Any, type: AreImageSpan.ImageType) {
+    private fun insertImage(src: Any, type: AreImageSpan.ImageType) {
         // Note for a possible bug:
         // There may be a possible bug here, it is related to:
         //   https://issuetracker.google.com/issues/67102093
