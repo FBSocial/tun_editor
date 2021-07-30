@@ -1,8 +1,10 @@
 package com.tuntech.tun_editor.view
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.Typeface
+import android.net.Uri
 import android.os.Build
 import android.text.*
 import android.text.style.*
@@ -11,12 +13,13 @@ import android.util.Log
 import android.util.TypedValue
 import android.view.inputmethod.EditorInfo
 import androidx.appcompat.widget.AppCompatEditText
+import com.bumptech.glide.Glide
+import com.bumptech.glide.RequestManager
+import com.bumptech.glide.request.target.SimpleTarget
+import com.bumptech.glide.request.transition.Transition
 import com.chinalwb.are.Constants
 import com.chinalwb.are.Util
-import com.chinalwb.are.spans.AreHrSpan
-import com.chinalwb.are.spans.AreQuoteSpan
-import com.chinalwb.are.spans.ListBulletSpan
-import com.chinalwb.are.spans.ListNumberSpan
+import com.chinalwb.are.spans.*
 
 class Editor: AppCompatEditText {
 
@@ -50,6 +53,8 @@ class Editor: AppCompatEditText {
 
     private var mTextType: String = TEXT_TYPE_NORMAL
     private var mTextStyleList: ArrayList<String> = ArrayList()
+
+    private val sGlideRequests: RequestManager = Glide.with(context)
 
     constructor(context: Context): super(context)
 
@@ -156,6 +161,11 @@ class Editor: AppCompatEditText {
         ssb.append(Constants.CHAR_NEW_LINE)
         ssb.setSpan(AreHrSpan(), 2, 3, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
         editableText.replace(selectionStart, selectionEnd, ssb)
+    }
+
+    fun insertImageUrl(url: String) {
+        Log.d(TAG, "insert image $url")
+        insertImage(url, AreImageSpan.ImageType.URL)
     }
 
     private fun initGlobalValues() {
@@ -510,6 +520,76 @@ class Editor: AppCompatEditText {
         for (span in allSpans) {
             editable.removeSpan(span)
         }
+    }
+
+    fun insertImage(src: Any, type: AreImageSpan.ImageType) {
+        // Note for a possible bug:
+        // There may be a possible bug here, it is related to:
+        //   https://issuetracker.google.com/issues/67102093
+        // But I forget what the real use case is, just remember that
+        // When working on the feature, there was a crash bug
+        //
+        // That's why I introduce the method below:
+        // this.mEditText.useSoftwareLayerOnAndroid8();
+        //
+        // However, with this setting software layer, there is another
+        // bug which is when inserting a few (2~3) images, there will
+        // be a warning:
+        //
+        // AREditText not displayed because it is too large to fit into a software layer (or drawing cache), needs 17940960 bytes, only 8294400 available
+        //
+        // And then the EditText becomes an entire white nothing displayed
+        //
+        // So in temporary, I commented out this method invoke to prevent this known issue
+        // When someone run into the crash bug caused by this on Android 8
+        // I can then find out a solution to cover both cases
+        val sWidth = Util.getScreenWidthAndHeight(context)[0];
+
+        val myTarget = object : SimpleTarget<Bitmap?>() {
+            override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap?>?) {
+                var bitmap: Bitmap = resource
+                bitmap = Util.scaleBitmapToFitWidth(bitmap, sWidth)
+                var imageSpan: ImageSpan? = null
+                if (type == AreImageSpan.ImageType.URI) {
+                    imageSpan = AreImageSpan(context, bitmap, src as Uri)
+                } else if (type == AreImageSpan.ImageType.URL) {
+                    imageSpan = AreImageSpan(context, bitmap, src as String)
+                }
+                if (imageSpan == null) {
+                    return
+                }
+                insertSpan(imageSpan)
+            }
+        }
+        when (type) {
+            AreImageSpan.ImageType.URI -> {
+                sGlideRequests.asBitmap().load(src as Uri).centerCrop().into(myTarget)
+            }
+            AreImageSpan.ImageType.URL -> {
+                sGlideRequests.asBitmap().load(src as String).centerCrop().into(myTarget)
+            }
+            AreImageSpan.ImageType.RES -> {
+                val imageSpan: ImageSpan = AreImageSpan(context, src as Int)
+                insertSpan(imageSpan)
+            }
+        }
+    }
+
+    private fun insertSpan(imageSpan: ImageSpan) {
+        val editable: Editable = editableText
+        val start: Int = selectionStart
+        val end: Int = selectionEnd
+        val centerSpan: AlignmentSpan = AlignmentSpan.Standard(Layout.Alignment.ALIGN_CENTER)
+        val ssb = SpannableStringBuilder()
+        ssb.append(Constants.CHAR_NEW_LINE)
+        ssb.append(Constants.ZERO_WIDTH_SPACE_STR)
+        ssb.append(Constants.CHAR_NEW_LINE)
+        ssb.append(Constants.ZERO_WIDTH_SPACE_STR)
+        ssb.setSpan(imageSpan, 1, 2, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+        ssb.setSpan(centerSpan, 1, 2, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+        val leftSpan: AlignmentSpan = AlignmentSpan.Standard(Layout.Alignment.ALIGN_NORMAL)
+        ssb.setSpan(leftSpan, 3, 4, Spanned.SPAN_INCLUSIVE_INCLUSIVE)
+        editable.replace(start, end, ssb)
     }
 
 }

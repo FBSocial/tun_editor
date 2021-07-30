@@ -126,6 +126,7 @@ class TunEditorController extends ChangeNotifier with TunEditorHandler, TunEdito
   void onImageClick() {
     debugPrint('on image click');
     onImage?.call();
+    _tunEditorApi?.insertImage();
   }
   @override
   void onEmojiClick() {

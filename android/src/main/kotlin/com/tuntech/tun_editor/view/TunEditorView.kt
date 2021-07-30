@@ -183,7 +183,8 @@ internal class TunEditorView(
                 areEditor.insertDivider()
             }
             HANDLE_METHOD_INSERT_IMAGE -> {
-                // TODO Insert image.
+                val url = "https://avatars0.githubusercontent.com/u/1758864?s=460&v=4"
+                areEditor.insertImageUrl(url)
             }
 
             else -> {

@@ -99,8 +99,8 @@ class TunEditorApi {
   void insertDivider() {
     _channel.invokeMethod('insertDivider');
   }
-  // TODO Insert image.
   void insertImage() {
+    _channel.invokeMethod('insertImage');
   }
 
 }
