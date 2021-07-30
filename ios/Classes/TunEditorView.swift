@@ -1,5 +1,6 @@
 import Flutter
 import UIKit
+import SwiftUI
 import RichEditorView
 
 class TunEditorViewFactory: NSObject, FlutterPlatformViewFactory {
@@ -28,16 +29,23 @@ class TunEditorViewFactory: NSObject, FlutterPlatformViewFactory {
 class TunEditorView: NSObject, FlutterPlatformView {
 
     private var _view: UIView
+    
+    private var methodChannel: FlutterMethodChannel
 
     init(
         frame: CGRect,
         viewIdentifier viewId: Int64,
         arguments args: Any?,
-        binaryMessenger messenger: FlutterBinaryMessenger?
+        binaryMessenger messenger: FlutterBinaryMessenger
     ) {
+        
         _view = UIView()
+        methodChannel = FlutterMethodChannel(name: "tun/editor/\(viewId)", binaryMessenger: messenger)
+
         super.init()
         createNativeView(view: _view)
+        
+        methodChannel.setMethodCallHandler(handle)
     }
 
     func view() -> UIView {
@@ -45,11 +53,14 @@ class TunEditorView: NSObject, FlutterPlatformView {
     }
 
     func createNativeView(view _view: UIView) {
-        // _view.backgroundColor = UIColor.blue
-
-        let editor = RichEditorView(frame: _view.bounds)
+        let editor = RichEditorView(frame: UIScreen.main.bounds)
         editor.html = "<h1>My Awesome Editor</h1>Now I am editing in <em>style.</em>"
         _view.addSubview(editor)
+    }
+    
+    public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+        print("on method call \(call.method)")
+        result(nil)
     }
 
 }

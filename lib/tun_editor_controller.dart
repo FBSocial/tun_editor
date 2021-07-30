@@ -144,6 +144,7 @@ class TunEditorController extends ChangeNotifier with TunEditorHandler, TunEdito
   }
   @override
   void setTextStyle(List<dynamic> textStyle) {
+    debugPrint('set text style');
     _tunEditorApi?.setTextStyle(textStyle);
   }
   @override

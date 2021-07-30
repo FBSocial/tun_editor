@@ -18,6 +18,7 @@ class TunEditorToolbarApi {
   }
 
   Future<bool?> _onMethodCall(MethodCall call) async {
+    debugPrint('on method call: ${call.method}');
     switch (call.method) {
       // Common.
       case 'onAtClick':
