@@ -9,7 +9,7 @@ public class SwiftTunEditorPlugin: NSObject, FlutterPlugin {
     registrar.addMethodCallDelegate(instance, channel: channel)
 
     let tunEditorViewFactory = TunEditorViewFactory(messenger: messenger)
-    let tunEditorToolbarViewFactory = TunEditorToolbarViewFactory(messenger: messenger)
+//    let tunEditorToolbarViewFactory = TunEditorToolbarViewFactory(messenger: messenger)
     registrar.register(tunEditorViewFactory, withId: "tun_editor")
     registrar.register(tunEditorViewFactory, withId: "tun_editor_toolbar")
   }

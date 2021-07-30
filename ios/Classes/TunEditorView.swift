@@ -69,6 +69,38 @@ class TunEditorView: NSObject, FlutterPlatformView {
             if (_editor.undoManager?.canRedo == true) {
                 _editor.undoManager?.redo()
             }
+        case "clearTextType":
+            _editor.removeFormat()
+        case "clearTextStyle":
+            _editor.removeFormat()
+        case "setTextType":
+            let textType: String = call.arguments is String
+                ? call.arguments as! String
+                : TextType.headline1.rawValue
+            switch textType {
+            case TextType.headline1.rawValue:
+                _editor.header(1)
+            case TextType.headline2.rawValue:
+                _editor.header(2)
+            case TextType.headline3.rawValue:
+                _editor.header(3)
+            case TextType.listBullet.rawValue:
+                _editor.unorderedList()
+            case TextType.listOrdered.rawValue:
+                _editor.orderedList()
+            case TextType.quote.rawValue:
+                _editor.blockquote()
+            default:
+                print("missing text type")
+            }
+//        case "setTextStyle":
+//        case "updateSelection":
+//        case "formatText":
+//        case "replaceText":
+//        case "insert":
+//        case "insertDivider":
+//        case "insertImage":
+            
         default:
             print("missing tun editor method")
         }
