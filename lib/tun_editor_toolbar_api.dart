@@ -39,6 +39,9 @@ class TunEditorToolbarApi {
       case 'setTextStyle':
         _handler.setTextStyle(call.arguments as List<dynamic>);
         break;
+      case 'insertDivider':
+        _handler.insertDivider();
+        break;
 
       default:
         throw MissingPluginException(
@@ -57,5 +60,6 @@ mixin TunEditorToolbarHandler on ChangeNotifier {
   void onSubToolbarToggle(bool isShow);
   void setTextType(String textType);
   void setTextStyle(List<dynamic> textStyle);
+  void insertDivider();
 
 }

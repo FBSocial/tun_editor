@@ -96,6 +96,10 @@ class TunEditorApi {
       'autoAppendNewlineAfterImage': autoAppendNewlineAfterImage,
     });
   }
+  void insertDivider() {
+    _channel.invokeMethod('insertDivider');
+  }
+  // TODO Insert image.
   void insertImage() {
   }
 

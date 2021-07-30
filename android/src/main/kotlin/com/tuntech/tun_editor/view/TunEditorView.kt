@@ -34,6 +34,7 @@ internal class TunEditorView(
         const val HANDLE_METHOD_FORMAT_TEXT = "formatText"
         const val HANDLE_METHOD_REPLACE_TEXT = "replaceText"
         const val HANDLE_METHOD_INSERT = "insert"
+        const val HANDLE_METHOD_INSERT_DIVIDER = "insertDivider"
         const val HANDLE_METHOD_INSERT_IMAGE = "insertImage"
     }
 
@@ -177,6 +178,9 @@ internal class TunEditorView(
                 }
                 println("new text: ${areEditor.text} $index $data")
                 result.success(null)
+            }
+            HANDLE_METHOD_INSERT_DIVIDER -> {
+                areEditor.insertDivider()
             }
             HANDLE_METHOD_INSERT_IMAGE -> {
                 // TODO Insert image.

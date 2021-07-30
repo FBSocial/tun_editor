@@ -20,9 +20,16 @@ class TunEditorController extends ChangeNotifier with TunEditorHandler, TunEdito
   TextSelection get selection => _selection;
   TextSelection _selection;
 
+  VoidCallback? onAt;
+  VoidCallback? onImage;
+  VoidCallback? onEmoji;
+
   TunEditorController({
     required this.document,
     required TextSelection selection,
+    this.onAt,
+    this.onImage,
+    this.onEmoji,
   }): _selection = selection;
 
   factory TunEditorController.basic() {
@@ -112,12 +119,18 @@ class TunEditorController extends ChangeNotifier with TunEditorHandler, TunEdito
   // =========== Tun editor toolbar handler ===========
   @override
   void onAtClick() {
+    debugPrint('on at click');
+    onAt?.call();
   }
   @override
   void onImageClick() {
+    debugPrint('on image click');
+    onImage?.call();
   }
   @override
   void onEmojiClick() {
+    debugPrint('on emoji click');
+    onEmoji?.call();
   }
   @override
   void onSubToolbarToggle(bool isShow) {
@@ -132,6 +145,10 @@ class TunEditorController extends ChangeNotifier with TunEditorHandler, TunEdito
   @override
   void setTextStyle(List<dynamic> textStyle) {
     _tunEditorApi?.setTextStyle(textStyle);
+  }
+  @override
+  void insertDivider() {
+    _tunEditorApi?.insertDivider();
   }
 
   // =========== Tun editor handler ===========

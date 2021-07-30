@@ -4,17 +4,16 @@ import android.content.Context
 import android.graphics.Color
 import android.graphics.Typeface
 import android.os.Build
-import android.text.Editable
-import android.text.Spannable
-import android.text.Spanned
-import android.text.TextWatcher
+import android.text.*
 import android.text.style.*
 import android.util.AttributeSet
 import android.util.Log
 import android.util.TypedValue
 import android.view.inputmethod.EditorInfo
 import androidx.appcompat.widget.AppCompatEditText
+import com.chinalwb.are.Constants
 import com.chinalwb.are.Util
+import com.chinalwb.are.spans.AreHrSpan
 import com.chinalwb.are.spans.AreQuoteSpan
 import com.chinalwb.are.spans.ListBulletSpan
 import com.chinalwb.are.spans.ListNumberSpan
@@ -72,6 +71,7 @@ class Editor: AppCompatEditText {
         setPadding(padding, padding, padding, padding)
         setTextSize(TypedValue.COMPLEX_UNIT_SP, FONT_SIZE_NORMAL.toFloat())
 
+        initGlobalValues()
         initListener()
     }
 
@@ -86,18 +86,18 @@ class Editor: AppCompatEditText {
 
     fun setTextType(textType: String) {
         mTextType = textType
-        formatSelectionLines(textType)
+        formatSelectionLines()
     }
 
     fun clearTextType() {
         mTextType = TEXT_TYPE_NORMAL
-        formatSelectionLines(TEXT_TYPE_NORMAL)
+        formatSelectionLines()
     }
 
     fun setTextStyle(styleList: List<String>) {
         mTextStyleList.clear()
         mTextStyleList.addAll(styleList)
-        formatSelectionCursor(styleList)
+        formatSelectionCursor()
     }
 
     fun clearTextStyle() {
@@ -114,16 +114,54 @@ class Editor: AppCompatEditText {
             TEXT_TYPE_LIST_ORDERED,
             TEXT_TYPE_QUOTE,
             TEXT_TYPE_CODE_BLOCK -> {
-                applyTextType(index, index + len, attr)
+                applyTextType(index, index + len, TEXT_TYPE_HEADLINE1, false)
+                when (mTextType) {
+                    TEXT_TYPE_HEADLINE1 -> {
+                        applyTextType(index, index + len, TEXT_TYPE_HEADLINE1, mTextType == TEXT_TYPE_HEADLINE1)
+                    }
+                    TEXT_TYPE_HEADLINE2 -> {
+                        applyTextType(index, index + len, TEXT_TYPE_HEADLINE2, mTextType == TEXT_TYPE_HEADLINE2)
+                    }
+                    TEXT_TYPE_HEADLINE3 -> {
+                        applyTextType(index, index + len, TEXT_TYPE_HEADLINE3, mTextType == TEXT_TYPE_HEADLINE3)
+                    }
+                }
+                applyTextType(index, index + len, TEXT_TYPE_LIST_BULLET, attr == TEXT_TYPE_LIST_BULLET)
+                applyTextType(index, index + len, TEXT_TYPE_LIST_ORDERED, attr == TEXT_TYPE_LIST_ORDERED)
+                applyTextType(index, index + len, TEXT_TYPE_QUOTE, attr == TEXT_TYPE_QUOTE)
+                applyTextType(index, index + len, TEXT_TYPE_CODE_BLOCK, attr == TEXT_TYPE_CODE_BLOCK)
             }
 
             TEXT_STYLE_BOLD, TEXT_STYLE_ITALIC, TEXT_STYLE_UNDERLINE, TEXT_STYLE_STRIKE_THROUGH -> {
-                applyTextStyle(index, index + len, attr)
+                applyTextStyle(index, index + len, TEXT_STYLE_BOLD, mTextStyleList.contains(
+                    TEXT_STYLE_BOLD))
+                applyTextStyle(index, index + len, TEXT_STYLE_ITALIC, mTextStyleList.contains(
+                    TEXT_STYLE_ITALIC))
+                applyTextStyle(index, index + len, TEXT_STYLE_UNDERLINE, mTextStyleList.contains(
+                    TEXT_STYLE_UNDERLINE))
+                applyTextStyle(index, index + len, TEXT_STYLE_STRIKE_THROUGH, mTextStyleList.contains(
+                    TEXT_STYLE_STRIKE_THROUGH))
             }
             else -> {
                 Log.w(TAG, "format text with missing attribute: $attr")
             }
         }
+    }
+
+    fun insertDivider() {
+        val ssb = SpannableStringBuilder()
+        ssb.append(Constants.CHAR_NEW_LINE)
+        ssb.append(Constants.CHAR_NEW_LINE)
+        ssb.append(Constants.ZERO_WIDTH_SPACE_STR)
+        ssb.append(Constants.CHAR_NEW_LINE)
+        ssb.setSpan(AreHrSpan(), 2, 3, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+        editableText.replace(selectionStart, selectionEnd, ssb)
+    }
+
+    private fun initGlobalValues() {
+        val wh = Util.getScreenWidthAndHeight(context)
+        Constants.SCREEN_WIDTH = wh[0]
+        Constants.SCREEN_HEIGHT = wh[1]
     }
 
     private fun initListener() {
@@ -143,16 +181,37 @@ class Editor: AppCompatEditText {
             override fun afterTextChanged(s: Editable?) {
                 if (endPos > startPos) {
                     // Insert new text, apply text type and styles.
-                    applyTextType(startPos, endPos, mTextType)
-                    for (style in mTextStyleList) {
-                        applyTextStyle(startPos, endPos, style)
+                    applyTextType(startPos, endPos, TEXT_TYPE_HEADLINE1, false)
+                    when (mTextType) {
+                        TEXT_TYPE_HEADLINE1 -> {
+                            applyTextType(startPos, endPos, TEXT_TYPE_HEADLINE1, mTextType == TEXT_TYPE_HEADLINE1)
+                        }
+                        TEXT_TYPE_HEADLINE2 -> {
+                            applyTextType(startPos, endPos, TEXT_TYPE_HEADLINE2, mTextType == TEXT_TYPE_HEADLINE2)
+                        }
+                        TEXT_TYPE_HEADLINE3 -> {
+                            applyTextType(startPos, endPos, TEXT_TYPE_HEADLINE3, mTextType == TEXT_TYPE_HEADLINE3)
+                        }
                     }
+                    applyTextType(startPos, endPos, TEXT_TYPE_LIST_BULLET, mTextType == TEXT_TYPE_LIST_BULLET)
+                    applyTextType(startPos, endPos, TEXT_TYPE_LIST_ORDERED, mTextType == TEXT_TYPE_LIST_ORDERED)
+                    applyTextType(startPos, endPos, TEXT_TYPE_QUOTE, mTextType == TEXT_TYPE_QUOTE)
+                    applyTextType(startPos, endPos, TEXT_TYPE_CODE_BLOCK, mTextType == TEXT_TYPE_CODE_BLOCK)
+
+                    applyTextStyle(startPos, endPos, TEXT_STYLE_BOLD, mTextStyleList.contains(
+                        TEXT_STYLE_BOLD))
+                    applyTextStyle(startPos, endPos, TEXT_STYLE_ITALIC, mTextStyleList.contains(
+                        TEXT_STYLE_ITALIC))
+                    applyTextStyle(startPos, endPos, TEXT_STYLE_UNDERLINE, mTextStyleList.contains(
+                        TEXT_STYLE_UNDERLINE))
+                    applyTextStyle(startPos, endPos, TEXT_STYLE_STRIKE_THROUGH, mTextStyleList.contains(
+                        TEXT_STYLE_STRIKE_THROUGH))
                 }
             }
         })
     }
 
-    private fun formatSelectionLines(textType: String) {
+    private fun formatSelectionLines() {
         // Calculate the whole line's start index and end index.
         val startLine = layout.getLineForOffset(selectionStart)
         val endLine  = layout.getLineForOffset(selectionEnd)
@@ -163,15 +222,35 @@ class Editor: AppCompatEditText {
         }
 
         // Remove all span first.
-        removeAllSpans(startIndex, endIndex)
-        applyTextType(startIndex, endIndex, textType)
+        // removeAllSpans(startIndex, endIndex)
+        applyTextType(startIndex, endIndex, TEXT_TYPE_HEADLINE1, false)
+        when (mTextType) {
+            TEXT_TYPE_HEADLINE1 -> {
+                applyTextType(startIndex, endIndex, TEXT_TYPE_HEADLINE1, mTextType == TEXT_TYPE_HEADLINE1)
+            }
+            TEXT_TYPE_HEADLINE2 -> {
+                applyTextType(startIndex, endIndex, TEXT_TYPE_HEADLINE2, mTextType == TEXT_TYPE_HEADLINE2)
+            }
+            TEXT_TYPE_HEADLINE3 -> {
+                applyTextType(startIndex, endIndex, TEXT_TYPE_HEADLINE3, mTextType == TEXT_TYPE_HEADLINE3)
+            }
+        }
+        applyTextType(startIndex, endIndex, TEXT_TYPE_LIST_BULLET, mTextType == TEXT_TYPE_LIST_BULLET)
+        applyTextType(startIndex, endIndex, TEXT_TYPE_LIST_ORDERED, mTextType == TEXT_TYPE_LIST_ORDERED)
+        applyTextType(startIndex, endIndex, TEXT_TYPE_QUOTE, mTextType == TEXT_TYPE_QUOTE)
+        applyTextType(startIndex, endIndex, TEXT_TYPE_CODE_BLOCK, mTextType == TEXT_TYPE_CODE_BLOCK)
     }
 
-    private fun formatSelectionCursor(styleList: List<String>) {
-        removeAllSpans(selectionStart, selectionEnd)
-        for (style in styleList) {
-            applyTextStyle(selectionStart, selectionEnd, style)
-        }
+    private fun formatSelectionCursor() {
+        // removeAllSpans(selectionStart, selectionEnd)
+        applyTextStyle(selectionStart, selectionEnd, TEXT_STYLE_BOLD, mTextStyleList.contains(
+            TEXT_STYLE_BOLD))
+        applyTextStyle(selectionStart, selectionEnd, TEXT_STYLE_ITALIC, mTextStyleList.contains(
+            TEXT_STYLE_ITALIC))
+        applyTextStyle(selectionStart, selectionEnd, TEXT_STYLE_UNDERLINE, mTextStyleList.contains(
+            TEXT_STYLE_UNDERLINE))
+        applyTextStyle(selectionStart, selectionEnd, TEXT_STYLE_STRIKE_THROUGH, mTextStyleList.contains(
+            TEXT_STYLE_STRIKE_THROUGH))
     }
 
     private fun removeAllSpans(start: Int, end: Int) {
@@ -191,8 +270,8 @@ class Editor: AppCompatEditText {
     }
 
     // Apply text type to the all lines between start and end.
-    private fun applyTextType(start: Int, end: Int, textType: String) {
-        Log.d(TAG, "apply text type: $mTextType, $start, $end")
+    private fun applyTextType(start: Int, end: Int, textType: String, isChecked: Boolean) {
+        Log.d(TAG, "apply text type: $textType, $start, $end, $isChecked")
 
         // Calculate the whole line's start index and end index.
         val startLine = layout.getLineForOffset(start)
@@ -205,32 +284,32 @@ class Editor: AppCompatEditText {
                 // text = editableText.replace(start, end, editableText.substring(start, end))
             }
             TEXT_TYPE_HEADLINE1 -> {
-                applySpan(editableText, startIndex, endIndex, {
+                applySpan(editableText, startIndex, endIndex, isChecked, {
                     return@applySpan AbsoluteSizeSpan(FONT_SIZE_HEADLINE_1, true)
                 }, AbsoluteSizeSpan::class.java)
             }
             TEXT_TYPE_HEADLINE2 -> {
-                applySpan(editableText, startIndex, endIndex, {
+                applySpan(editableText, startIndex, endIndex, isChecked, {
                     return@applySpan AbsoluteSizeSpan(FONT_SIZE_HEADLINE_2, true)
                 }, AbsoluteSizeSpan::class.java)
             }
             TEXT_TYPE_HEADLINE3 -> {
-                applySpan(editableText, startIndex, endIndex, {
+                applySpan(editableText, startIndex, endIndex, isChecked, {
                     return@applySpan AbsoluteSizeSpan(FONT_SIZE_HEADLINE_3, true)
                 }, AbsoluteSizeSpan::class.java)
             }
             TEXT_TYPE_LIST_BULLET -> {
-                applySpan(editableText, startIndex, endIndex, {
+                applySpan(editableText, startIndex, endIndex, isChecked, {
                     return@applySpan ListBulletSpan()
                 }, ListBulletSpan::class.java)
             }
             TEXT_TYPE_LIST_ORDERED -> {
-                applySpan(editableText, startIndex, endIndex, {
+                applySpan(editableText, startIndex, endIndex, isChecked, {
                     return@applySpan ListNumberSpan(1)
                 }, ListNumberSpan::class.java)
             }
             TEXT_TYPE_QUOTE -> {
-                applySpan(editableText, startIndex, endIndex, {
+                applySpan(editableText, startIndex, endIndex, isChecked, {
                     return@applySpan AreQuoteSpan()
                 }, AreQuoteSpan::class.java)
             }
@@ -240,8 +319,8 @@ class Editor: AppCompatEditText {
         }
     }
 
-    private fun applyTextStyle(start: Int, end: Int, textStyle: String) {
-        Log.d(TAG, "apply text style: $textStyle, $start, $end")
+    private fun applyTextStyle(start: Int, end: Int, textStyle: String, isChecked: Boolean) {
+        Log.d(TAG, "apply text style: $textStyle, $start, $end, $isChecked")
 
         when (textStyle) {
             TEXT_STYLE_BOLD -> {
@@ -250,75 +329,149 @@ class Editor: AppCompatEditText {
                 // }
                 // val span = StyleSpan(Typeface.BOLD)
                 // editableText.setSpan(span, start, end, Spannable.SPAN_EXCLUSIVE_INCLUSIVE)
-                applySpan(editableText, start, end, {
+                applySpan(editableText, start, end, isChecked, {
                     return@applySpan StyleSpan(Typeface.BOLD)
                 }, StyleSpan::class.java)
             }
             TEXT_STYLE_ITALIC -> {
                 // val span = StyleSpan(Typeface.ITALIC)
                 // editableText.setSpan(span, start, end, Spannable.SPAN_EXCLUSIVE_INCLUSIVE)
-                applySpan(editableText, start, end, {
+                applySpan(editableText, start, end, isChecked, {
                     return@applySpan StyleSpan(Typeface.ITALIC)
                 }, StyleSpan::class.java)
             }
             TEXT_STYLE_UNDERLINE -> {
                 // val span = UnderlineSpan()
                 // editableText.setSpan(span, start, end, Spannable.SPAN_EXCLUSIVE_INCLUSIVE)
-                applySpan(editableText, start, end, {
+                applySpan(editableText, start, end, isChecked, {
                     return@applySpan UnderlineSpan()
                 }, UnderlineSpan::class.java)
             }
             TEXT_STYLE_STRIKE_THROUGH -> {
                 // val span = StrikethroughSpan()
                 // editableText.setSpan(span, start, end, Spannable.SPAN_EXCLUSIVE_INCLUSIVE)
-                applySpan(editableText, start, end, {
+                applySpan(editableText, start, end, isChecked, {
                     return@applySpan StrikethroughSpan()
                 }, StrikethroughSpan::class.java)
             }
         }
     }
 
-    private fun <E> applySpan(editable: Editable, start: Int, end: Int, newSpan: () -> E, clazzE: Class<E>) {
-        if (end > start) {
-            //
-            // User inputs or user selects a range
-            val spans: Array<E> = editable.getSpans(start, end, clazzE)
-            var existingESpan: E? = null
-            if (spans.isNotEmpty()) {
-                existingESpan = spans[0]
-            }
-            if (existingESpan == null) {
-                checkAndMergeSpan(editable, start, end, newSpan, clazzE)
-            } else {
-                val existingESpanStart: Int = editable.getSpanStart(existingESpan)
-                val existingESpanEnd: Int = editable.getSpanEnd(existingESpan)
-                if (existingESpanStart <= start && existingESpanEnd >= end) {
-                    // The selection is just within an existing E span
-                    // Do nothing for this case
-                } else {
+    private fun <E> applySpan(editable: Editable, start: Int, end: Int, isChecked: Boolean, newSpan: () -> E, clazzE: Class<E>) {
+        if (isChecked) {
+            if (end > start) {
+                //
+                // User inputs or user selects a range
+                val spans: Array<E> = editable.getSpans(start, end, clazzE)
+                var existingESpan: E? = null
+                if (spans.isNotEmpty()) {
+                    existingESpan = spans[0]
+                }
+                if (existingESpan == null) {
                     checkAndMergeSpan(editable, start, end, newSpan, clazzE)
+                } else {
+                    val existingESpanStart: Int = editable.getSpanStart(existingESpan)
+                    val existingESpanEnd: Int = editable.getSpanEnd(existingESpan)
+                    if (existingESpanStart <= start && existingESpanEnd >= end) {
+                        // The selection is just within an existing E span
+                        // Do nothing for this case
+                    } else {
+                        checkAndMergeSpan(editable, start, end, newSpan, clazzE)
+                    }
+                }
+            } else {
+                //
+                // User deletes
+                val spans: Array<E> = editable.getSpans(start, end, clazzE)
+                if (spans.isNotEmpty()) {
+                    var span: E? = spans[0]
+                    var lastSpanStart: Int = editable.getSpanStart(span)
+                    for (e in spans) {
+                        val lastSpanStartTmp: Int = editable.getSpanStart(e)
+                        if (lastSpanStartTmp > lastSpanStart) {
+                            lastSpanStart = lastSpanStartTmp
+                            span = e
+                        }
+                    }
+                    val eStart: Int = editable.getSpanStart(span)
+                    val eEnd: Int = editable.getSpanEnd(span)
+                    Log.d(TAG, "eSpan start == $eStart, eSpan end == $eEnd")
+                    if (eStart >= eEnd) {
+                        editable.removeSpan(span)
+                    }
                 }
             }
         } else {
             //
-            // User deletes
-            val spans: Array<E> = editable.getSpans(start, end, clazzE)
-            if (spans.isNotEmpty()) {
-                var span: E? = spans[0]
-                var lastSpanStart: Int = editable.getSpanStart(span)
-                for (e in spans) {
-                    val lastSpanStartTmp: Int = editable.getSpanStart(e)
-                    if (lastSpanStartTmp > lastSpanStart) {
-                        lastSpanStart = lastSpanStartTmp
-                        span = e
+            // User un-checks the style
+            if (end > start) {
+                // User inputs or user selects a range
+                val spans = editable.getSpans(start, end, clazzE)
+                if (spans.isNotEmpty()) {
+                    val span = spans[0]
+                    if (null != span) {
+                        //
+                        // User stops the style, and wants to show
+                        // un-UNDERLINE characters
+                        val ess = editable.getSpanStart(span) // ess == existing span start
+                        val ese = editable.getSpanEnd(span) // ese = existing span end
+                        if (start >= ese) {
+                            // User inputs to the end of the existing e span
+                            // End existing e span
+                            editable.removeSpan(span)
+                            editable.setSpan(span, ess, start - 1, Spanned.SPAN_EXCLUSIVE_INCLUSIVE)
+                        } else if (start == ess && end == ese) {
+                            // Case 1 desc:
+                            // *BBBBBB*
+                            // All selected, and un-check e
+                            editable.removeSpan(span)
+                        } else if (start > ess && end < ese) {
+                            // Case 2 desc:
+                            // BB*BB*BB
+                            // *BB* is selected, and un-check e
+                            editable.removeSpan(span)
+                            val spanLeft = newSpan()
+                            editable.setSpan(spanLeft, ess, start, Spanned.SPAN_EXCLUSIVE_INCLUSIVE)
+                            val spanRight = newSpan()
+                            editable.setSpan(spanRight, end, ese, Spanned.SPAN_EXCLUSIVE_INCLUSIVE)
+                        } else if (start == ess && end < ese) {
+                            // Case 3 desc:
+                            // *BBBB*BB
+                            // *BBBB* is selected, and un-check e
+                            editable.removeSpan(span)
+                            editable.setSpan(newSpan(), end, ese, Spanned.SPAN_EXCLUSIVE_INCLUSIVE)
+                        } else if (start > ess && end == ese) {
+                            // Case 4 desc:
+                            // BB*BBBB*
+                            // *BBBB* is selected, and un-check e
+                            editable.removeSpan(span)
+                            editable.setSpan(newSpan(), ess, start, Spanned.SPAN_EXCLUSIVE_INCLUSIVE)
+                        }
                     }
                 }
-                val eStart: Int = editable.getSpanStart(span)
-                val eEnd: Int = editable.getSpanEnd(span)
-                Log.d(TAG, "eSpan start == $eStart, eSpan end == $eEnd")
-                if (eStart >= eEnd) {
-                    editable.removeSpan(span)
-                }
+            // } else if (end == start) {
+            //     //
+            //     // User changes focus position
+            //     // Do nothing for this case
+            // } else {
+            //     //
+            //     // User deletes
+            //     val spans = editable.getSpans(start, end, clazzE)
+            //     if (spans.isNotEmpty()) {
+            //         val span = spans[0]
+            //         if (null != span) {
+            //             val eStart = editable.getSpanStart(span)
+            //             val eEnd = editable.getSpanEnd(span)
+            //             if (eStart >= eEnd) {
+            //                 //
+            //                 // Invalid case, this will never happen.
+            //             } else {
+            //                 //
+            //                 // Do nothing, the default behavior is to extend
+            //                 // the span's area.
+            //             }
+            //         }
+            //     }
             }
         }
     }
