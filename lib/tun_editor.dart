@@ -74,10 +74,20 @@ class TunEditorState extends State<TunEditor> {
         layoutDirection: TextDirection.ltr,
         creationParams: creationParams,
         creationParamsCodec: StandardMessageCodec(),
+        onPlatformViewCreated: (int id) {
+          controller.attachTunEditor(id);
+        },
       );
     } else {
       throw UnsupportedError("Unsupported platform view");
     }
+  }
+
+  @override
+  void dispose() {
+    controller.detachTunEditorToolbar();
+  
+    super.dispose();
   }
 
 }

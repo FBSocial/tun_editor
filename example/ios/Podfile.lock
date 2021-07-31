@@ -1,5 +1,7 @@
 PODS:
   - Flutter (1.0.0)
+  - ios_platform_images (0.0.1):
+    - Flutter
   - RichEditorView (5.0.0)
   - tun_editor (0.0.1):
     - Flutter
@@ -7,6 +9,7 @@ PODS:
 
 DEPENDENCIES:
   - Flutter (from `Flutter`)
+  - ios_platform_images (from `.symlinks/plugins/ios_platform_images/ios`)
   - tun_editor (from `.symlinks/plugins/tun_editor/ios`)
 
 SPEC REPOS:
@@ -16,13 +19,16 @@ SPEC REPOS:
 EXTERNAL SOURCES:
   Flutter:
     :path: Flutter
+  ios_platform_images:
+    :path: ".symlinks/plugins/ios_platform_images/ios"
   tun_editor:
     :path: ".symlinks/plugins/tun_editor/ios"
 
 SPEC CHECKSUMS:
   Flutter: 434fef37c0980e73bb6479ef766c45957d4b510c
+  ios_platform_images: 8dea35d2db257ac6a4cda1ef5dda433cd5dd7ec0
   RichEditorView: 1bbb07b87ca2d479ac29a6877014b38b8df233ef
-  tun_editor: 04329f55554567d8637cfe68e44a63d07aa9625e
+  tun_editor: 4ae7bec38c44d1cb3bfc09e09fba94f2703ded9a
 
 PODFILE CHECKSUM: aafe91acc616949ddb318b77800a7f51bffa2a4c
 

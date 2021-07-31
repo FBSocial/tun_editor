@@ -1,20 +1,31 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
+typedef OnSelectionChanged = Function(Map status);
+
 class TunEditorToolbarApi {
 
-  final MethodChannel _channel;
   final TunEditorToolbarHandler _handler;
+  MethodChannel? _channel;
+  OnSelectionChanged? _onSelectionChanged;
 
   TunEditorToolbarApi(
-    int id,
-    this._handler
-  ) : _channel = MethodChannel('tun/editor/toolbar/$id') {
-    _channel.setMethodCallHandler(_onMethodCall);
+    this._handler, {
+    int? viewId,
+    OnSelectionChanged? onSelectionChanged,
+  })  {
+    if (viewId != null) {
+      _channel = MethodChannel('tun/editor/toolbar/$viewId');
+      _channel?.setMethodCallHandler(_onMethodCall);
+    }
+    if (onSelectionChanged != null) {
+      _onSelectionChanged = onSelectionChanged;
+    }
   }
 
   void onSelectionChanged(Map status) {
-    _channel.invokeMethod('onSelectionChanged', status);
+    _channel?.invokeMethod('onSelectionChanged', status);
+    _onSelectionChanged?.call(status);
   }
 
   Future<bool?> _onMethodCall(MethodCall call) async {
@@ -38,6 +49,7 @@ class TunEditorToolbarApi {
         _handler.setTextType(call.arguments as String);
         break;
       case 'setTextStyle':
+        debugPrint('set text style');
         _handler.setTextStyle(call.arguments as List<dynamic>);
         break;
       case 'insertDivider':

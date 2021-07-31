@@ -112,8 +112,23 @@ class TunEditorController extends ChangeNotifier with TunEditorHandler, TunEdito
     _tunEditorApi = TunEditorApi(viewId, this);
   }
 
-  void attachTunEditorToolbar(int viewId) {
-    _tunEditorToolbarApi = TunEditorToolbarApi(viewId, this);
+  void detachTunEditor() {
+    _tunEditorApi = null;
+  }
+
+  void attachTunEditorToolbar({
+    int? viewId,
+    OnSelectionChanged? onSelectionChanged,
+  }) {
+    _tunEditorToolbarApi = TunEditorToolbarApi(
+      this,
+      viewId: viewId,
+      onSelectionChanged: onSelectionChanged,
+    );
+  }
+
+  void detachTunEditorToolbar() {
+    _tunEditorToolbarApi = null;
   }
 
   // =========== Tun editor toolbar handler ===========
@@ -145,7 +160,6 @@ class TunEditorController extends ChangeNotifier with TunEditorHandler, TunEdito
   }
   @override
   void setTextStyle(List<dynamic> textStyle) {
-    debugPrint('set text style');
     _tunEditorApi?.setTextStyle(textStyle);
   }
   @override

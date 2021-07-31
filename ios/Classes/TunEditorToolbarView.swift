@@ -2,7 +2,6 @@ import Flutter
 import UIKit
 import SwiftUI
 
-
 class TunEditorToolbarViewFactory: NSObject, FlutterPlatformViewFactory {
 
     private var messenger: FlutterBinaryMessenger
@@ -28,7 +27,33 @@ class TunEditorToolbarViewFactory: NSObject, FlutterPlatformViewFactory {
 
 class TunEditorToolbarView: NSObject, FlutterPlatformView {
 
-    private var _view: UIView
+    private let _view = UIView()
+    
+    // Toolbar related.
+    private let stackToolbar = UIStackView()
+    private let btnAt = UIButton()
+    private let btnImage = UIButton()
+    private let btnEmoji = UIButton()
+    private let btnTextType = UIButton()
+    private let btnTextStyle = UIButton()
+    
+    // Text type related.
+    private let stackTextType = UIStackView()
+    private let btnHeadline1 = UIButton()
+    private let btnHeadline2 = UIButton()
+    private let btnHeadline3 = UIButton()
+    private let btnListBullet = UIButton()
+    private let btnListOrdered = UIButton()
+    private let btnDivider = UIButton()
+    private let btnQuote = UIButton()
+    private let btnCodeBlock = UIButton()
+    
+    // Text style related.
+    private let stackTextStyle = UIStackView()
+    private let btnBold = UIButton()
+    private let btnItalic = UIButton()
+    private let btnUnderline = UIButton()
+    private let btnStrikThrough = UIButton()
     
     private var methodChannel: FlutterMethodChannel
     
@@ -41,105 +66,132 @@ class TunEditorToolbarView: NSObject, FlutterPlatformView {
         arguments args: Any?,
         binaryMessenger messenger: FlutterBinaryMessenger
     ) {
-        _view = UIView()
-        methodChannel = FlutterMethodChannel(name: "tun/editor/toolbar/\(viewId)}", binaryMessenger: messenger)
+        methodChannel = FlutterMethodChannel(name: "tun/editor/toolbar/\(viewId)", binaryMessenger: messenger)
         super.init()
         
-        createNativeView(view: _view)
+        initView(view: _view)
         methodChannel.setMethodCallHandler(handle)
     }
 
     func view() -> UIView {
         return _view
     }
-
-    func createNativeView(view _view: UIView) {
+    
+    func initView(view _view: UIView) {
         _view.backgroundColor = UIColor.white
-        
-        
-        let stack = UIStackView(frame: CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: 100))
-        stack.axis = .vertical
-        stack.spacing = 4
-        stack.distribution = .fillProportionally
+        _view.frame = CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: 100)
                 
         // Toolbar.
-        let toolbarStack = UIStackView(frame: CGRect(x: 0, y: 0, width: stack.bounds.width, height: 48))
-        toolbarStack.axis = .horizontal
-        toolbarStack.alignment = .leading
-        toolbarStack.spacing = 8
-        toolbarStack.backgroundColor = .lightGray
-        toolbarStack.distribution = .equalCentering
-        toolbarStack.layoutMargins = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
+        stackToolbar.frame = CGRect(x: 0, y: 0, width: _view.bounds.width, height: 48)
+        stackToolbar.axis = .horizontal
+        stackToolbar.alignment = .leading
+        stackToolbar.spacing = 8
+        stackToolbar.backgroundColor = .lightGray
+        stackToolbar.distribution = .equalCentering
+        stackToolbar.layoutMargins = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
         
-        let ibTextType = UIButton(frame: CGRect(x: 0, y: 0, width: 36, height: 36))
-        ibTextType.setTitle("T", for: .normal)
-        ibTextType.setTitleColor(.black, for: .normal)
-        ibTextType.addTarget(self, action: #selector(toggleTextType), for: .touchUpInside)
-        ibTextType.backgroundColor = .green
-        ibTextType.layer.cornerRadius = 10
+        setupButton(btnAt, "toolbar_at", #selector(onAtClick))
+        setupButton(btnImage, "toolbar_image", #selector(self.onImageClick))
+        setupButton(btnEmoji, "toolbar_emoji", #selector(self.onEmojiClick))
+        setupButton(btnTextType, "toolbar_font_type", #selector(self.toggleTextTypeToolbar))
+        setupButton(btnTextStyle, "toolbar_font_style", #selector(self.toogleTextStyleToolbar))
+        stackToolbar.addArrangedSubview(btnAt)
+        stackToolbar.addArrangedSubview(btnImage)
+        stackToolbar.addArrangedSubview(btnEmoji)
+        stackToolbar.addArrangedSubview(btnTextType)
+        stackToolbar.addArrangedSubview(btnTextStyle)
         
-        let ibTextStyle = UIButton(frame: CGRect(x: 0, y: 0, width: 36, height: 36))
-        ibTextStyle.setTitle("A", for: .normal)
-        ibTextStyle.setTitleColor(.black, for: .normal)
-        ibTextStyle.addTarget(self, action: #selector(toggleTextStyle), for: .touchUpInside)
-        ibTextStyle.backgroundColor = .green
-        ibTextStyle.layer.cornerRadius = 10
-        toolbarStack.addArrangedSubview(ibTextType)
-        toolbarStack.addArrangedSubview(ibTextStyle)
+        // Text type toolbar.
+        stackTextType.frame = CGRect(x: 0, y: 0, width: _view.bounds.width, height: 48)
+        stackTextType.backgroundColor = .white
+        stackTextType.axis = .horizontal
+        stackTextType.spacing = 8
+        stackTextType.distribution = .equalSpacing
+        stackTextType.layoutMargins = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
         
-        // Sub toolbar.
-        let subToolbarStack = UIStackView(frame: CGRect(x: 0, y: 0, width: stack.bounds.width, height: 48))
-        subToolbarStack.backgroundColor = .cyan
-        subToolbarStack.axis = .horizontal
-        subToolbarStack.spacing = 8
-        subToolbarStack.distribution = .equalSpacing
-        subToolbarStack.layoutMargins = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 16)
-        
-        // Bold button
-        let ibBold = UIButton(frame: CGRect(x: 0, y: 0, width: 36, height: 36))
-        ibBold.setTitle("B", for: .normal)
-        ibBold.setTitleColor(.black, for: .normal)
-        ibBold.addTarget(self, action: #selector(setBold), for: .touchUpInside)
-        ibBold.backgroundColor = .green
-        ibBold.layer.cornerRadius = 10
-        
-        let ibItalic = UIButton(frame: CGRect(x: 0, y: 0, width: 36, height: 36))
-        ibItalic.setTitle("I", for: .normal)
-        ibItalic.setTitleColor(.black, for: .normal)
-        ibItalic.addTarget(self, action: #selector(setBold), for: .touchUpInside)
-        ibItalic.backgroundColor = .green
-        ibItalic.layer.cornerRadius = 10
-        
-        let ibUnderline = UIButton(frame: CGRect(x: 0, y: 0, width: 36, height: 36))
-        ibUnderline.setTitle("U", for: .normal)
-        ibUnderline.setTitleColor(.black, for: .normal)
-        ibUnderline.addTarget(self, action: #selector(setBold), for: .touchUpInside)
-        ibUnderline.backgroundColor = .green
-        ibUnderline.layer.cornerRadius = 10
-        
-        let ibStrikeThrough = UIButton(frame: CGRect(x: 0, y: 0, width: 36, height: 36))
-        ibStrikeThrough.setTitle("S", for: .normal)
-        ibStrikeThrough.setTitleColor(.black, for: .normal)
-        ibStrikeThrough.addTarget(self, action: #selector(setBold), for: .touchUpInside)
-        ibStrikeThrough.backgroundColor = .green
-        ibStrikeThrough.layer.cornerRadius = 10
+        setupButton(btnHeadline1, "toolbar_h1", #selector(self.onTextTypeBtnClick), tag: TextType.headline1.viewTag())
+        setupButton(btnHeadline2, "toolbar_h2", #selector(self.onTextTypeBtnClick), tag: TextType.headline2.viewTag())
+        setupButton(btnHeadline3, "toolbar_h3", #selector(self.onTextTypeBtnClick), tag: TextType.headline3.viewTag())
+        setupButton(btnListBullet, "toolbar_list", #selector(self.onTextTypeBtnClick), tag: TextType.listBullet.viewTag())
+        setupButton(btnListOrdered, "toolbar_ordered_list", #selector(self.onTextTypeBtnClick), tag: TextType.listOrdered.viewTag())
+        setupButton(btnDivider, "toolbar_divider", #selector(self.onTextTypeBtnClick), tag: TextType.divider.viewTag())
+        setupButton(btnQuote, "toolbar_quote", #selector(self.onTextTypeBtnClick), tag: TextType.quote.viewTag())
+        setupButton(btnCodeBlock, "toolbar_code_block", #selector(self.onTextTypeBtnClick), tag: TextType.codeBlock.viewTag())
+        stackTextType.addArrangedSubview(btnHeadline1)
+        stackTextType.addArrangedSubview(btnHeadline2)
+        stackTextType.addArrangedSubview(btnHeadline3)
+        stackTextType.addArrangedSubview(btnListBullet)
+        stackTextType.addArrangedSubview(btnListOrdered)
+        stackTextType.addArrangedSubview(btnDivider)
+        stackTextType.addArrangedSubview(btnQuote)
+        stackTextType.addArrangedSubview(btnCodeBlock)
 
-        subToolbarStack.addArrangedSubview(ibBold)
-        subToolbarStack.addArrangedSubview(ibItalic)
-        subToolbarStack.addArrangedSubview(ibUnderline)
-        subToolbarStack.addArrangedSubview(ibStrikeThrough)
-
-        stack.addArrangedSubview(subToolbarStack)
-        stack.addArrangedSubview(toolbarStack)
-
-        _view.addSubview(stack)
+        // Text style toolbar.
+        setupButton(btnBold, "toolbar_bold", #selector(self.onTextStyleClick), tag: TextStyle.bold.viewTag())
+        setupButton(btnItalic, "toolbar_italic", #selector(self.onTextStyleClick), tag: TextStyle.italic.viewTag())
+        setupButton(btnUnderline, "toolbar_underline", #selector(self.onTextStyleClick), tag: TextStyle.underline.viewTag())
+        setupButton(btnStrikThrough, "toolbar_strike_through", #selector(self.onTextStyleClick), tag: TextStyle.strikeThrough.viewTag())
+        stackTextStyle.addArrangedSubview(btnBold)
+        stackTextStyle.addArrangedSubview(btnItalic)
+        stackTextStyle.addArrangedSubview(btnUnderline)
+        stackTextStyle.addArrangedSubview(btnStrikThrough)
+        
+        _view.addSubview(stackToolbar)
+        _view.addSubview(stackTextType)
+        _view.addSubview(stackTextStyle)
     }
     
-    @objc func setBold() {
-        print("setBold")
-        debugPrint("set bold in debug")
-        let styleList = ["bold"]
-        methodChannel.invokeMethod("setTextStyle", arguments: styleList)
+    @objc func onAtClick() {
+        print("on at click")
+        methodChannel.invokeMethod("onAtClick", arguments: nil)
+    }
+    
+    @objc func onImageClick() {
+        print("on image click")
+        methodChannel.invokeMethod("onImageClick", arguments: nil)
+    }
+    
+    @objc func onEmojiClick() {
+        print("on emoji click")
+        methodChannel.invokeMethod("onEmojiClick", arguments: nil)
+    }
+    
+    @objc func onTextTypeBtnClick(_ sender: UIButton) {
+        switch sender.tag {
+        case TextType.headline1.viewTag():
+            toggleTextType(TextType.headline1.rawValue)
+        case TextType.headline2.viewTag():
+            toggleTextType(TextType.headline2.rawValue)
+        case TextType.headline3.viewTag():
+            toggleTextType(TextType.headline3.rawValue)
+        case TextType.listBullet.viewTag():
+            toggleTextType(TextType.listBullet.rawValue)
+        case TextType.listOrdered.viewTag():
+            toggleTextType(TextType.listOrdered.rawValue)
+        case TextType.divider.viewTag():
+            methodChannel.invokeMethod("insertDivider", arguments: nil)
+        case TextType.quote.viewTag():
+            toggleTextType(TextType.quote.rawValue)
+        case TextType.codeBlock.viewTag():
+            toggleTextType(TextType.codeBlock.rawValue)
+        default:
+            print("missing tag on text type button click")
+        }
+    }
+    
+    @objc func onTextStyleClick(_ sender: UIButton) {
+        switch sender.tag {
+        case TextStyle.bold.viewTag():
+            toggleTextStyle(TextStyle.bold.rawValue)
+        case TextStyle.italic.viewTag():
+            toggleTextStyle(TextStyle.italic.rawValue)
+        case TextStyle.underline.viewTag():
+            toggleTextStyle(TextStyle.underline.rawValue)
+        case TextStyle.strikeThrough.viewTag():
+            toggleTextStyle(TextStyle.strikeThrough.rawValue)
+        default:
+            print("missing tag on text style button click")
+        }
     }
     
     @objc func toggleTextType(_ textType: String) {
@@ -173,7 +225,7 @@ class TunEditorToolbarView: NSObject, FlutterPlatformView {
             // TODO hightlight button
             print("headline1")
         default:
-            print("missing text type")
+            print("missing text type in current text type")
         }
     }
     
@@ -186,12 +238,11 @@ class TunEditorToolbarView: NSObject, FlutterPlatformView {
             // TODO hightlight button
             print("bold")
         default:
-            print("missing text style")
+            print("missing text style in current text style")
         }
-
     }
     
-    public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+    func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         switch call.method {
         case "onSelectionChanged":
             print("on selection changed")
@@ -200,6 +251,22 @@ class TunEditorToolbarView: NSObject, FlutterPlatformView {
             print("missing channel method: \(call.method)")
         }
     }
-
+    
+    @objc func toggleTextTypeToolbar() {
+        print("toggle text type toolbar")
+    }
+    
+    @objc func toogleTextStyleToolbar() {
+        print("toggle text style toolbar")
+    }
+    
+    func setupButton(_ btn: UIButton, _ imageName: String, _ selector: Selector, tag: Int = -1) {
+        btn.setImage(UIImage(named: imageName, in: Bundle.main, compatibleWith: nil), for: .normal)
+        btn.backgroundColor = UIColor(red: 238, green: 239, blue: 240, alpha: 1)
+        btn.layer.cornerRadius = 4
+        btn.contentEdgeInsets = UIEdgeInsets(top: 6, left: 6, bottom: 6, right: 6)
+        btn.tag = tag
+        btn.addTarget(self, action: selector, for: .touchUpInside)
+    }
 
 }

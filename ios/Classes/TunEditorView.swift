@@ -39,7 +39,6 @@ class TunEditorView: NSObject, FlutterPlatformView {
         arguments args: Any?,
         binaryMessenger messenger: FlutterBinaryMessenger
     ) {
-        
         _view = UIView()
         _editor = RichEditorView(frame: UIScreen.main.bounds)
         methodChannel = FlutterMethodChannel(name: "tun/editor/\(viewId)", binaryMessenger: messenger)
@@ -60,6 +59,7 @@ class TunEditorView: NSObject, FlutterPlatformView {
     }
     
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+        debugPrint("handle method in tun editor: \(call.method)")
         switch call.method {
         case "undo":
             if (_editor.undoManager?.canUndo == true) {
@@ -74,6 +74,8 @@ class TunEditorView: NSObject, FlutterPlatformView {
         case "clearTextStyle":
             _editor.removeFormat()
         case "setTextType":
+            // Remove format first.
+            _editor.removeFormat()
             let textType: String = call.arguments is String
                 ? call.arguments as! String
                 : TextType.headline1.rawValue
