@@ -189,6 +189,7 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
       isShowTextType = false;
       isShowTextStyle = false;
     });
+    controller.insertImage();
   }
 
   void onEmojiClick() {

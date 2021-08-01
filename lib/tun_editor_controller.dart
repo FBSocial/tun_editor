@@ -131,6 +131,10 @@ class TunEditorController extends ChangeNotifier with TunEditorHandler, TunEdito
     _tunEditorToolbarApi = null;
   }
 
+  void insertImage() {
+    _tunEditorApi?.insertImage();
+  }
+
   // =========== Tun editor toolbar handler ===========
   @override
   void onAtClick() {

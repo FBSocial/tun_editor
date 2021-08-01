@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>Tun Editor</title>
+    <link rel="stylesheet" href="snow.css" type="text/css" charset="utf-8">
+    <script src="quill.min.js" charset="utf-8"></script>
+  </head>
+  <body>
+    <div id="editor"></div>
+
+    <script>
+      var options = {
+        readOnly: false,
+        theme: 'snow',
+      }
+      var quill = new Quill('#editor', options)
+    </script>
+  </body>
+</html>

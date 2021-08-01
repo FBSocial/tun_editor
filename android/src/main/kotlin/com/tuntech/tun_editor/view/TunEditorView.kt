@@ -1,17 +1,11 @@
 package com.tuntech.tun_editor.view
 
 import android.content.Context
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.View
-import android.widget.ScrollView
-import com.tuntech.tun_editor.utils.SelectionUtil
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.platform.PlatformView
-import java.util.*
-import kotlin.collections.ArrayList
 
 internal class TunEditorView(
     context: Context,
@@ -39,19 +33,13 @@ internal class TunEditorView(
     }
 
     // View.
-    private val scrollView: ScrollView = ScrollView(context)
-    private val areEditor: Editor = Editor(context)
+    private val quillEditor: QuillEditor = QuillEditor(context)
 
     // Method channel.
     private val methodChannel: MethodChannel = MethodChannel(messenger, "tun/editor/${id}")
 
-    private var currentStyle: String = ""
-
-    // Text watcher related.
-    private var oldText: String = ""
-
     override fun getView(): View {
-        return scrollView
+        return quillEditor
     }
 
     override fun dispose() {
@@ -59,40 +47,10 @@ internal class TunEditorView(
     }
 
     init {
-        scrollView.isFillViewport = true
-        scrollView.addView(areEditor)
-
         methodChannel.setMethodCallHandler(this)
 
-        areEditor.addTextChangedListener(object: TextWatcher {
-            override fun beforeTextChanged(
-                s: CharSequence?, start: Int,
-                count: Int, after: Int
-            ) {
-                oldText = s?.toString() ?: ""
-            }
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                val args = HashMap<String, Any>()
-                args["start"] = start
-                args["before"] = before
-                args["count"] = count
-                args["oldText"] = oldText
-                args["newText"] = s?.toString() ?: ""
-                args["style"] = currentStyle
-                methodChannel.invokeMethod(INVOKE_METHOD_ON_TEXT_CHANGE, args)
-            }
-            override fun afterTextChanged(s: Editable?) {
-            }
-        })
-        areEditor.setOnSelectionChanged { selStart, selEnd ->
-            val res = SelectionUtil.checkSelectionStyle(areEditor.editableText, selStart, selEnd)
-            currentStyle = res["style"] as? String ?: ""
-            println("on selection changed $selStart, $selEnd: $currentStyle")
-            methodChannel.invokeMethod(INVOKE_METHOD_ON_SELECTION_CHANGED, res)
-        }
-        if (creationParams?.containsKey("place_holder") == true) {
+       if (creationParams?.containsKey("place_holder") == true) {
             val placeHolder: String = (creationParams["place_holder"] as? String) ?: ""
-            areEditor.hint = placeHolder
         }
     }
 
@@ -106,30 +64,43 @@ internal class TunEditorView(
                 result.success(null)
             }
             HANDLE_METHOD_CLEAR_TEXT_TYPE -> {
-                areEditor.clearTextType()
                 result.success(null)
             }
             HANDLE_METHOD_CLEAR_TEXT_STYLE -> {
-                areEditor.clearTextStyle()
                 result.success(null)
             }
             HANDLE_METHOD_SET_TEXT_TYPE -> {
-                val textType: String = call.arguments as? String ?: Editor.TEXT_TYPE_NORMAL
-                areEditor.setTextType(textType)
-                result.success(null)
+                // when (call.arguments as? String ?: Editor.TEXT_TYPE_NORMAL) {
+                //     TextCons.TEXT_TYPE_NORMAL -> richEditor.removeFormat()
+                //     TextCons.TEXT_TYPE_HEADLINE1 -> richEditor.setHeading(1)
+                //     TextCons.TEXT_TYPE_HEADLINE2 -> richEditor.setHeading(2)
+                //     TextCons.TEXT_TYPE_HEADLINE3 -> richEditor.setHeading(3)
+                //     TextCons.TEXT_TYPE_LIST_BULLET -> richEditor.setBullets()
+                //     TextCons.TEXT_TYPE_LIST_ORDERED -> richEditor.setNumbers()
+                //     TextCons.TEXT_TYPE_QUOTE -> richEditor.setBlockquote()
+                // }
+                // result.success(null)
             }
             HANDLE_METHOD_SET_TEXT_STYLE -> {
-                val textStyle: List<String> = (call.arguments as? List<*> ?: ArrayList<String>()).map {
-                    return@map it as String? ?: ""
-                }
-                areEditor.setTextStyle(textStyle)
-                result.success(null)
+                // val textStyleList: List<String> = (call.arguments as? List<*> ?: ArrayList<String>()).map {
+                //     return@map it as String? ?: ""
+                // }
+                // richEditor.removeFormat()
+                // for (textStyle in textStyleList) {
+                //     when (textStyle) {
+                //         TextCons.TEXT_STYLE_BOLD -> richEditor.setBold()
+                //         TextCons.TEXT_STYLE_ITALIC -> richEditor.setItalic()
+                //         TextCons.TEXT_STYLE_UNDERLINE -> richEditor.setUnderline()
+                //         TextCons.TEXT_STYLE_STRIKE_THROUGH -> richEditor.setStrikeThrough()
+                //     }
+                // }
+                // result.success(null)
             }
             HANDLE_METHOD_UPDATE_SELECTION -> {
                 val args = call.arguments as? Map<*, *> ?: return
                 val selStart = args["selStart"] as? Int ?: 0
                 val selEnd = args["selEnd"] as? Int ?: 0
-                areEditor.setSelection(selStart, selEnd)
+                // TODO Set selection
                 result.success(null)
             }
             HANDLE_METHOD_FORMAT_TEXT -> {
@@ -140,10 +111,10 @@ internal class TunEditorView(
                 if (index < 0) {
                     index = 0
                 }
-                if (len > areEditor.length()) {
-                    len = areEditor.length()
-                }
-                areEditor.formatText(attr, index, len)
+                // if (len > areEditor.length()) {
+                //     len = areEditor.length()
+                // }
+                // TODO Format text
                 result.success(null)
             }
             HANDLE_METHOD_REPLACE_TEXT -> {
@@ -153,11 +124,10 @@ internal class TunEditorView(
                 val data = args["data"] as? String ?: ""
                 val ignoreFocus = args["ignoreFocus"] as Boolean? ?: false
                 val autoAppendNewLineAfterImage = args["autoAppendNewLineAfterImage"] as Boolean? ?: true
-                if (index > areEditor.length()) {
-                    return
-                }
-                areEditor.text =
-                    areEditor.editableText.replace(index, index + len, data)
+                // if (index > areEditor.length()) {
+                //     return
+                // }
+                // TODO Replace
                 result.success(null)
             }
             HANDLE_METHOD_INSERT -> {
@@ -167,24 +137,25 @@ internal class TunEditorView(
                 val replaceLength = args["replaceLength"] as? Int ?: 0
                 val autoAppendNewLineAfterImage = args["autoAppendNewLineAfterImage"] as Boolean? ?: true
 
-                if (index > areEditor.length()) {
-                    return
-                }
-                if (replaceLength > 0) {
-                    areEditor.text =
-                        areEditor.editableText.replace(index, index + replaceLength, data)
-                } else {
-                    areEditor.text = areEditor.editableText.insert(index, data)
-                }
-                println("new text: ${areEditor.text} $index $data")
+                // if (index > areEditor.length()) {
+                //     return
+                // }
+                // if (replaceLength > 0) {
+                //     areEditor.text =
+                //         areEditor.editableText.replace(index, index + replaceLength, data)
+                // } else {
+                //     areEditor.text = areEditor.editableText.insert(index, data)
+                // }
+                // println("new text: ${areEditor.text} $index $data")
+                // TODO Insert
                 result.success(null)
             }
             HANDLE_METHOD_INSERT_DIVIDER -> {
-                areEditor.insertDivider()
+                quillEditor.insertDivider()
             }
             HANDLE_METHOD_INSERT_IMAGE -> {
                 val url = "https://avatars0.githubusercontent.com/u/1758864?s=460&v=4"
-                areEditor.insertImageUrl(url)
+                // richEditor.insertImage(url, "test image")
             }
 
             else -> {

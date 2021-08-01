@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>Tun Editor</title>
+    <link rel="stylesheet" href="normalize.css" type="text/css" charset="utf-8">
+    <link rel="stylesheet" href="snow.css" type="text/css" charset="utf-8">
+    <script src="quill.min.js" charset="utf-8"></script>
+    <script src="markdown.js" charset="utf-8"></script>
+    <style>
+      .ql-container.ql-snow {
+         border: none !important;
+         height: 100vh;
+       }
+    </style>
+  </head>
+  <body>
+    <div id="editor"></div>
+
+    <script>
+      var insertDivider;
+      document.addEventListener('DOMContentLoaded', () => {
+        let BlockEmbed = Quill.import('blots/block/embed');
+        class DividerBlot extends BlockEmbed { }
+        DividerBlot.blotName = 'divider';
+        DividerBlot.tagName = 'hr';
+        Quill.register(DividerBlot);
+
+        var options = {
+          readOnly: false,
+          theme: 'snow',
+          modules: {
+            toolbar: false,
+          }
+        };
+        var quill = new Quill('#editor', options);
+
+        quill.on('text-change', function(delta, oldDelta, source) {
+          if (source == 'api') {
+            console.log("An API call triggered this change.");
+          } else if (source == 'user') {
+            console.log("A user action triggered this change.");
+          }
+          console.log(JSON.stringify(delta), JSON.stringify(oldDelta), source);
+        });
+        quill.on('selection-change', function(range, oldRange, source) {
+          if (range) {
+            var format = quill.getFormat()
+            console.log(format)
+            if (range.length == 0) {
+              console.log('User cursor is on', range.index);
+            } else {
+              var text = quill.getText(range.index, range.length);
+              console.log('User has highlighted', text);
+            }
+            tun.onSelectionChanged()
+          } else {
+            console.log('Cursor not in the editor');
+          }
+        });
+
+        var markdownOptions = {
+          ignoreTags: [ 'h4', 'h5', 'h6' ], // @option - if you need to ignore some tags.
+        };
+        new QuillMarkdown(quill, markdownOptions);
+
+        // Insert divider.
+        insertDivider = function() {
+          let range = quill.getSelection(true);
+          quill.insertText(range.index, '\n', Quill.sources.USER);
+          quill.insertEmbed(range.index + 1, 'divider', true, Quill.sources.USER);
+          quill.setSelection(range.index + 2, Quill.sources.SILENT);
+        }
+      })
+    </script>
+  </body>
+</html>
