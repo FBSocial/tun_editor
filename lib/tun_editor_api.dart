@@ -70,9 +70,10 @@ class TunEditorApi {
   }
   void formatText(int index, int len, Attribute attribute) {
     _channel.invokeMethod('formatText', {
-      'attribute': attribute.uniqueKey,
       'index': index,
       'len': len,
+      'name': attribute.key,
+      'value': attribute.value,
     });
   }
   void replaceText(int index, int len, Object? data, {

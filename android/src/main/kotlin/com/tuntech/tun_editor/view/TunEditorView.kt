@@ -2,13 +2,14 @@ package com.tuntech.tun_editor.view
 
 import android.content.Context
 import android.view.View
+import com.tuntech.tun_editor.TextCons
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.platform.PlatformView
 
 internal class TunEditorView(
-    context: Context,
+    val context: Context,
     id: Int,
     creationParams: Map<String, Any?>?,
     messenger: BinaryMessenger
@@ -70,51 +71,46 @@ internal class TunEditorView(
                 result.success(null)
             }
             HANDLE_METHOD_SET_TEXT_TYPE -> {
-                // when (call.arguments as? String ?: Editor.TEXT_TYPE_NORMAL) {
-                //     TextCons.TEXT_TYPE_NORMAL -> richEditor.removeFormat()
-                //     TextCons.TEXT_TYPE_HEADLINE1 -> richEditor.setHeading(1)
-                //     TextCons.TEXT_TYPE_HEADLINE2 -> richEditor.setHeading(2)
-                //     TextCons.TEXT_TYPE_HEADLINE3 -> richEditor.setHeading(3)
-                //     TextCons.TEXT_TYPE_LIST_BULLET -> richEditor.setBullets()
-                //     TextCons.TEXT_TYPE_LIST_ORDERED -> richEditor.setNumbers()
-                //     TextCons.TEXT_TYPE_QUOTE -> richEditor.setBlockquote()
-                // }
-                // result.success(null)
+                when (call.arguments as? String ?: Editor.TEXT_TYPE_NORMAL) {
+                    TextCons.TEXT_TYPE_NORMAL -> quillEditor.removeCurrentFormat()
+                    TextCons.TEXT_TYPE_HEADLINE1 -> quillEditor.format("header", 1)
+                    TextCons.TEXT_TYPE_HEADLINE2 -> quillEditor.format("header", 2)
+                    TextCons.TEXT_TYPE_HEADLINE3 -> quillEditor.format("header", 3)
+                    TextCons.TEXT_TYPE_LIST_BULLET -> quillEditor.format("list", "bullet")
+                    TextCons.TEXT_TYPE_LIST_ORDERED -> quillEditor.format("list", "ordered")
+                    TextCons.TEXT_TYPE_QUOTE -> quillEditor.format("blockquote", true)
+                    TextCons.TEXT_TYPE_CODE_BLOCK -> quillEditor.format("code-block", true)
+                }
+                 result.success(null)
             }
             HANDLE_METHOD_SET_TEXT_STYLE -> {
-                // val textStyleList: List<String> = (call.arguments as? List<*> ?: ArrayList<String>()).map {
-                //     return@map it as String? ?: ""
-                // }
-                // richEditor.removeFormat()
-                // for (textStyle in textStyleList) {
-                //     when (textStyle) {
-                //         TextCons.TEXT_STYLE_BOLD -> richEditor.setBold()
-                //         TextCons.TEXT_STYLE_ITALIC -> richEditor.setItalic()
-                //         TextCons.TEXT_STYLE_UNDERLINE -> richEditor.setUnderline()
-                //         TextCons.TEXT_STYLE_STRIKE_THROUGH -> richEditor.setStrikeThrough()
-                //     }
-                // }
-                // result.success(null)
+                val textStyleList: List<String> = (call.arguments as? List<*> ?: ArrayList<String>()).map {
+                    return@map it as String? ?: ""
+                }
+                quillEditor.format("bold", textStyleList.contains(TextCons.TEXT_STYLE_BOLD))
+                quillEditor.format("italic", textStyleList.contains(TextCons.TEXT_STYLE_ITALIC))
+                quillEditor.format("underline", textStyleList.contains(TextCons.TEXT_STYLE_UNDERLINE))
+                quillEditor.format("strike", textStyleList.contains(TextCons.TEXT_STYLE_STRIKE_THROUGH))
+                result.success(null)
             }
             HANDLE_METHOD_UPDATE_SELECTION -> {
                 val args = call.arguments as? Map<*, *> ?: return
                 val selStart = args["selStart"] as? Int ?: 0
                 val selEnd = args["selEnd"] as? Int ?: 0
-                // TODO Set selection
+                if (selEnd > selStart) {
+                    quillEditor.setSelection(selStart, selEnd - selStart)
+                } else {
+                    quillEditor.setSelection(selEnd, selStart - selEnd)
+                }
                 result.success(null)
             }
             HANDLE_METHOD_FORMAT_TEXT -> {
                 val args = call.arguments as? Map<*, *> ?: return
-                val attr = args["attribute"] as? String ?: return
-                var index = args["index"] as? Int ?: 0
-                var len = args["len"] as? Int ?: 0
-                if (index < 0) {
-                    index = 0
-                }
-                // if (len > areEditor.length()) {
-                //     len = areEditor.length()
-                // }
-                // TODO Format text
+                val index = args["index"] as? Int ?: 0
+                val len = args["len"] as? Int ?: 0
+                val name = args["name"] as? String ?: return
+                val value = args["value"] as? String ?: return
+                quillEditor.formatText(index, len, name, value)
                 result.success(null)
             }
             HANDLE_METHOD_REPLACE_TEXT -> {
@@ -124,10 +120,7 @@ internal class TunEditorView(
                 val data = args["data"] as? String ?: ""
                 val ignoreFocus = args["ignoreFocus"] as Boolean? ?: false
                 val autoAppendNewLineAfterImage = args["autoAppendNewLineAfterImage"] as Boolean? ?: true
-                // if (index > areEditor.length()) {
-                //     return
-                // }
-                // TODO Replace
+                quillEditor.replaceText(index, len, data, ignoreFocus, autoAppendNewLineAfterImage)
                 result.success(null)
             }
             HANDLE_METHOD_INSERT -> {

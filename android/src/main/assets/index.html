@@ -20,6 +20,10 @@
 
     <script>
       var insertDivider;
+      var format;
+      var removeFormat;
+      var removeCurrentFormat;
+      var getSelection;
       document.addEventListener('DOMContentLoaded', () => {
         let BlockEmbed = Quill.import('blots/block/embed');
         class DividerBlot extends BlockEmbed { }
@@ -71,6 +75,25 @@
           quill.insertText(range.index, '\n', Quill.sources.USER);
           quill.insertEmbed(range.index + 1, 'divider', true, Quill.sources.USER);
           quill.setSelection(range.index + 2, Quill.sources.SILENT);
+        }
+        format = function(name, value) {
+          quill.format(name, value, 'user');
+        }
+        removeFormat = function(index, length) {
+          quill.removeFormat(index, length, 'user');
+        }
+        removeCurrentFormat = function() {
+          var range = quill.getSelection();
+          if (range.length === 0) {
+            let leaf, offset = quill.getLeaf(range.index);
+            quill.removeFormat(range.index - offset, range.index + leaf.domNode.length);
+          } else {
+             quill.removeFormat(range.index, range.length);
+          }
+        }
+        getSelection = function() {
+          var range = quill.getSelection()
+          tun.getSelectionRes(range.index, range.length)
         }
       })
     </script>
