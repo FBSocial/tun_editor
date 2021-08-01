@@ -44,7 +44,7 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      height: 100,
+      height: isShowTextType || isShowTextStyle ? 100 : 48,
       padding: EdgeInsets.symmetric(
         horizontal: 16,
       ),
@@ -82,19 +82,19 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
         children: [
           SizedBox(width: 4),
           buildButton(IconFont.headline1, () => toggleTextType('header1'), currentTextType == "header1"),
-          SizedBox(width: 8),
+          SizedBox(width: 4),
           buildButton(IconFont.headline2, () => toggleTextType('header2'), currentTextType == 'header2'),
-          SizedBox(width: 8),
+          SizedBox(width: 4),
           buildButton(IconFont.headline3, () => toggleTextType('header3'), currentTextType == "header3"),
-          SizedBox(width: 8),
+          SizedBox(width: 4),
           buildButton(IconFont.listBullet, () => toggleTextType('list-bullet'), currentTextType == "list-bullet"),
-          SizedBox(width: 8),
+          SizedBox(width: 4),
           buildButton(IconFont.listOrdered, () => toggleTextType('list-ordered'), currentTextType == "list-ordered"),
-          SizedBox(width: 8),
+          SizedBox(width: 4),
           buildButton(IconFont.divider, insertDivider, false),
-          SizedBox(width: 8),
-          buildButton(IconFont.quote, () => toggleTextType('quote'), currentTextType == "quote"),
-          SizedBox(width: 8),
+          SizedBox(width: 4),
+          buildButton(IconFont.quote, () => toggleTextType('blockquote'), currentTextType == "blockquote"),
+          SizedBox(width: 4),
           buildButton(IconFont.codeBlock, () => toggleTextType('code-block'), currentTextType == "code-block"),
           SizedBox(width: 4),
         ],
@@ -117,11 +117,11 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
         children: [
           SizedBox(width: 4),
           buildButton(IconFont.bold, () => toggleTextStyle('bold'), currentTextStyleList.contains('bold')),
-          SizedBox(width: 8),
+          SizedBox(width: 4),
           buildButton(IconFont.italic, () => toggleTextStyle('italic'), currentTextStyleList.contains('italic')),
-          SizedBox(width: 8),
+          SizedBox(width: 4),
           buildButton(IconFont.underline, () => toggleTextStyle('underline'), currentTextStyleList.contains('underline')),
-          SizedBox(width: 8),
+          SizedBox(width: 4),
           buildButton(IconFont.strikeThrough, () => toggleTextStyle('strike'), currentTextStyleList.contains('strike')),
           SizedBox(width: 4),
         ],
@@ -136,14 +136,27 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
       child: Row(
         children: [
           buildButton(IconFont.at, onAtClick, false),
-          SizedBox(width: 8),
+          SizedBox(width: 4),
           buildButton(IconFont.image, onImageClick, false),
-          SizedBox(width: 8),
+          SizedBox(width: 4),
           buildButton(IconFont.emoji, onEmojiClick, false),
-          SizedBox(width: 8),
+          SizedBox(width: 4),
           buildButton(IconFont.textType, toggleTextTypeView, isShowTextType),
-          SizedBox(width: 8),
+          SizedBox(width: 4),
           buildButton(IconFont.textStyle, toggleTextStyleView, isShowTextStyle),
+          Spacer(),
+          GestureDetector(
+            onTap: onSendClick,
+            child: Container(
+              width: 50,
+              height: 36,
+              decoration: BoxDecoration(
+                color: Color(0xFFEEEFF0),
+                borderRadius: BorderRadius.circular(18),
+              ),
+              child: Icon(IconFont.send, size: 24),
+            ),
+          ),
         ],
       ),
     );
@@ -185,7 +198,12 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
     });
   }
 
+  void onSendClick() {
+    setState(() {});
+  }
+
   void insertDivider() {
+    controller.insertDivider();
   }
 
   void toggleTextType(String textType) {

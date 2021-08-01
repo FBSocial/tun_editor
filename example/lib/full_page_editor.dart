@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:tun_editor/models/documents/attribute.dart';
 import 'package:tun_editor/models/documents/document.dart';
 import 'package:tun_editor/tun_editor.dart';
 import 'package:tun_editor/tun_editor_controller.dart';
@@ -53,8 +54,8 @@ class FullPageEditorState extends State<FullPageEditor> {
         title: GestureDetector(
           child: Text("Editor"),
           onTap: () {
-            // _controller.formatText(0, 6, Attribute.ul);
-            _controller.insert(2, 'Bye Bye');
+            _controller.formatText(0, 2, Attribute.h1);
+            // _controller.insert(2, 'Bye Bye');
             // _controller.replaceText(6, 5, 'Jeffrey Wu', null);
           },
         ),

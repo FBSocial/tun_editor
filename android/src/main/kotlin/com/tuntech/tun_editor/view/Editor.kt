@@ -121,15 +121,15 @@ class Editor: AppCompatEditText {
             TEXT_TYPE_QUOTE,
             TEXT_TYPE_CODE_BLOCK -> {
                 applyTextType(index, index + len, TEXT_TYPE_HEADLINE1, false)
-                when (mTextType) {
+                when (attr) {
                     TEXT_TYPE_HEADLINE1 -> {
-                        applyTextType(index, index + len, TEXT_TYPE_HEADLINE1, mTextType == TEXT_TYPE_HEADLINE1)
+                        applyTextType(index, index + len, TEXT_TYPE_HEADLINE1, attr == TEXT_TYPE_HEADLINE1)
                     }
                     TEXT_TYPE_HEADLINE2 -> {
-                        applyTextType(index, index + len, TEXT_TYPE_HEADLINE2, mTextType == TEXT_TYPE_HEADLINE2)
+                        applyTextType(index, index + len, TEXT_TYPE_HEADLINE2, attr == TEXT_TYPE_HEADLINE2)
                     }
                     TEXT_TYPE_HEADLINE3 -> {
-                        applyTextType(index, index + len, TEXT_TYPE_HEADLINE3, mTextType == TEXT_TYPE_HEADLINE3)
+                        applyTextType(index, index + len, TEXT_TYPE_HEADLINE3, attr == TEXT_TYPE_HEADLINE3)
                     }
                 }
                 applyTextType(index, index + len, TEXT_TYPE_LIST_BULLET, attr == TEXT_TYPE_LIST_BULLET)
@@ -140,17 +140,13 @@ class Editor: AppCompatEditText {
 
             TEXT_STYLE_BOLD, TEXT_STYLE_ITALIC, TEXT_STYLE_UNDERLINE, TEXT_STYLE_STRIKE_THROUGH -> {
                 applyTextStyle(index, index + len, TEXT_STYLE_BOLD, false)
-                if (mTextStyleList.contains(TEXT_STYLE_BOLD) && mTextStyleList.contains(TEXT_STYLE_ITALIC)) {
-                    applyTextStyle(index, index + len, TEXT_STYLE_BOLD_ITALIC, true)
-                } else if (mTextStyleList.contains(TEXT_STYLE_BOLD)) {
+                if (attr == TEXT_STYLE_BOLD) {
                     applyTextStyle(index, index + len, TEXT_STYLE_BOLD, true)
-                } else if (mTextStyleList.contains(TEXT_STYLE_ITALIC)) {
+                } else if (attr == TEXT_STYLE_ITALIC) {
                     applyTextStyle(index, index + len, TEXT_STYLE_ITALIC, true)
                 }
-                applyTextStyle(index, index + len, TEXT_STYLE_UNDERLINE, mTextStyleList.contains(
-                    TEXT_STYLE_UNDERLINE))
-                applyTextStyle(index, index + len, TEXT_STYLE_STRIKE_THROUGH, mTextStyleList.contains(
-                    TEXT_STYLE_STRIKE_THROUGH))
+                applyTextStyle(index, index + len, TEXT_STYLE_UNDERLINE, attr == TEXT_STYLE_UNDERLINE)
+                applyTextStyle(index, index + len, TEXT_STYLE_STRIKE_THROUGH, attr == TEXT_STYLE_STRIKE_THROUGH)
             }
             else -> {
                 Log.w(TAG, "format text with missing attribute: $attr")
@@ -161,10 +157,9 @@ class Editor: AppCompatEditText {
     fun insertDivider() {
         val ssb = SpannableStringBuilder()
         ssb.append(Constants.CHAR_NEW_LINE)
-        ssb.append(Constants.CHAR_NEW_LINE)
         ssb.append(Constants.ZERO_WIDTH_SPACE_STR)
         ssb.append(Constants.CHAR_NEW_LINE)
-        ssb.setSpan(AreHrSpan(), 2, 3, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+        ssb.setSpan(AreHrSpan(), 1, 2, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
         editableText.replace(selectionStart, selectionEnd, ssb)
     }
 
@@ -225,6 +220,16 @@ class Editor: AppCompatEditText {
                         TEXT_STYLE_UNDERLINE))
                     applyTextStyle(startPos, endPos, TEXT_STYLE_STRIKE_THROUGH, mTextStyleList.contains(
                         TEXT_STYLE_STRIKE_THROUGH))
+
+                    // parseMarkdown
+                    if (s != null) {
+                        val lastChar = s.substring(endPos - 1, endPos)
+                        val isSpace = lastChar == " "
+                        val isNewLine = lastChar == "\n"
+                        if (isSpace || isNewLine) {
+                            parseMarkdown()
+                        }
+                    }
                 }
             }
         })
@@ -289,6 +294,92 @@ class Editor: AppCompatEditText {
         }
         editableText.getSpans(start, end, AreQuoteSpan::class.java).forEach {
             editableText.removeSpan(it)
+        }
+    }
+
+    private fun parseMarkdown() {
+        val currentLine = Util.getCurrentCursorLine(this)
+        val start = Util.getThisLineStart(this, currentLine)
+        val end = Util.getThisLineEnd(this, currentLine)
+        val lineText = editableText.substring(start, end)
+
+        val headerRegex = Regex("^(#){1,6}\\s")
+        val listBulletRegex = Regex("^\\[+-*]\\s\$")
+        val listOrderedRegex = Regex("^\\1\\s\$")
+        val quoteRegex = Regex("^(>)\\s")
+        val dividerRegex = Regex("^([-*]\\s?){3}")
+        val codeBlockRegex = Regex("^`{3}(?:\\s|\\n)")
+        val boldRegex = Regex("(?:\\*|_){2}(.+?)(?:\\*|_){2}")
+        val italicRegex = Regex("(?:\\*|_){1}(.+?)(?:\\*|_){1}")
+        val underlineRegex = Regex("")
+        val strikeThroughRegex = Regex("(?:~~)(.+?)(?:~~)")
+        when {
+            headerRegex.matches(lineText) -> {
+                val res = headerRegex.find(lineText) ?: return
+                if (res.groupValues.isNotEmpty()) {
+                    return
+                }
+                val size = res.groupValues.first().length
+                when (size - 1) {
+                    1 -> {
+                        formatText(TEXT_TYPE_HEADLINE1, start, end)
+                        mTextType = TEXT_TYPE_HEADLINE1
+                    }
+                    2 -> {
+                        formatText(TEXT_TYPE_HEADLINE2, start, end)
+                        mTextType = TEXT_TYPE_HEADLINE2
+                    }
+                    3 -> {
+                        formatText(TEXT_TYPE_HEADLINE3, start, end)
+                        mTextType = TEXT_TYPE_HEADLINE3
+                    }
+                    else -> {
+                        formatText(TEXT_TYPE_HEADLINE3, start, end)
+                        mTextType = TEXT_TYPE_HEADLINE3
+                    }
+                }
+                editableText.delete(start, start + size)
+            }
+            listBulletRegex.matches(lineText) -> {
+                val res = listBulletRegex.find(lineText) ?: return
+                if (res.groupValues.isEmpty()) {
+                    return
+                }
+                val size = res.groupValues.first().length
+                formatText(TEXT_TYPE_LIST_BULLET, start, end)
+                editableText.delete(start, start + size)
+            }
+            listOrderedRegex.matches(lineText) -> {
+                val res = listOrderedRegex.find(lineText) ?: return
+                if (res.groupValues.isEmpty()) {
+                    return
+                }
+                val size = res.groupValues.first().length
+                formatText(TEXT_TYPE_LIST_ORDERED, start, end)
+                editableText.delete(start, start + size)
+            }
+            dividerRegex.matches(lineText) -> {
+                editableText.delete(start, start + 4)
+                insertDivider()
+            }
+            quoteRegex.matches(lineText) -> {
+                val res = quoteRegex.find(lineText) ?: return
+                if (res.groupValues.isEmpty()) {
+                    return
+                }
+                val size = res.groupValues.first().length
+                formatText(TEXT_TYPE_QUOTE, start, end)
+                editableText.delete(start, start + size)
+            }
+            codeBlockRegex.matches(lineText) -> {
+                val res = codeBlockRegex.find(lineText) ?: return
+                if (res.groupValues.isEmpty()) {
+                    return
+                }
+                val size = res.groupValues.first().length
+                formatText(TEXT_TYPE_CODE_BLOCK, start, end)
+                editableText.delete(start, start + size)
+            }
         }
     }
 

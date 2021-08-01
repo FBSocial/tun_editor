@@ -40,7 +40,7 @@ class TunEditorView: NSObject, FlutterPlatformView {
         binaryMessenger messenger: FlutterBinaryMessenger
     ) {
         _view = UIView()
-        _editor = RichEditorView(frame: UIScreen.main.bounds)
+        _editor = RichEditorView(frame: CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: 400))
         methodChannel = FlutterMethodChannel(name: "tun/editor/\(viewId)", binaryMessenger: messenger)
 
         super.init()
@@ -78,7 +78,7 @@ class TunEditorView: NSObject, FlutterPlatformView {
             _editor.removeFormat()
             let textType: String = call.arguments is String
                 ? call.arguments as! String
-                : TextType.headline1.rawValue
+                : TextType.normal.rawValue
             switch textType {
             case TextType.headline1.rawValue:
                 _editor.header(1)
@@ -95,7 +95,22 @@ class TunEditorView: NSObject, FlutterPlatformView {
             default:
                 print("missing text type")
             }
-//        case "setTextStyle":
+        case "setTextStyle":
+            _editor.removeFormat()
+            if let styles = call.arguments as? [String] {
+                if styles.contains(TextStyle.bold.rawValue) {
+                    _editor.bold()
+                }
+                if styles.contains(TextStyle.italic.rawValue) {
+                    _editor.italic()
+                }
+                if styles.contains(TextStyle.underline.rawValue) {
+                    _editor.underline()
+                }
+                if styles.contains(TextStyle.strikeThrough.rawValue) {
+                    _editor.strikethrough()
+                }
+            }
 //        case "updateSelection":
 //        case "formatText":
 //        case "replaceText":

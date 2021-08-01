@@ -24,5 +24,6 @@ class IconFont {
   static const IconData italic = IconData(0xe639, fontFamily: fontFamily, fontPackage: fontPackage);
   static const IconData underline = IconData(0xe638, fontFamily: fontFamily, fontPackage: fontPackage);
   static const IconData strikeThrough = IconData(0xe63a, fontFamily: fontFamily, fontPackage: fontPackage);
+  static const IconData send = IconData(0xe757, fontFamily: fontFamily, fontPackage: fontPackage);
 
 }

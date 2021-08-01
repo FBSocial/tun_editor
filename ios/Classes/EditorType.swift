@@ -15,7 +15,7 @@ enum TextType: String {
     case listBullet = "list-bullet"
     case listOrdered = "list-ordered"
     case divider = "divider"
-    case quote = "blockQuote"
+    case quote = "blockquote"
     case codeBlock = "code-block"
     
     func viewTag() -> Int {

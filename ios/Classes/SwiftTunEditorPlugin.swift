@@ -2,6 +2,7 @@ import Flutter
 import UIKit
 
 public class SwiftTunEditorPlugin: NSObject, FlutterPlugin {
+    
   public static func register(with registrar: FlutterPluginRegistrar) {
     let messenger = registrar.messenger()
     let channel = FlutterMethodChannel(name: "tun_editor", binaryMessenger: messenger)
@@ -17,4 +18,5 @@ public class SwiftTunEditorPlugin: NSObject, FlutterPlugin {
   public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
     result("iOS " + UIDevice.current.systemVersion)
   }
+    
 }
