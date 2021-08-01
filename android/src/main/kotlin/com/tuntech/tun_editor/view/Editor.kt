@@ -305,13 +305,12 @@ class Editor: AppCompatEditText {
 
         val headerRegex = Regex("^(#){1,6}\\s")
         val listBulletRegex = Regex("^\\[+-*]\\s\$")
-        val listOrderedRegex = Regex("^\\1\\s\$")
+        val listOrderedRegex = Regex("^1.\\s\$")
         val quoteRegex = Regex("^(>)\\s")
         val dividerRegex = Regex("^([-*]\\s?){3}")
         val codeBlockRegex = Regex("^`{3}(?:\\s|\\n)")
         val boldRegex = Regex("(?:\\*|_){2}(.+?)(?:\\*|_){2}")
         val italicRegex = Regex("(?:\\*|_){1}(.+?)(?:\\*|_){1}")
-        val underlineRegex = Regex("")
         val strikeThroughRegex = Regex("(?:~~)(.+?)(?:~~)")
         when {
             headerRegex.matches(lineText) -> {
@@ -379,6 +378,36 @@ class Editor: AppCompatEditText {
                 val size = res.groupValues.first().length
                 formatText(TEXT_TYPE_CODE_BLOCK, start, end)
                 editableText.delete(start, start + size)
+            }
+            boldRegex.matches(lineText) -> {
+                val res = boldRegex.find(lineText) ?: return
+                if (res.groupValues.isEmpty()) {
+                    return
+                }
+                val size = res.groupValues.first().length
+                formatText(TEXT_STYLE_BOLD, start, start + size)
+                editableText.delete(start, start + 2)
+                editableText.delete(start + size - 2, start + size)
+            }
+            italicRegex.matches(lineText) -> {
+                val res = italicRegex.find(lineText) ?: return
+                if (res.groupValues.isEmpty()) {
+                    return
+                }
+                val size = res.groupValues.first().length
+                formatText(TEXT_STYLE_ITALIC, start, start + size)
+                editableText.delete(start, start + 2)
+                editableText.delete(start + size - 2, start + size)
+            }
+            strikeThroughRegex.matches(lineText) -> {
+                val res = strikeThroughRegex.find(lineText) ?: return
+                if (res.groupValues.isEmpty()) {
+                    return
+                }
+                val size = res.groupValues.first().length
+                formatText(TEXT_STYLE_STRIKE_THROUGH, start, start + size)
+                editableText.delete(start, start + 2)
+                editableText.delete(start + size - 2, start + size)
             }
         }
     }
