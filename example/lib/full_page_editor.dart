@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:tun_editor/models/documents/attribute.dart';
 import 'package:tun_editor/models/documents/document.dart';
 import 'package:tun_editor/tun_editor.dart';
 import 'package:tun_editor/tun_editor_controller.dart';
@@ -24,6 +23,8 @@ class FullPageEditorState extends State<FullPageEditor> {
 
   String _previewText = "";
 
+  FocusNode focusNode = FocusNode();
+
   @override
   void initState() {
     super.initState();
@@ -44,6 +45,9 @@ class FullPageEditorState extends State<FullPageEditor> {
         _previewText = doc;
       });
     });
+    focusNode.addListener(() {
+      debugPrint('focus node listener: ${focusNode.hasFocus}');
+    });
   }
 
   @override
@@ -54,7 +58,12 @@ class FullPageEditorState extends State<FullPageEditor> {
         title: GestureDetector(
           child: Text("Editor"),
           onTap: () {
-            _controller.formatText(0, 2, Attribute.h1);
+            if (focusNode.hasFocus) {
+              focusNode.requestFocus(focusNode);
+            } else {
+              focusNode.unfocus();
+            }
+            // _controller.formatText(0, 2, Attribute.h1);
             // _controller.insert(2, 'Bye Bye');
             // _controller.replaceText(6, 5, 'Jeffrey Wu', null);
           },
@@ -70,7 +79,10 @@ class FullPageEditorState extends State<FullPageEditor> {
               Expanded(
                 child: TunEditor(
                   controller: _controller,
-                  placeHolder: "Hello World",
+                  placeholder: "Hello World!",
+                  focusNode: focusNode,
+                  autoFocus: false,
+                  readOnly: false,
                 ),
               ),
               // SizedBox(

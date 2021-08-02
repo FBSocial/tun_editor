@@ -35,7 +35,7 @@ internal class TunEditorView(
     }
 
     // View.
-    private val quillEditor: QuillEditor = QuillEditor(context)
+    private lateinit var quillEditor: QuillEditor
 
     // Method channel.
     private val methodChannel: MethodChannel = MethodChannel(messenger, "tun/editor/${id}")
@@ -49,18 +49,34 @@ internal class TunEditorView(
     }
 
     init {
-        methodChannel.setMethodCallHandler(this)
+        var placeholder = ""
+        var padding: List<Int> = listOf(12, 15, 12, 15)
+        var autoFocus = false
+        var readOnly = false
+        if (creationParams?.containsKey("placeholder") == true) {
+            placeholder = (creationParams["placeholder"] as? String) ?: ""
+        }
+        if (creationParams?.containsKey("padding") == true) {
+            padding = (creationParams["padding"] as? List<*>)?.map {
+                return@map it as? Int ?: 0
+            } ?: listOf()
+            Log.d("TunEditorView", "padding $padding")
+        }
+        if (creationParams?.containsKey("autoFocus") == true) {
+            autoFocus = (creationParams["autoFocus"] as? Boolean) ?: false
+        }
+        if (creationParams?.containsKey("readOnly") == true) {
+            readOnly = (creationParams["readOnly"] as? Boolean) ?: false
+        }
 
+        quillEditor = QuillEditor(context, placeholder, padding, readOnly, autoFocus)
         quillEditor.setOnTextChangeListener { delta, oldDelta ->
             val text = HashMap<String, String>()
             text["delta"] = delta
             text["oldDelta"] = oldDelta
-            Log.d(QuillEditor.TAG, "on text change, $delta, $oldDelta")
             methodChannel.invokeMethod(INVOKE_METHOD_ON_TEXT_CHANGE, text)
         }
-       if (creationParams?.containsKey("place_holder") == true) {
-            val placeHolder: String = (creationParams["place_holder"] as? String) ?: ""
-        }
+        methodChannel.setMethodCallHandler(this)
     }
 
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {

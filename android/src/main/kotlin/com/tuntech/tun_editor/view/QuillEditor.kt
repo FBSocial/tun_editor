@@ -26,6 +26,19 @@ class QuillEditor: WebView {
 
     constructor(context: Context, attr: AttributeSet, defStyle: Int): super (context, attr, defStyle)
 
+    constructor(context: Context, placeholder: String, padding: List<Int>, readOnly: Boolean,
+                autoFocus: Boolean): this(context) {
+        this.placeholder = placeholder
+        this.readOnly = readOnly
+        this.autoFocus = autoFocus
+        this.padding = padding
+    }
+
+    private var placeholder: String = ""
+    private var readOnly: Boolean = false
+    private var autoFocus: Boolean = false
+    private var padding: List<Int> = listOf()
+
     private var getSelectionResList: ArrayList<((Selection) -> Unit)> = ArrayList()
 
     private var onTextChangeListener: ((String, String) -> Unit)? = null
@@ -36,7 +49,18 @@ class QuillEditor: WebView {
         settings.javaScriptEnabled = true
 
         webChromeClient = WebChromeClient()
-        webViewClient = QuillEditorWebClient()
+        webViewClient = QuillEditorWebClient(
+            onPageFinished = {
+                setPlaceholder(placeholder)
+                setPadding(padding)
+                if (autoFocus) {
+                    focus()
+                } else {
+                    blur()
+                }
+                setReadOnly(readOnly)
+            }
+        )
 
         addJavascriptInterface(JSInterface(
             onGetSelectionRes = {
@@ -97,11 +121,36 @@ class QuillEditor: WebView {
     }
 
     fun insertImage(url: String, alt: String) {
-        exec("javascript::insertImage(\"$url\", \"$alt\")")
+        exec("javascript:insertImage(\"$url\", \"$alt\")")
+    }
+
+    fun focus() {
+        exec("javascript:focus()");
+    }
+
+    fun blur() {
+        exec("javascript:blur()");
     }
 
     fun setOnTextChangeListener(onTextChangeListener: ((String, String) -> Unit)) {
         this.onTextChangeListener = onTextChangeListener
+    }
+
+    private fun setPlaceholder(placeholder: String) {
+        exec("javascript:setPlaceholder(\"$placeholder\")")
+    }
+
+    private fun setPadding(padding: List<Int>) {
+        if (padding.size < 4) {
+            Log.w(TAG, "set editor padding failed: padding size is less then 4")
+            return
+        }
+        exec("javascript:setPadding(${padding[0]}, ${padding[1]}, ${padding[2]}, ${padding[3]})")
+    }
+
+    private fun setReadOnly(readOnly: Boolean) {
+        Log.d(TAG, "set read only, $readOnly")
+        exec("javascript:setReadOnly($readOnly)")
     }
 
     private fun exec(command: String) {
@@ -138,13 +187,16 @@ class QuillEditor: WebView {
         }
     }
 
-    class QuillEditorWebClient: WebViewClient() {
+    class QuillEditorWebClient(
+        private val onPageFinished: () -> Unit
+    ): WebViewClient() {
 
         override fun onPageFinished(view: WebView?, url: String?) {
             super.onPageFinished(view, url)
 
             if (url?.equals(URL, true) == true) {
                 // Page loaded.
+                onPageFinished?.invoke()
             }
         }
 
