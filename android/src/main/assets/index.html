@@ -32,29 +32,22 @@
       var blur;
       document.addEventListener('DOMContentLoaded', () => {
         let BlockEmbed = Quill.import('blots/block/embed');
-        class DividerBlot extends BlockEmbed { }
-        DividerBlot.blotName = 'divider';
-        DividerBlot.tagName = 'hr';
-        Quill.register(DividerBlot);
+        class DividerBlot extends BlockEmbed {
 
-        class ImageBlot extends BlockEmbed {
-          static create(value) {
+          static create(type) {
             let node = super.create();
-            node.setAttribute('alt', value.alt);
-            node.setAttribute('src', value.url);
+            node.setAttribute('type', type);
             return node;
           }
 
           static value(node) {
-            return {
-              alt: node.getAttribute('alt'),
-              url: node.getAttribute('src')
-            };
+            return node.getAttribute('type');
           }
+
         }
-        ImageBlot.blotName = 'image';
-        ImageBlot.tagName = 'img';
-        Quill.register(ImageBlot);
+        DividerBlot.blotName = 'divider';
+        DividerBlot.tagName = 'hr';
+        Quill.register(DividerBlot);
 
         var options = {
           readOnly: false,
@@ -66,6 +59,7 @@
         var quill = new Quill('#editor', options);
 
         quill.on('text-change', function(delta, oldDelta, source) {
+          console.log(JSON.stringify(oldDelta));
           tun.onTextChange(JSON.stringify(delta), JSON.stringify(oldDelta), source)
         });
         quill.on('selection-change', function(range, oldRange, source) {
@@ -95,16 +89,13 @@
         insertDivider = function() {
           let range = quill.getSelection(true);
           quill.insertText(range.index, '\n', Quill.sources.USER);
-          quill.insertEmbed(range.index + 1, 'divider', true, Quill.sources.USER);
+          quill.insertEmbed(range.index + 1, 'divider', 'hr', Quill.sources.USER);
           quill.setSelection(range.index + 2, Quill.sources.SILENT);
         }
         insertImage = function(url, alt) {
           let range = quill.getSelection(true);
           quill.insertText(range.index, '\n', Quill.sources.USER);
-          quill.insertEmbed(range.index + 1, 'image', {
-            alt: alt,
-            url: url,
-          }, Quill.sources.USER);
+          quill.insertEmbed(range.index + 1, 'image', url, Quill.sources.USER);
           quill.setSelection(range.index + 2, Quill.sources.SILENT);
         }
         format = function(name, value) {
