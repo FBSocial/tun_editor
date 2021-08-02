@@ -10,9 +10,16 @@ class TunEditorToolbar extends StatefulWidget {
 
   final TunEditorController controller;
 
+  final VoidCallback? onAtClick;
+  final VoidCallback? onImageClick;
+  final VoidCallback? onEmojiClick;
+
   const TunEditorToolbar({
     Key? key,
     required this.controller,
+    this.onAtClick,
+    this.onImageClick,
+    this.onEmojiClick,
   }) : super(key: key);
 
   @override
@@ -182,6 +189,7 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
       isShowTextType = false;
       isShowTextStyle = false;
     });
+    widget.onAtClick?.call();
   }
 
   void onImageClick() {
@@ -189,7 +197,7 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
       isShowTextType = false;
       isShowTextStyle = false;
     });
-    controller.insertImage();
+    widget.onImageClick?.call();
   }
 
   void onEmojiClick() {
@@ -197,6 +205,7 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
       isShowTextType = false;
       isShowTextStyle = false;
     });
+    widget.onEmojiClick?.call();
   }
 
   void onSendClick() {

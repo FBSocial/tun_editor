@@ -19,9 +19,12 @@ internal class TunEditorView(
     companion object {
         const val INVOKE_METHOD_ON_TEXT_CHANGE = "onTextChange"
         const val INVOKE_METHOD_ON_SELECTION_CHANGED = "onSelectionChanged"
+        const val INVOKE_METHOD_ON_FOCUS_CHANGED = "onFocusChanged"
 
         const val HANDLE_METHOD_UNDO = "undo"
         const val HANDLE_METHOD_REDO = "redo"
+        const val HANDLE_METHOD_FOCUS = "focus"
+        const val HANDLE_METHOD_BLUR = "blur"
         const val HANDLE_METHOD_CLEAR_TEXT_TYPE = "clearTextType"
         const val HANDLE_METHOD_CLEAR_TEXT_STYLE = "clearTextStyle"
         const val HANDLE_METHOD_SET_TEXT_TYPE = "setTextType"
@@ -60,7 +63,6 @@ internal class TunEditorView(
             padding = (creationParams["padding"] as? List<*>)?.map {
                 return@map it as? Int ?: 0
             } ?: listOf()
-            Log.d("TunEditorView", "padding $padding")
         }
         if (creationParams?.containsKey("autoFocus") == true) {
             autoFocus = (creationParams["autoFocus"] as? Boolean) ?: false
@@ -76,6 +78,9 @@ internal class TunEditorView(
             text["oldDelta"] = oldDelta
             methodChannel.invokeMethod(INVOKE_METHOD_ON_TEXT_CHANGE, text)
         }
+        quillEditor.setOnFocusChangeListener { hasFocus ->
+            methodChannel.invokeMethod(INVOKE_METHOD_ON_FOCUS_CHANGED, hasFocus)
+        }
         methodChannel.setMethodCallHandler(this)
     }
 
@@ -86,6 +91,14 @@ internal class TunEditorView(
                 result.success(null)
             }
             HANDLE_METHOD_REDO -> {
+                result.success(null)
+            }
+            HANDLE_METHOD_FOCUS -> {
+                quillEditor.focus()
+                result.success(null)
+            }
+            HANDLE_METHOD_BLUR -> {
+                quillEditor.blur()
                 result.success(null)
             }
             HANDLE_METHOD_CLEAR_TEXT_TYPE -> {
@@ -151,8 +164,10 @@ internal class TunEditorView(
                 quillEditor.insertDivider()
             }
             HANDLE_METHOD_INSERT_IMAGE -> {
-                val url = "https://avatars0.githubusercontent.com/u/1758864?s=460&v=4"
-                quillEditor.insertImage(url, "test image")
+                val args = call.arguments as? Map<*, *> ?: return
+                val url = args["url"] as? String ?: return
+                val alt = args["alt"] as? String ?: return
+                quillEditor.insertImage(url, alt)
             }
 
             else -> {

@@ -79,8 +79,10 @@
               console.log('User has highlighted', text);
             }
             tun.onSelectionChanged()
+            // tun.onFocusChanged(true)
           } else {
             console.log('Cursor not in the editor');
+            // tun.onFocusChanged(false)
           }
         });
 
@@ -97,7 +99,6 @@
           quill.setSelection(range.index + 2, Quill.sources.SILENT);
         }
         insertImage = function(url, alt) {
-          console.log('insert image')
           let range = quill.getSelection(true);
           quill.insertText(range.index, '\n', Quill.sources.USER);
           quill.insertEmbed(range.index + 1, 'image', {
@@ -130,7 +131,6 @@
         }
         setPadding = function(top, right, bottom, left) {
           var editor = document.querySelector('.ql-editor');
-          console.log(`${top}px ${right}px ${bottom}px ${left}px`);
           editor.style.padding = `${top}px ${right}px ${bottom}px ${left}px`;
         }
         setReadOnly = function(readOnly) {

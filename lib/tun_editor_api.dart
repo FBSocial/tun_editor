@@ -17,7 +17,6 @@ class TunEditorApi {
   Future<bool?> _onMethodCall(MethodCall call) async {
     switch (call.method) {
       case 'onTextChange':
-        debugPrint('on text change called');
         try {
           final args = call.arguments as Map<dynamic, dynamic>;
           final delta = args["delta"] as String;
@@ -30,6 +29,11 @@ class TunEditorApi {
 
       case 'onSelectionChanged':
         _handler.onSelectionChanged(call.arguments);
+        break;
+
+      case 'onFocusChange':
+        final hasFocus = call.arguments as bool;
+        _handler.onFocusChanged(hasFocus);
         break;
 
       default:
@@ -96,10 +100,18 @@ class TunEditorApi {
   void insertDivider() {
     _channel.invokeMethod('insertDivider');
   }
-  void insertImage() {
-    _channel.invokeMethod('insertImage');
+  void insertImage(String url, String alt) {
+    _channel.invokeMethod('insertImage', {
+      'url': url,
+      'alt': alt,
+    });
   }
-
+  void focus() {
+    _channel.invokeMethod('focus');
+  }
+  void blur() {
+    _channel.invokeMethod('blur');
+  }
 }
 
 mixin TunEditorHandler on ChangeNotifier {
@@ -107,4 +119,5 @@ mixin TunEditorHandler on ChangeNotifier {
     String delta, String oldDelta,
   );
   void onSelectionChanged(Map<dynamic, dynamic> status);
+  void onFocusChanged(bool hasFocus);
 }

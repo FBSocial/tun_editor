@@ -4,12 +4,20 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.os.Build
+import android.os.Handler
+import android.os.Looper
 import android.util.AttributeSet
 import android.util.Log
 import android.webkit.JavascriptInterface
 import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import androidx.core.content.ContextCompat.getSystemService
+
+import android.view.inputmethod.InputMethodManager
+
+
+
 
 @SuppressLint("SetJavaScriptEnabled", "AddJavascriptInterface")
 class QuillEditor: WebView {
@@ -42,6 +50,7 @@ class QuillEditor: WebView {
     private var getSelectionResList: ArrayList<((Selection) -> Unit)> = ArrayList()
 
     private var onTextChangeListener: ((String, String) -> Unit)? = null
+    private var onFocusChangedListener: ((Boolean) -> Unit)? = null
 
     init {
         isVerticalScrollBarEnabled = false
@@ -53,12 +62,13 @@ class QuillEditor: WebView {
             onPageFinished = {
                 setPlaceholder(placeholder)
                 setPadding(padding)
+                setReadOnly(readOnly)
+
                 if (autoFocus) {
                     focus()
                 } else {
                     blur()
                 }
-                setReadOnly(readOnly)
             }
         )
 
@@ -68,6 +78,11 @@ class QuillEditor: WebView {
                     res(it)
                 }
                 getSelectionResList.clear()
+            },
+            onFocusChangedListener = { hasFocus ->
+                (context as Activity).runOnUiThread {
+                    onFocusChangedListener?.invoke(hasFocus)
+                }
             },
             onTextChangeListener = { delta, oldDelta ->
                 (context as Activity).runOnUiThread {
@@ -125,15 +140,24 @@ class QuillEditor: WebView {
     }
 
     fun focus() {
+        requestFocus()
+        val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+        imm?.showSoftInput(this, 0)
         exec("javascript:focus()");
     }
 
     fun blur() {
+        val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+        imm?.hideSoftInputFromWindow(windowToken, 0)
         exec("javascript:blur()");
     }
 
     fun setOnTextChangeListener(onTextChangeListener: ((String, String) -> Unit)) {
         this.onTextChangeListener = onTextChangeListener
+    }
+
+    fun setOnFocusChangeListener(onFocusChangedListener: (Boolean) -> Unit) {
+        this.onFocusChangedListener = onFocusChangedListener
     }
 
     private fun setPlaceholder(placeholder: String) {
@@ -149,7 +173,6 @@ class QuillEditor: WebView {
     }
 
     private fun setReadOnly(readOnly: Boolean) {
-        Log.d(TAG, "set read only, $readOnly")
         exec("javascript:setReadOnly($readOnly)")
     }
 
@@ -168,11 +191,16 @@ class QuillEditor: WebView {
 
     class JSInterface(
         private val onGetSelectionRes: (Selection) -> Unit,
+        private val onFocusChangedListener: (Boolean) -> Unit,
         private val onTextChangeListener: ((String, String) -> Unit)
     ) {
         @JavascriptInterface
         fun onSelectionChanged() {
-            Log.d(TAG, "on selection changed on native")
+        }
+
+        @JavascriptInterface
+        fun onFocusChanged(hasFocus: Boolean) {
+            onFocusChangedListener.invoke(hasFocus)
         }
 
         @JavascriptInterface

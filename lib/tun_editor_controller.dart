@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:tun_editor/models/documents/attribute.dart';
 import 'package:tun_editor/models/documents/document.dart';
-import 'package:tun_editor/models/documents/style.dart';
 import 'package:tun_editor/models/quill_delta.dart';
 import 'package:tun_editor/tun_editor_api.dart';
 import 'package:tun_editor/tun_editor_toolbar_api.dart';
@@ -94,6 +93,19 @@ class TunEditorController extends ChangeNotifier with TunEditorHandler, TunEdito
     replaceText(index, 0, data, TextSelection.collapsed(offset: selection.baseOffset));
   }
 
+  /// Insert image with [url] and [alt]
+  void insertImage(String url, String alt) {
+    _tunEditorApi?.insertImage(url, alt);
+  }
+
+  void focus() {
+    _tunEditorApi?.focus();
+  }
+
+  void blur() {
+    _tunEditorApi?.blur();
+  }
+
   void addSubToolbarListener(ValueChanged<bool> onSubToolbarToggle) {
     this._subToolbarListeners.add(onSubToolbarToggle);
   }
@@ -125,25 +137,17 @@ class TunEditorController extends ChangeNotifier with TunEditorHandler, TunEdito
     _tunEditorToolbarApi = null;
   }
 
-  void insertImage() {
-    _tunEditorApi?.insertImage();
-  }
-
   // =========== Tun editor toolbar handler ===========
   @override
   void onAtClick() {
-    debugPrint('on at click');
     onAt?.call();
   }
   @override
   void onImageClick() {
-    debugPrint('on image click');
     onImage?.call();
-    _tunEditorApi?.insertImage();
   }
   @override
   void onEmojiClick() {
-    debugPrint('on emoji click');
     onEmoji?.call();
   }
   @override
@@ -182,6 +186,10 @@ class TunEditorController extends ChangeNotifier with TunEditorHandler, TunEdito
     final selEnd = status["selEnd"] as int;
     _selection = TextSelection(baseOffset: selStart, extentOffset: selEnd);
     _tunEditorToolbarApi?.onSelectionChanged(status);
+  }
+
+  @override
+  void onFocusChanged(bool hasFocus) {
   }
 
 }

@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -50,39 +51,42 @@ class TunEditorState extends State<TunEditor> {
   bool get autoFocus => widget.autoFocus;
   FocusNode? get focusNode => widget.focusNode;
   ScrollController? get scrollController => widget.scrollController;
-
-  FocusAttachment? _focusAttachment;
-
+  
   @override
   void initState() {
     super.initState();
   
-    focusNode?.addListener(_handleFocusChange);
-    _focusAttachment = focusNode?.attach(context);
+    if (autoFocus) {
+      focusNode?.requestFocus();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    _focusAttachment?.reparent();
-
     Map<String, dynamic> creationParams = {
-      "placeholder": placeholder,
-      "readOnly": readOnly,
-      "padding": [
+      'placeholder': placeholder,
+      'readOnly': readOnly,
+      'padding': [
         padding.top.toInt(),
         padding.right.toInt(),
         padding.bottom.toInt(),
         padding.left.toInt(),
       ],
-      "autoFocus": autoFocus,
+      'autoFocus': autoFocus,
     };
 
     if (Platform.isAndroid) {
       // Android platform.
       return Focus(
         focusNode: focusNode,
-        onFocusChange: (bool isFocus) {
-          debugPrint('on focus change: $isFocus');
+        canRequestFocus: true,
+        onFocusChange: (bool hasFocus) {
+          debugPrint('on focus changed: $hasFocus');
+          if (hasFocus) {
+            controller.focus();
+          } else {
+            controller.blur();
+          }
         },
         child: PlatformViewLink(
           viewType: VIEW_TYPE_TUN_EDITOR,
@@ -128,19 +132,9 @@ class TunEditorState extends State<TunEditor> {
 
   @override
   void dispose() {
-    focusNode?.removeListener(_handleFocusChange);
-    focusNode?.dispose();
     controller.detachTunEditorToolbar();
   
     super.dispose();
-  }
-
-  void _handleFocusChange() {
-    if (focusNode?.hasFocus == true) {
-      debugPrint('request focuse');
-    } else {
-      debugPrint('request focuse');
-    }
   }
 
 }

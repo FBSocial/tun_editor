@@ -59,9 +59,9 @@ class FullPageEditorState extends State<FullPageEditor> {
           child: Text("Editor"),
           onTap: () {
             if (focusNode.hasFocus) {
-              focusNode.requestFocus(focusNode);
-            } else {
               focusNode.unfocus();
+            } else {
+              focusNode.requestFocus();
             }
             // _controller.formatText(0, 2, Attribute.h1);
             // _controller.insert(2, 'Bye Bye');
@@ -81,7 +81,7 @@ class FullPageEditorState extends State<FullPageEditor> {
                   controller: _controller,
                   placeholder: "Hello World!",
                   focusNode: focusNode,
-                  autoFocus: false,
+                  autoFocus: true,
                   readOnly: false,
                 ),
               ),
@@ -95,6 +95,16 @@ class FullPageEditorState extends State<FullPageEditor> {
               // ),
               TunEditorToolbar(
                 controller: _controller,
+                onAtClick: () {
+                },
+                onImageClick: () {
+                  _controller.insertImage(
+                    'https://avatars0.githubusercontent.com/u/1758864?s=460&v=4',
+                    'test iamge',
+                  );
+                },
+                onEmojiClick: () {
+                },
               ),
             ],
           ),
