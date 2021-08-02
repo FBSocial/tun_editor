@@ -112,6 +112,7 @@ class TunEditorApi {
   void blur() {
     _channel.invokeMethod('blur');
   }
+
 }
 
 mixin TunEditorHandler on ChangeNotifier {
