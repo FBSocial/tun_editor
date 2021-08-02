@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:tun_editor/models/documents/document.dart';
 import 'package:tun_editor/tun_editor.dart';
 import 'package:tun_editor/tun_editor_controller.dart';
@@ -19,6 +20,7 @@ class FullPageEditor extends StatefulWidget {
 
 class FullPageEditorState extends State<FullPageEditor> {
 
+  bool isLoading = true;
   late TunEditorController _controller;
 
   String _previewText = "";
@@ -29,29 +31,15 @@ class FullPageEditorState extends State<FullPageEditor> {
   void initState() {
     super.initState();
   
-    _controller = TunEditorController(
-        document: Document(),
-        selection: TextSelection.collapsed(offset: 0),
-    );
-    _controller.document.changes.listen((event) {
-      final delta1 = json.encode(event.item1.toJson());
-      final delta2 = json.encode(event.item2.toJson());
-      debugPrint('event: $delta1 - $delta2');
-
-      final doc = json.encode(_controller.document.toDelta().toJson());
-      debugPrint('document: $doc');
-
-      setState(() {
-        _previewText = doc;
-      });
-    });
-    focusNode.addListener(() {
-      debugPrint('focus node listener: ${focusNode.hasFocus}');
-    });
+    _loadDocument();
   }
 
   @override
   Widget build(BuildContext context) {
+    if (isLoading) {
+      return const Scaffold(body: Center(child: Text('Loading...')));
+    }
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -118,6 +106,34 @@ class FullPageEditorState extends State<FullPageEditor> {
     _controller.dispose();
   
     super.dispose();
+  }
+
+  Future<void> _loadDocument() async {
+    final result = await rootBundle.loadString('assets/sample_data.json');
+    final doc = Document.fromJson(jsonDecode(result));
+
+    _controller = TunEditorController(
+        document: doc,
+        selection: TextSelection.collapsed(offset: 0),
+    );
+    _controller.document.changes.listen((event) {
+      final delta1 = json.encode(event.item1.toJson());
+      final delta2 = json.encode(event.item2.toJson());
+      debugPrint('event: $delta1 - $delta2');
+
+      final doc = json.encode(_controller.document.toDelta().toJson());
+      debugPrint('document: $doc');
+
+      setState(() {
+        _previewText = doc;
+      });
+    });
+    focusNode.addListener(() {
+      debugPrint('focus node listener: ${focusNode.hasFocus}');
+    });
+    setState(() {
+      isLoading = false;
+    });
   }
 
 }

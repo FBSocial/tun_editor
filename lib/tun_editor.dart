@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -73,6 +74,7 @@ class TunEditorState extends State<TunEditor> {
         padding.left.toInt(),
       ],
       'autoFocus': autoFocus,
+      'delta': controller.document.toDelta().toJson(),
     };
 
     if (Platform.isAndroid) {

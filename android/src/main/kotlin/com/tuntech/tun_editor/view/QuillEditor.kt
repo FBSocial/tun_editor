@@ -11,6 +11,7 @@ import android.webkit.JavascriptInterface
 import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import org.json.JSONArray
 
 
 @SuppressLint("SetJavaScriptEnabled", "AddJavascriptInterface")
@@ -29,17 +30,20 @@ class QuillEditor: WebView {
     constructor(context: Context, attr: AttributeSet, defStyle: Int): super (context, attr, defStyle)
 
     constructor(context: Context, placeholder: String, padding: List<Int>, readOnly: Boolean,
-                autoFocus: Boolean): this(context) {
+                autoFocus: Boolean, delta: List<*>): this(context) {
         this.placeholder = placeholder
         this.readOnly = readOnly
         this.autoFocus = autoFocus
         this.padding = padding
+        this.delta = delta
+        Log.d(TAG, "delta: $delta")
     }
 
     private var placeholder: String = ""
     private var readOnly: Boolean = false
     private var autoFocus: Boolean = false
     private var padding: List<Int> = listOf()
+    private var delta: List<*> = listOf<Map<String, Any>>()
 
     private var getSelectionResList: ArrayList<((Selection) -> Unit)> = ArrayList()
 
@@ -57,6 +61,7 @@ class QuillEditor: WebView {
                 setPlaceholder(placeholder)
                 setPadding(padding)
                 setReadOnly(readOnly)
+                setContents(delta)
 
                 if (autoFocus) {
                     focus()
@@ -170,6 +175,11 @@ class QuillEditor: WebView {
         exec("javascript:setReadOnly($readOnly)")
     }
 
+    private fun setContents(delta: List<*>) {
+        exec("javascript:setContents(${JSONArray(delta)})")
+        Log.d(TAG, "javascript:setContents(${JSONArray(delta)})")
+    }
+
     private fun exec(command: String) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             evaluateJavascript(command, null)
@@ -218,7 +228,7 @@ class QuillEditor: WebView {
 
             if (url?.equals(URL, true) == true) {
                 // Page loaded.
-                onPageFinished?.invoke()
+                onPageFinished.invoke()
             }
         }
 

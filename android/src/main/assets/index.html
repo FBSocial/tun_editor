@@ -30,6 +30,7 @@
       var setReadOnly;
       var focus;
       var blur;
+      var setContents;
       document.addEventListener('DOMContentLoaded', () => {
         let BlockEmbed = Quill.import('blots/block/embed');
         class DividerBlot extends BlockEmbed {
@@ -65,18 +66,8 @@
         quill.on('selection-change', function(range, oldRange, source) {
           if (range) {
             var format = quill.getFormat()
-            console.log(format)
-            if (range.length == 0) {
-              console.log('User cursor is on', range.index);
-            } else {
-              var text = quill.getText(range.index, range.length);
-              console.log('User has highlighted', text);
-            }
+            console.log('format', JSON.stringify(format))
             tun.onSelectionChanged()
-            // tun.onFocusChanged(true)
-          } else {
-            console.log('Cursor not in the editor');
-            // tun.onFocusChanged(false)
           }
         });
 
@@ -132,6 +123,9 @@
         }
         blur = function() {
           quill.blur();
+        }
+        setContents = function(delta) {
+          quill.setContents(delta);
         }
       })
     </script>

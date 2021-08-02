@@ -56,6 +56,7 @@ internal class TunEditorView(
         var padding: List<Int> = listOf(12, 15, 12, 15)
         var autoFocus = false
         var readOnly = false
+        var delta: List<*> = listOf<Map<String, Any>>()
         if (creationParams?.containsKey("placeholder") == true) {
             placeholder = (creationParams["placeholder"] as? String) ?: ""
         }
@@ -70,8 +71,11 @@ internal class TunEditorView(
         if (creationParams?.containsKey("readOnly") == true) {
             readOnly = (creationParams["readOnly"] as? Boolean) ?: false
         }
+        if (creationParams?.containsKey("delta") == true) {
+            delta = (creationParams["delta"] as? List<*>) ?: listOf<Map<String, Any>>()
+        }
 
-        quillEditor = QuillEditor(context, placeholder, padding, readOnly, autoFocus)
+        quillEditor = QuillEditor(context, placeholder, padding, readOnly, autoFocus, delta)
         quillEditor.setOnTextChangeListener { delta, oldDelta ->
             val text = HashMap<String, String>()
             text["delta"] = delta
