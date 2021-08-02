@@ -1,6 +1,7 @@
 package com.tuntech.tun_editor.view
 
 import android.content.Context
+import android.util.Log
 import android.view.View
 import com.tuntech.tun_editor.TextCons
 import io.flutter.plugin.common.BinaryMessenger
@@ -50,6 +51,13 @@ internal class TunEditorView(
     init {
         methodChannel.setMethodCallHandler(this)
 
+        quillEditor.setOnTextChangeListener { delta, oldDelta ->
+            val text = HashMap<String, String>()
+            text["delta"] = delta
+            text["oldDelta"] = oldDelta
+            Log.d(QuillEditor.TAG, "on text change, $delta, $oldDelta")
+            methodChannel.invokeMethod(INVOKE_METHOD_ON_TEXT_CHANGE, text)
+        }
        if (creationParams?.containsKey("place_holder") == true) {
             val placeHolder: String = (creationParams["place_holder"] as? String) ?: ""
         }
@@ -71,7 +79,7 @@ internal class TunEditorView(
                 result.success(null)
             }
             HANDLE_METHOD_SET_TEXT_TYPE -> {
-                when (call.arguments as? String ?: Editor.TEXT_TYPE_NORMAL) {
+                when (call.arguments as? String ?: TextCons.TEXT_TYPE_NORMAL) {
                     TextCons.TEXT_TYPE_NORMAL -> quillEditor.removeCurrentFormat()
                     TextCons.TEXT_TYPE_HEADLINE1 -> quillEditor.format("header", 1)
                     TextCons.TEXT_TYPE_HEADLINE2 -> quillEditor.format("header", 2)
@@ -123,32 +131,12 @@ internal class TunEditorView(
                 quillEditor.replaceText(index, len, data, ignoreFocus, autoAppendNewLineAfterImage)
                 result.success(null)
             }
-            HANDLE_METHOD_INSERT -> {
-                val args = call.arguments as? Map<*, *> ?: return
-                val index = args["index"] as? Int ?: 0
-                val data = args["data"] as? String ?: ""
-                val replaceLength = args["replaceLength"] as? Int ?: 0
-                val autoAppendNewLineAfterImage = args["autoAppendNewLineAfterImage"] as Boolean? ?: true
-
-                // if (index > areEditor.length()) {
-                //     return
-                // }
-                // if (replaceLength > 0) {
-                //     areEditor.text =
-                //         areEditor.editableText.replace(index, index + replaceLength, data)
-                // } else {
-                //     areEditor.text = areEditor.editableText.insert(index, data)
-                // }
-                // println("new text: ${areEditor.text} $index $data")
-                // TODO Insert
-                result.success(null)
-            }
             HANDLE_METHOD_INSERT_DIVIDER -> {
                 quillEditor.insertDivider()
             }
             HANDLE_METHOD_INSERT_IMAGE -> {
                 val url = "https://avatars0.githubusercontent.com/u/1758864?s=460&v=4"
-                // richEditor.insertImage(url, "test image")
+                quillEditor.insertImage(url, "test image")
             }
 
             else -> {

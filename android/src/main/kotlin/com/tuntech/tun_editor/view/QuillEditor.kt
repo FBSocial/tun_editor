@@ -1,6 +1,7 @@
 package com.tuntech.tun_editor.view
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
 import android.os.Build
 import android.util.AttributeSet
@@ -10,7 +11,7 @@ import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.webkit.WebViewClient
 
-@SuppressLint("SetJavaScriptEnabled")
+@SuppressLint("SetJavaScriptEnabled", "AddJavascriptInterface")
 class QuillEditor: WebView {
 
     companion object {
@@ -27,6 +28,8 @@ class QuillEditor: WebView {
 
     private var getSelectionResList: ArrayList<((Selection) -> Unit)> = ArrayList()
 
+    private var onTextChangeListener: ((String, String) -> Unit)? = null
+
     init {
         isVerticalScrollBarEnabled = false
         isHorizontalScrollBarEnabled = false
@@ -41,6 +44,11 @@ class QuillEditor: WebView {
                     res(it)
                 }
                 getSelectionResList.clear()
+            },
+            onTextChangeListener = { delta, oldDelta ->
+                (context as Activity).runOnUiThread {
+                    onTextChangeListener?.invoke(delta, oldDelta)
+                }
             }
         ), "tun")
 
@@ -88,6 +96,14 @@ class QuillEditor: WebView {
         exec("javascript::replaceText($index, $length, $data, $ignoreFocus, $autoAppendNewLineAfterImage)")
     }
 
+    fun insertImage(url: String, alt: String) {
+        exec("javascript::insertImage(\"$url\", \"$alt\")")
+    }
+
+    fun setOnTextChangeListener(onTextChangeListener: ((String, String) -> Unit)) {
+        this.onTextChangeListener = onTextChangeListener
+    }
+
     private fun exec(command: String) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             evaluateJavascript(command, null)
@@ -102,7 +118,8 @@ class QuillEditor: WebView {
     )
 
     class JSInterface(
-        private val onGetSelectionRes: (Selection) -> Unit
+        private val onGetSelectionRes: (Selection) -> Unit,
+        private val onTextChangeListener: ((String, String) -> Unit)
     ) {
         @JavascriptInterface
         fun onSelectionChanged() {
@@ -113,6 +130,11 @@ class QuillEditor: WebView {
         fun getSelectionRes(index: Int, length: Int) {
             val selection = Selection(index, length)
             onGetSelectionRes(selection)
+        }
+
+        @JavascriptInterface
+        fun onTextChange(delta: String, oldDelta: String, source: String) {
+            onTextChangeListener(delta, oldDelta)
         }
     }
 

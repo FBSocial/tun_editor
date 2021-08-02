@@ -20,6 +20,7 @@
 
     <script>
       var insertDivider;
+      var insertImage;
       var format;
       var removeFormat;
       var removeCurrentFormat;
@@ -31,6 +32,25 @@
         DividerBlot.tagName = 'hr';
         Quill.register(DividerBlot);
 
+        class ImageBlot extends BlockEmbed {
+          static create(value) {
+            let node = super.create();
+            node.setAttribute('alt', value.alt);
+            node.setAttribute('src', value.url);
+            return node;
+          }
+
+          static value(node) {
+            return {
+              alt: node.getAttribute('alt'),
+              url: node.getAttribute('src')
+            };
+          }
+        }
+        ImageBlot.blotName = 'image';
+        ImageBlot.tagName = 'img';
+        Quill.register(ImageBlot);
+
         var options = {
           readOnly: false,
           theme: 'snow',
@@ -41,12 +61,7 @@
         var quill = new Quill('#editor', options);
 
         quill.on('text-change', function(delta, oldDelta, source) {
-          if (source == 'api') {
-            console.log("An API call triggered this change.");
-          } else if (source == 'user') {
-            console.log("A user action triggered this change.");
-          }
-          console.log(JSON.stringify(delta), JSON.stringify(oldDelta), source);
+          tun.onTextChange(JSON.stringify(delta), JSON.stringify(oldDelta), source)
         });
         quill.on('selection-change', function(range, oldRange, source) {
           if (range) {
@@ -74,6 +89,16 @@
           let range = quill.getSelection(true);
           quill.insertText(range.index, '\n', Quill.sources.USER);
           quill.insertEmbed(range.index + 1, 'divider', true, Quill.sources.USER);
+          quill.setSelection(range.index + 2, Quill.sources.SILENT);
+        }
+        insertImage = function(url, alt) {
+          console.log('insert image')
+          let range = quill.getSelection(true);
+          quill.insertText(range.index, '\n', Quill.sources.USER);
+          quill.insertEmbed(range.index + 1, 'image', {
+            alt: alt,
+            url: url,
+          }, Quill.sources.USER);
           quill.setSelection(range.index + 2, Quill.sources.SILENT);
         }
         format = function(name, value) {

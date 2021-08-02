@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:tun_editor/models/documents/attribute.dart';
 import 'package:tun_editor/models/documents/document.dart';
@@ -89,15 +91,7 @@ class TunEditorController extends ChangeNotifier with TunEditorHandler, TunEdito
     int replaceLength = 0,
     bool autoAppendNewlineAfterImage = true,
   }) {
-    _tunEditorApi?.insert(
-        index, data,
-        replaceLength: replaceLength,
-        autoAppendNewlineAfterImage: autoAppendNewlineAfterImage,
-    );
-    updateSelection(
-        TextSelection.collapsed(offset: index + (data is String ? data.length : 0)),
-        ChangeSource.LOCAL,
-    );
+    replaceText(index, 0, data, TextSelection.collapsed(offset: selection.baseOffset));
   }
 
   void addSubToolbarListener(ValueChanged<bool> onSubToolbarToggle) {
@@ -174,38 +168,11 @@ class TunEditorController extends ChangeNotifier with TunEditorHandler, TunEdito
   // =========== Tun editor handler ===========
   @override
   Future<void> onTextChange(
-    int start, int before, int count,
-    String oldText, String newText,
-    String style,
+    String delta, String oldDelta,
   ) async {
-    final attrs = _getAttributes(style);
-    if (before <= 0) {
-      // Insert.
-      final delta = Delta()
-          ..retain(start)
-          ..insert(newText.substring(start, start + count), attrs);
-      document.compose(delta, ChangeSource.LOCAL);
-
-    } else {
-      if (count <= 0) {
-        // Delete.
-        final delta = Delta()
-            ..retain(start)
-            ..delete(before);
-        document.compose(delta, ChangeSource.LOCAL);
-
-      } else {
-        // Replace.
-        final insertDelta = Delta()
-            ..retain(start + before)
-            ..insert(newText.substring(start, start + count), attrs);
-        final deleteDelta = Delta()
-            ..retain(start)
-            ..delete(before);
-        document.compose(insertDelta, ChangeSource.LOCAL);
-        document.compose(deleteDelta, ChangeSource.LOCAL);
-      }
-    }
+    final deltaMap = json.decode(delta) as Map;
+    final deltaObj = deltaMap['ops'] as List<dynamic>;
+    document.compose(Delta.fromJson(deltaObj), ChangeSource.LOCAL);
     notifyListeners();
   }
 
@@ -215,46 +182,6 @@ class TunEditorController extends ChangeNotifier with TunEditorHandler, TunEdito
     final selEnd = status["selEnd"] as int;
     _selection = TextSelection(baseOffset: selStart, extentOffset: selEnd);
     _tunEditorToolbarApi?.onSelectionChanged(status);
-  }
-
-  Map<String, dynamic>? _getAttributes(String styleStr) {
-    Style style = Style();
-    switch (styleStr) {
-      // case 'header1':
-      //   style = style.put(Attribute.h1);
-      //   break;
-      // case 'header2':
-      //   style = style.put(Attribute.h2);
-      //   break;
-      // case 'header3':
-      //   style = style.put(Attribute.h3);
-      //   break;
-      case 'list-bullet':
-        style = style.put(Attribute.ul);
-        break;
-      case 'list-ordered':
-        style = style.put(Attribute.ol);
-        break;
-      case 'blockquote':
-        style = style.put(Attribute.blockQuote);
-        break;
-      case 'code-block':
-        style = style.put(Attribute.codeBlock);
-        break;
-      case 'bold':
-        style = style.put(Attribute.bold);
-        break;
-      case 'italic':
-        style = style.put(Attribute.italic);
-        break;
-      case 'underline':
-        style = style.put(Attribute.underline);
-        break;
-      case 'strike':
-        style = style.put(Attribute.strikeThrough);
-        break;
-    }
-    return style.toJson();
   }
 
 }

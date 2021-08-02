@@ -17,16 +17,12 @@ class TunEditorApi {
   Future<bool?> _onMethodCall(MethodCall call) async {
     switch (call.method) {
       case 'onTextChange':
-        final args = call.arguments as Map<dynamic, dynamic>;
-        final start = args["start"] as int;
-        final before = args["before"] as int;
-        final count = args["count"] as int;
-        final oldText = args["oldText"] as String;
-        final newText = args["newText"] as String;
-        final style = args["style"] as String;
-        debugPrint("onTextChange: $start, $before, $count, $style");
+        debugPrint('on text change called');
         try {
-          _handler.onTextChange(start, before, count, oldText, newText, style);
+          final args = call.arguments as Map<dynamic, dynamic>;
+          final delta = args["delta"] as String;
+          final oldDelta = args["oldDelta"] as String;
+          _handler.onTextChange(delta, oldDelta);
         } catch(e, s) {
           print('on text change: $e, $s');
         }
@@ -108,9 +104,7 @@ class TunEditorApi {
 
 mixin TunEditorHandler on ChangeNotifier {
   Future<void> onTextChange(
-    int start, int before, int count,
-    String oldText, String newText,
-    String style,
+    String delta, String oldDelta,
   );
   void onSelectionChanged(Map<dynamic, dynamic> status);
 }

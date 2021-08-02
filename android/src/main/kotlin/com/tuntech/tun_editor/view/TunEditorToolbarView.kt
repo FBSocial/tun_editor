@@ -7,6 +7,7 @@ import android.view.View
 import android.widget.ImageButton
 import android.widget.LinearLayout
 import com.tuntech.tun_editor.R
+import com.tuntech.tun_editor.TextCons
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
@@ -68,7 +69,7 @@ internal class TunEditorToolbarView(
     private var isShowTextStyle = false
 
     // Text type and text style state.
-    private var currentTextType: String = Editor.TEXT_TYPE_NORMAL
+    private var currentTextType: String = TextCons.TEXT_TYPE_NORMAL
     private var currentTextStyleList: ArrayList<String> = ArrayList()
 
     private val methodChannel = MethodChannel(messenger, "tun/editor/toolbar/${id}")
@@ -90,30 +91,30 @@ internal class TunEditorToolbarView(
 
                 // Refresh text type.
                 currentTextType = when {
-                    status["isHeadline1"] == true -> Editor.TEXT_TYPE_HEADLINE1
-                    status["isHeadline2"] == true -> Editor.TEXT_TYPE_HEADLINE1
-                    status["isHeadline3"] == true -> Editor.TEXT_TYPE_HEADLINE1
-                    status["isList"] == true -> Editor.TEXT_TYPE_HEADLINE1
-                    status["isOrderedList"] == true -> Editor.TEXT_TYPE_HEADLINE1
-                    status["isQuote"] == true -> Editor.TEXT_TYPE_HEADLINE1
-                    status["isCodeBlock"] == true -> Editor.TEXT_TYPE_HEADLINE1
-                    else -> Editor.TEXT_TYPE_NORMAL
+                    status["isHeadline1"] == true -> TextCons.TEXT_TYPE_HEADLINE1
+                    status["isHeadline2"] == true -> TextCons.TEXT_TYPE_HEADLINE1
+                    status["isHeadline3"] == true -> TextCons.TEXT_TYPE_HEADLINE1
+                    status["isList"] == true -> TextCons.TEXT_TYPE_HEADLINE1
+                    status["isOrderedList"] == true -> TextCons.TEXT_TYPE_HEADLINE1
+                    status["isQuote"] == true -> TextCons.TEXT_TYPE_HEADLINE1
+                    status["isCodeBlock"] == true -> TextCons.TEXT_TYPE_HEADLINE1
+                    else -> TextCons.TEXT_TYPE_NORMAL
                 }
                 refreshTextTypeView()
 
                 // // Refresh text style.
                 // currentTextStyleList.clear()
                 // if (status["isBold"] == true) {
-                //     currentTextStyleList.add(Editor.TEXT_STYLE_BOLD)
+                //     currentTextStyleList.add(TextCons.TEXT_STYLE_BOLD)
                 // }
                 // if (status["isItalic"] == true) {
-                //     currentTextStyleList.add(Editor.TEXT_STYLE_ITALIC)
+                //     currentTextStyleList.add(TextCons.TEXT_STYLE_ITALIC)
                 // }
                 // if (status["isUnderline"] == true) {
-                //     currentTextStyleList.add(Editor.TEXT_STYLE_UNDERLINE)
+                //     currentTextStyleList.add(TextCons.TEXT_STYLE_UNDERLINE)
                 // }
                 // if (status["isStrikeThrough"] == true) {
-                //     currentTextStyleList.add(Editor.TEXT_STYLE_STRIKE_THROUGH)
+                //     currentTextStyleList.add(TextCons.TEXT_STYLE_STRIKE_THROUGH)
                 // }
                 // refreshTextStyleView()
                 result.success(null)
@@ -136,42 +137,42 @@ internal class TunEditorToolbarView(
 
         // Text type.
         ibHeadline1.setOnClickListener {
-            toggleTextType(Editor.TEXT_TYPE_HEADLINE1)
+            toggleTextType(TextCons.TEXT_TYPE_HEADLINE1)
         }
         ibHeadline2.setOnClickListener {
-            toggleTextType(Editor.TEXT_TYPE_HEADLINE2)
+            toggleTextType(TextCons.TEXT_TYPE_HEADLINE2)
         }
         ibHeadline3.setOnClickListener {
-            toggleTextType(Editor.TEXT_TYPE_HEADLINE3)
+            toggleTextType(TextCons.TEXT_TYPE_HEADLINE3)
         }
         ibList.setOnClickListener {
-            toggleTextType(Editor.TEXT_TYPE_LIST_BULLET)
+            toggleTextType(TextCons.TEXT_TYPE_LIST_BULLET)
         }
         ibOrderedList.setOnClickListener {
-            toggleTextType(Editor.TEXT_TYPE_LIST_ORDERED)
+            toggleTextType(TextCons.TEXT_TYPE_LIST_ORDERED)
         }
         ibDivider.setOnClickListener {
             methodChannel.invokeMethod(INVOKE_METHOD_INSERT_DIVIDER, null)
         }
         ibQuote.setOnClickListener {
-            toggleTextType(Editor.TEXT_TYPE_QUOTE)
+            toggleTextType(TextCons.TEXT_TYPE_QUOTE)
         }
         ibCodeBlock.setOnClickListener {
-            toggleTextType(Editor.TEXT_TYPE_CODE_BLOCK)
+            toggleTextType(TextCons.TEXT_TYPE_CODE_BLOCK)
         }
 
         // Text style.
         ibBold.setOnClickListener {
-            toggleTextStyle(Editor.TEXT_STYLE_BOLD)
+            toggleTextStyle(TextCons.TEXT_STYLE_BOLD)
         }
         ibItalic.setOnClickListener {
-            toggleTextStyle(Editor.TEXT_STYLE_ITALIC)
+            toggleTextStyle(TextCons.TEXT_STYLE_ITALIC)
         }
         ibUnderline.setOnClickListener {
-            toggleTextStyle(Editor.TEXT_STYLE_UNDERLINE)
+            toggleTextStyle(TextCons.TEXT_STYLE_UNDERLINE)
         }
         ibStrikeThrough.setOnClickListener {
-            toggleTextStyle(Editor.TEXT_STYLE_STRIKE_THROUGH)
+            toggleTextStyle(TextCons.TEXT_STYLE_STRIKE_THROUGH)
         }
 
         // Toolbar items.
@@ -246,9 +247,9 @@ internal class TunEditorToolbarView(
     private fun toggleTextType(textType: String) {
         if (currentTextType == textType) {
             // Reset normal text type.
-            currentTextType = Editor.TEXT_TYPE_NORMAL
+            currentTextType = TextCons.TEXT_TYPE_NORMAL
             refreshTextTypeView()
-            methodChannel.invokeMethod(INVOKE_METHOD_SET_TEXT_TYPE, Editor.TEXT_TYPE_NORMAL)
+            methodChannel.invokeMethod(INVOKE_METHOD_SET_TEXT_TYPE, TextCons.TEXT_TYPE_NORMAL)
         } else {
             // Set new text type.
             currentTextType = textType
@@ -284,25 +285,25 @@ internal class TunEditorToolbarView(
 
         // Enable current text type.
         when (currentTextType) {
-            Editor.TEXT_TYPE_HEADLINE1 -> {
+            TextCons.TEXT_TYPE_HEADLINE1 -> {
                 ibHeadline1.setBackgroundResource(enabledBg)
             }
-            Editor.TEXT_TYPE_HEADLINE2 -> {
+            TextCons.TEXT_TYPE_HEADLINE2 -> {
                 ibHeadline2.setBackgroundResource(enabledBg)
             }
-            Editor.TEXT_TYPE_HEADLINE3 -> {
+            TextCons.TEXT_TYPE_HEADLINE3 -> {
                 ibHeadline3.setBackgroundResource(enabledBg)
             }
-            Editor.TEXT_TYPE_LIST_BULLET -> {
+            TextCons.TEXT_TYPE_LIST_BULLET -> {
                 ibList.setBackgroundResource(enabledBg)
             }
-            Editor.TEXT_TYPE_LIST_ORDERED -> {
+            TextCons.TEXT_TYPE_LIST_ORDERED -> {
                 ibOrderedList.setBackgroundResource(enabledBg)
             }
-            Editor.TEXT_TYPE_QUOTE -> {
+            TextCons.TEXT_TYPE_QUOTE -> {
                 ibQuote.setBackgroundResource(enabledBg)
             }
-            Editor.TEXT_TYPE_CODE_BLOCK -> {
+            TextCons.TEXT_TYPE_CODE_BLOCK -> {
                 ibCodeBlock.setBackgroundResource(enabledBg)
             }
         }
@@ -312,22 +313,22 @@ internal class TunEditorToolbarView(
         val disabledColor = Color.TRANSPARENT
         val enabledBg = R.drawable.bg_toolbar_item_focused
 
-        if (currentTextStyleList.contains(Editor.TEXT_STYLE_BOLD)) {
+        if (currentTextStyleList.contains(TextCons.TEXT_STYLE_BOLD)) {
             ibBold.setBackgroundResource(enabledBg)
         } else {
             ibBold.setBackgroundColor(disabledColor)
         }
-        if (currentTextStyleList.contains(Editor.TEXT_STYLE_ITALIC)) {
+        if (currentTextStyleList.contains(TextCons.TEXT_STYLE_ITALIC)) {
             ibItalic.setBackgroundResource(enabledBg)
         } else {
             ibItalic.setBackgroundColor(disabledColor)
         }
-        if (currentTextStyleList.contains(Editor.TEXT_STYLE_UNDERLINE)) {
+        if (currentTextStyleList.contains(TextCons.TEXT_STYLE_UNDERLINE)) {
             ibUnderline.setBackgroundResource(enabledBg)
         } else {
             ibUnderline.setBackgroundColor(disabledColor)
         }
-        if (currentTextStyleList.contains(Editor.TEXT_STYLE_STRIKE_THROUGH)) {
+        if (currentTextStyleList.contains(TextCons.TEXT_STYLE_STRIKE_THROUGH)) {
             ibStrikeThrough.setBackgroundResource(enabledBg)
         } else {
             ibStrikeThrough.setBackgroundColor(disabledColor)
