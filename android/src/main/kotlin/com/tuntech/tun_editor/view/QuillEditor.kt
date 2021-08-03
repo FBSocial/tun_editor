@@ -97,14 +97,6 @@ class QuillEditor: WebView {
         }
     }
 
-    fun removeFormat(index: Int, length: Int) {
-        exec("javascript:removeFormat($index, $length)")
-    }
-
-    fun removeCurrentFormat() {
-        exec("javascript:removeCurrentFormat()")
-    }
-
     fun setSelection(index: Int, length: Int) {
         exec("javascript:setSelection($index, $length)")
     }

@@ -113,7 +113,12 @@ internal class TunEditorView(
             // Format related.
             HANDLE_METHOD_SET_TEXT_TYPE -> {
                 when (call.arguments as? String ?: TextCons.TEXT_TYPE_NORMAL) {
-                    TextCons.TEXT_TYPE_NORMAL -> quillEditor.removeCurrentFormat()
+                    TextCons.TEXT_TYPE_NORMAL -> {
+                        quillEditor.format("header", false)
+                        quillEditor.format("list", false)
+                        quillEditor.format("blockquote", false)
+                        quillEditor.format("code-block", false)
+                    }
                     TextCons.TEXT_TYPE_HEADLINE1 -> quillEditor.format("header", 1)
                     TextCons.TEXT_TYPE_HEADLINE2 -> quillEditor.format("header", 2)
                     TextCons.TEXT_TYPE_HEADLINE3 -> quillEditor.format("header", 3)
