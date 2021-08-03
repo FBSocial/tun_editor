@@ -48,16 +48,14 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      height: isShowTextType || isShowTextStyle ? 100 : 48,
-      padding: EdgeInsets.symmetric(
-        horizontal: 16,
-      ),
+      height: (isShowTextType || isShowTextStyle ? 96 : 48) + 1,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           isShowTextType ? buildTextTypeToolbar() : SizedBox.shrink(),
           isShowTextStyle ? buildTextStyleToolbar() : SizedBox.shrink(),
           isShowTextType || isShowTextStyle ? SizedBox(height: 4) : SizedBox.shrink(),
+          Divider(height: 1, thickness: 1, color: Color(0x148F959E)),
           buildMainToolbar(),
         ],
       ),
@@ -72,111 +70,128 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
   }
 
   Widget buildTextTypeToolbar() {
-    return Container(
-      height: 48,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(4),
-        border: Border.all(
-          width: 1,
-          color: Color(0xFFF2F2F2),
-        ),
+    return Padding(
+      padding: EdgeInsets.symmetric(
+        horizontal: 10,
       ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          SizedBox(width: 4),
-          buildButton(
-            IconFont.headline1,
-            () => toggleTextType(Attribute.h1.uniqueKey),
-            currentTextType == Attribute.h1.uniqueKey,
+      child: Container(
+        height: 44,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(4),
+          border: Border.all(
+            width: 1,
+            color: Color(0x198F959E),
           ),
-          SizedBox(width: 4),
-          buildButton(
-            IconFont.headline2,
-            () => toggleTextType(Attribute.h2.uniqueKey),
-            currentTextType == Attribute.h2.uniqueKey,
-          ),
-          SizedBox(width: 4),
-          buildButton(
-            IconFont.headline3,
-            () => toggleTextType(Attribute.h3.uniqueKey),
-            currentTextType == Attribute.h3.uniqueKey,
-          ),
-          SizedBox(width: 4),
-          buildButton(
-            IconFont.listBullet,
-            () => toggleTextType(Attribute.ul.uniqueKey),
-            currentTextType == Attribute.ul.uniqueKey,
-          ),
-          SizedBox(width: 4),
-          buildButton(
-            IconFont.listOrdered,
-            () => toggleTextType(Attribute.ol.uniqueKey),
-            currentTextType == Attribute.ol.uniqueKey,
-          ),
-          SizedBox(width: 4),
-          buildButton(
-            IconFont.divider,
-            insertDivider,
-            false,
-          ),
-          SizedBox(width: 4),
-          buildButton(
-            IconFont.quote,
-            () => toggleTextType(Attribute.blockQuote.uniqueKey),
-            currentTextType == Attribute.blockQuote.uniqueKey,
-          ),
-          SizedBox(width: 4),
-          buildButton(
-            IconFont.codeBlock,
-            () => toggleTextType(Attribute.codeBlock.uniqueKey),
-            currentTextType == Attribute.codeBlock.uniqueKey,
-          ),
-          SizedBox(width: 4),
-        ],
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SizedBox(width: 4),
+            buildOutlineButton(
+              IconFont.headline1,
+              () => toggleTextType(Attribute.h1.uniqueKey),
+              currentTextType == Attribute.h1.uniqueKey,
+            ),
+            SizedBox(width: 4),
+            buildOutlineButton(
+              IconFont.headline2,
+              () => toggleTextType(Attribute.h2.uniqueKey),
+              currentTextType == Attribute.h2.uniqueKey,
+            ),
+            SizedBox(width: 4),
+            buildOutlineButton(
+              IconFont.headline3,
+              () => toggleTextType(Attribute.h3.uniqueKey),
+              currentTextType == Attribute.h3.uniqueKey,
+            ),
+            SizedBox(width: 4),
+            buildOutlineButton(
+              IconFont.listBullet,
+              () => toggleTextType(Attribute.ul.uniqueKey),
+              currentTextType == Attribute.ul.uniqueKey,
+            ),
+            SizedBox(width: 4),
+            buildOutlineButton(
+              IconFont.listOrdered,
+              () => toggleTextType(Attribute.ol.uniqueKey),
+              currentTextType == Attribute.ol.uniqueKey,
+            ),
+            SizedBox(width: 4),
+            buildOutlineButton(
+              IconFont.divider,
+              insertDivider,
+              false,
+            ),
+            SizedBox(width: 4),
+            buildOutlineButton(
+              IconFont.quote,
+              () => toggleTextType(Attribute.blockQuote.uniqueKey),
+              currentTextType == Attribute.blockQuote.uniqueKey,
+            ),
+            SizedBox(width: 4),
+            buildOutlineButton(
+              IconFont.codeBlock,
+              () => toggleTextType(Attribute.codeBlock.uniqueKey),
+              currentTextType == Attribute.codeBlock.uniqueKey,
+            ),
+            SizedBox(width: 4),
+          ],
+        ),
       ),
     );
   }
 
   Widget buildTextStyleToolbar() {
-    return Container(
-      height: 48,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(4),
-        border: Border.all(
-          width: 1,
-          color: Color(0xFFF2F2F2),
-        ),
+    return Padding(
+      padding: EdgeInsets.symmetric(
+        horizontal: 10,
       ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          SizedBox(width: 4),
-          buildButton(
-            IconFont.bold,
-            () => toggleTextStyle(Attribute.bold.uniqueKey),
-            currentTextStyleList.contains(Attribute.bold.uniqueKey),
+      child: Container(
+        height: 44,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(4),
+          border: Border.all(
+            width: 1,
+            color: Color(0x198F959E),
           ),
-          SizedBox(width: 4),
-          buildButton(
-            IconFont.italic,
-            () => toggleTextStyle(Attribute.italic.uniqueKey),
-            currentTextStyleList.contains(Attribute.italic.uniqueKey),
-          ),
-          SizedBox(width: 4),
-          buildButton(
-            IconFont.underline,
-            () => toggleTextStyle(Attribute.underline.uniqueKey),
-            currentTextStyleList.contains(Attribute.underline.uniqueKey),
-          ),
-          SizedBox(width: 4),
-          buildButton(
-            IconFont.strikeThrough,
-            () => toggleTextStyle(Attribute.strikeThrough.uniqueKey),
-            currentTextStyleList.contains(Attribute.strikeThrough.uniqueKey),
-          ),
-          SizedBox(width: 4),
-        ],
+          boxShadow: [
+            BoxShadow(
+              offset: Offset(0, 5),
+              blurRadius: 20,
+              color: Color(0x0C646A73),
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SizedBox(width: 10),
+            buildOutlineButton(
+              IconFont.bold,
+              () => toggleTextStyle(Attribute.bold.uniqueKey),
+              currentTextStyleList.contains(Attribute.bold.uniqueKey),
+            ),
+            SizedBox(width: 8),
+            buildOutlineButton(
+              IconFont.italic,
+              () => toggleTextStyle(Attribute.italic.uniqueKey),
+              currentTextStyleList.contains(Attribute.italic.uniqueKey),
+            ),
+            SizedBox(width: 8),
+            buildOutlineButton(
+              IconFont.underline,
+              () => toggleTextStyle(Attribute.underline.uniqueKey),
+              currentTextStyleList.contains(Attribute.underline.uniqueKey),
+            ),
+            SizedBox(width: 8),
+            buildOutlineButton(
+              IconFont.strikeThrough,
+              () => toggleTextStyle(Attribute.strikeThrough.uniqueKey),
+              currentTextStyleList.contains(Attribute.strikeThrough.uniqueKey),
+            ),
+            SizedBox(width: 10),
+          ],
+        ),
       ),
     );
   }
@@ -185,16 +200,19 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
     return Container(
       width: double.infinity,
       height: 48,
+      padding: EdgeInsets.symmetric(
+        horizontal: 12,
+      ),
       child: Row(
         children: [
           buildButton(IconFont.at, onAtClick, false),
-          SizedBox(width: 4),
+          SizedBox(width: 8),
           buildButton(IconFont.image, onImageClick, false),
-          SizedBox(width: 4),
+          SizedBox(width: 8),
           buildButton(IconFont.emoji, onEmojiClick, false),
-          SizedBox(width: 4),
+          SizedBox(width: 8),
           buildButton(IconFont.textType, toggleTextTypeView, isShowTextType),
-          SizedBox(width: 4),
+          SizedBox(width: 8),
           buildButton(IconFont.textStyle, toggleTextStyleView, isShowTextStyle),
           Spacer(),
           GestureDetector(
@@ -221,10 +239,25 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
         width: 36,
         height: 36,
         decoration: BoxDecoration(
-          color: isActive ? Color(0xFFEEEFF0) : Colors.transparent,
-          borderRadius: isActive ? BorderRadius.circular(4) : BorderRadius.zero,
+          color: isActive ? Color(0x268F959E) : Colors.transparent,
+          borderRadius: isActive ? BorderRadius.circular(3) : BorderRadius.zero,
         ),
-        child: Icon(iconData, size: 24, color: Color(0xFF333333)),
+        child: Icon(iconData, size: 24, color: Color(0xFF363940)),
+      ),
+    );
+  }
+
+  Widget buildOutlineButton(IconData iconData, VoidCallback onPressed, bool isActive) {
+    return GestureDetector(
+      onTap: onPressed,
+      child: Container(
+        width: 36,
+        height: 36,
+        child: Icon(
+          iconData,
+          size: 24,
+          color: isActive ? Color(0xFF5562F2) : Color(0xFF363940),
+        ),
       ),
     );
   }
@@ -258,6 +291,10 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
   }
 
   void insertDivider() {
+    // Disable insert divider if in code block.
+    if (currentTextType == Attribute.codeBlock.uniqueKey) {
+      return;
+    }
     controller.insertDivider();
   }
 
