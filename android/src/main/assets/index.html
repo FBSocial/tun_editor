@@ -69,8 +69,8 @@
         quill.on('selection-change', function(range, oldRange, source) {
           if (range) {
             var format = quill.getFormat()
-            console.log('format', JSON.stringify(format))
-            tun.onSelectionChanged()
+            console.log(`on selection change ${range.index} ${range.length} ${JSON.stringify(format)}`)
+            tun.onSelectionChange(range.index, range.length, JSON.stringify(format))
           }
         });
 
@@ -137,7 +137,6 @@
           var delta = new Delta().retain(index).delete(length).insert(data)
           quill.updateContents(delta);
         }
-        replaceText(0, 0, '🛹');
       })
     </script>
   </body>

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/services.dart';
 import 'package:tun_editor/models/documents/attribute.dart';
 
@@ -16,21 +18,28 @@ class TunEditorApi {
   Future<bool?> _onMethodCall(MethodCall call) async {
     switch (call.method) {
       case 'onTextChange':
+        final args = call.arguments as Map<dynamic, dynamic>;
+        final delta = args["delta"] as String;
+        final oldDelta = args["oldDelta"] as String;
+        _handler.onTextChange(delta, oldDelta);
+        break;
+
+      case 'onSelectionChange':
         try {
           final args = call.arguments as Map<dynamic, dynamic>;
-          final delta = args["delta"] as String;
-          final oldDelta = args["oldDelta"] as String;
-          _handler.onTextChange(delta, oldDelta);
+          final index = args["index"] as int;
+          final length = args["length"] as int;
+          final format = args['format'] is String
+              ? json.decode(args['format'])
+              : {};
+          _handler.onSelectionChange(index, length, format);
         } catch(e, s) {
-          print('on text change: $e, $s');
+          print('on selection change $e $s');
         }
         break;
 
-      case 'onSelectionChanged':
-        _handler.onSelectionChanged(call.arguments);
-        break;
-
       default:
+        print('missing method handler in tun editor');
         throw MissingPluginException(
           '${call.method} was invoked but has no handler',
         );
@@ -88,5 +97,5 @@ class TunEditorApi {
 
 mixin TunEditorHandler {
   Future<void> onTextChange(String delta, String oldDelta);
-  void onSelectionChanged(Map<dynamic, dynamic> status);
+  void onSelectionChange(int index, int length, Map<String, dynamic> format);
 }

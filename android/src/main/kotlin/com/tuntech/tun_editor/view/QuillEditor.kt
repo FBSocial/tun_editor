@@ -45,9 +45,8 @@ class QuillEditor: WebView {
     private var padding: List<Int> = listOf(12, 15, 12, 15)
     private var delta: List<*> = listOf<Map<String, Any>>()
 
-    private var getSelectionResList: ArrayList<((Selection) -> Unit)> = ArrayList()
-
     private var onTextChangeListener: ((String, String) -> Unit)? = null
+    private var onSelectionChangeListener: ((Int, Int, String) -> Unit)? = null
 
     init {
         isVerticalScrollBarEnabled = false
@@ -71,15 +70,14 @@ class QuillEditor: WebView {
         )
 
         addJavascriptInterface(JSInterface(
-            onGetSelectionRes = {
-                for (res in getSelectionResList) {
-                    res(it)
-                }
-                getSelectionResList.clear()
-            },
             onTextChangeListener = { delta, oldDelta ->
                 (context as Activity).runOnUiThread {
                     onTextChangeListener?.invoke(delta, oldDelta)
+                }
+            },
+            onSelectionChangeListener = { index, length, format ->
+                (context as Activity).runOnUiThread {
+                    onSelectionChangeListener?.invoke(index, length, format)
                 }
             }
         ), "tun")
@@ -105,11 +103,6 @@ class QuillEditor: WebView {
 
     fun removeCurrentFormat() {
         exec("javascript:removeCurrentFormat()")
-    }
-
-    fun getSelection(getSelectionRes: (Selection) -> Unit, focus: Boolean = true) {
-        this.getSelectionResList.add(getSelectionRes)
-        exec("javascript:getSelection($focus)")
     }
 
     fun setSelection(index: Int, length: Int) {
@@ -149,8 +142,12 @@ class QuillEditor: WebView {
         exec("javascript:blur()");
     }
 
-    fun setOnTextChangeListener(onTextChangeListener: ((String, String) -> Unit)) {
+    fun setOnTextChangeListener(onTextChangeListener: ((String, String) -> Unit)?) {
         this.onTextChangeListener = onTextChangeListener
+    }
+
+    fun setOnSelectionChangeListener(onSelectionChangeListener: ((Int, Int, String) -> Unit)?) {
+        this.onSelectionChangeListener = onSelectionChangeListener
     }
 
     private fun setPlaceholder(placeholder: String) {
@@ -187,22 +184,17 @@ class QuillEditor: WebView {
     )
 
     class JSInterface(
-        private val onGetSelectionRes: (Selection) -> Unit,
-        private val onTextChangeListener: ((String, String) -> Unit)
+        private val onTextChangeListener: ((String, String) -> Unit),
+        private val onSelectionChangeListener: (Int, Int, String) -> Unit
     ) {
         @JavascriptInterface
-        fun onSelectionChanged() {
+        fun onSelectionChange(index: Int, length: Int, format: String) {
+            onSelectionChangeListener(index, length, format)
         }
 
         @JavascriptInterface
         fun onTextChange(delta: String, oldDelta: String, source: String) {
             onTextChangeListener(delta, oldDelta)
-        }
-
-        @JavascriptInterface
-        fun getSelectionRes(index: Int, length: Int) {
-            val selection = Selection(index, length)
-            onGetSelectionRes(selection)
         }
     }
 

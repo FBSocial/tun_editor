@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:tun_editor/iconfont.dart';
 import 'package:tun_editor/controller.dart';
+import 'package:tun_editor/models/documents/attribute.dart';
 
 class TunEditorToolbar extends StatefulWidget {
 
@@ -26,13 +27,22 @@ class TunEditorToolbar extends StatefulWidget {
 
 class TunEditorToolbarState extends State<TunEditorToolbar> {
 
+  static const String FORMAT_TEXT_TYPE_NORMAL = "normal";
+
   bool isShowTextType = false;
   bool isShowTextStyle = false;
 
-  String currentTextType = "normal";
+  String currentTextType = FORMAT_TEXT_TYPE_NORMAL;
   List<String> currentTextStyleList = [];
 
   TunEditorController get controller => widget.controller;
+
+  @override
+  void initState() {
+    super.initState();
+  
+    controller.addFormatListener(syncFormat);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -54,6 +64,13 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
     );
   }
 
+  @override
+  void dispose() {
+    controller.removeFormatListener(syncFormat);
+  
+    super.dispose();
+  }
+
   Widget buildTextTypeToolbar() {
     return Container(
       height: 48,
@@ -68,21 +85,53 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
         mainAxisSize: MainAxisSize.min,
         children: [
           SizedBox(width: 4),
-          buildButton(IconFont.headline1, () => toggleTextType('header1'), currentTextType == "header1"),
+          buildButton(
+            IconFont.headline1,
+            () => toggleTextType(Attribute.h1.uniqueKey),
+            currentTextType == Attribute.h1.uniqueKey,
+          ),
           SizedBox(width: 4),
-          buildButton(IconFont.headline2, () => toggleTextType('header2'), currentTextType == 'header2'),
+          buildButton(
+            IconFont.headline2,
+            () => toggleTextType(Attribute.h2.uniqueKey),
+            currentTextType == Attribute.h2.uniqueKey,
+          ),
           SizedBox(width: 4),
-          buildButton(IconFont.headline3, () => toggleTextType('header3'), currentTextType == "header3"),
+          buildButton(
+            IconFont.headline3,
+            () => toggleTextType(Attribute.h3.uniqueKey),
+            currentTextType == Attribute.h3.uniqueKey,
+          ),
           SizedBox(width: 4),
-          buildButton(IconFont.listBullet, () => toggleTextType('list-bullet'), currentTextType == "list-bullet"),
+          buildButton(
+            IconFont.listBullet,
+            () => toggleTextType(Attribute.ul.uniqueKey),
+            currentTextType == Attribute.ul.uniqueKey,
+          ),
           SizedBox(width: 4),
-          buildButton(IconFont.listOrdered, () => toggleTextType('list-ordered'), currentTextType == "list-ordered"),
+          buildButton(
+            IconFont.listOrdered,
+            () => toggleTextType(Attribute.ol.uniqueKey),
+            currentTextType == Attribute.ol.uniqueKey,
+          ),
           SizedBox(width: 4),
-          buildButton(IconFont.divider, insertDivider, false),
+          buildButton(
+            IconFont.divider,
+            insertDivider,
+            false,
+          ),
           SizedBox(width: 4),
-          buildButton(IconFont.quote, () => toggleTextType('blockquote'), currentTextType == "blockquote"),
+          buildButton(
+            IconFont.quote,
+            () => toggleTextType(Attribute.blockQuote.uniqueKey),
+            currentTextType == Attribute.blockQuote.uniqueKey,
+          ),
           SizedBox(width: 4),
-          buildButton(IconFont.codeBlock, () => toggleTextType('code-block'), currentTextType == "code-block"),
+          buildButton(
+            IconFont.codeBlock,
+            () => toggleTextType(Attribute.codeBlock.uniqueKey),
+            currentTextType == Attribute.codeBlock.uniqueKey,
+          ),
           SizedBox(width: 4),
         ],
       ),
@@ -103,13 +152,29 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
         mainAxisSize: MainAxisSize.min,
         children: [
           SizedBox(width: 4),
-          buildButton(IconFont.bold, () => toggleTextStyle('bold'), currentTextStyleList.contains('bold')),
+          buildButton(
+            IconFont.bold,
+            () => toggleTextStyle(Attribute.bold.uniqueKey),
+            currentTextStyleList.contains(Attribute.bold.uniqueKey),
+          ),
           SizedBox(width: 4),
-          buildButton(IconFont.italic, () => toggleTextStyle('italic'), currentTextStyleList.contains('italic')),
+          buildButton(
+            IconFont.italic,
+            () => toggleTextStyle(Attribute.italic.uniqueKey),
+            currentTextStyleList.contains(Attribute.italic.uniqueKey),
+          ),
           SizedBox(width: 4),
-          buildButton(IconFont.underline, () => toggleTextStyle('underline'), currentTextStyleList.contains('underline')),
+          buildButton(
+            IconFont.underline,
+            () => toggleTextStyle(Attribute.underline.uniqueKey),
+            currentTextStyleList.contains(Attribute.underline.uniqueKey),
+          ),
           SizedBox(width: 4),
-          buildButton(IconFont.strikeThrough, () => toggleTextStyle('strike'), currentTextStyleList.contains('strike')),
+          buildButton(
+            IconFont.strikeThrough,
+            () => toggleTextStyle(Attribute.strikeThrough.uniqueKey),
+            currentTextStyleList.contains(Attribute.strikeThrough.uniqueKey),
+          ),
           SizedBox(width: 4),
         ],
       ),
@@ -198,7 +263,7 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
 
   void toggleTextType(String textType) {
     if (currentTextType == textType) {
-      currentTextType = "normal";
+      currentTextType = FORMAT_TEXT_TYPE_NORMAL;
     } else {
       currentTextType = textType;
     }
@@ -228,6 +293,56 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
       isShowTextStyle = !isShowTextStyle;
       isShowTextType = false;
     });
+  }
+
+  void syncFormat(Map<String, dynamic> format) {
+    debugPrint('sync format: $format');
+    // Check text type.
+    if (format.containsKey(Attribute.header.key)) {
+      final level = format[Attribute.header.key] as int?;
+      switch (level) {
+        case 1:
+          currentTextType = Attribute.h1.uniqueKey;
+          break;
+        case 2:
+          currentTextType = Attribute.h2.uniqueKey;
+          break;
+        case 3:
+          currentTextType = Attribute.h3.uniqueKey;
+          break;
+      }
+    } else if (format.containsKey(Attribute.list.key)) {
+      final listType = format[Attribute.list.key] as String?;
+      final ulValue = Attribute.ul.value as String;
+      final olValue = Attribute.ol.value as String;
+      if (listType == ulValue) {
+        currentTextType = Attribute.ul.uniqueKey;
+      } else if (listType == olValue) {
+        currentTextType = Attribute.ol.uniqueKey;
+      }
+    } else if (format.containsKey(Attribute.blockQuote.key)) {
+      currentTextType = Attribute.blockQuote.uniqueKey;
+    } else if (format.containsKey(Attribute.codeBlock.key)) {
+      currentTextType = Attribute.codeBlock.uniqueKey;
+    } else {
+      currentTextType = FORMAT_TEXT_TYPE_NORMAL;
+    }
+
+    // Check text style.
+    currentTextStyleList.clear();
+    if (format.containsKey(Attribute.bold.key)) {
+      currentTextStyleList.add(Attribute.bold.uniqueKey);
+    }
+    if (format.containsKey(Attribute.italic.key)) {
+      currentTextStyleList.add(Attribute.italic.uniqueKey);
+    }
+    if (format.containsKey(Attribute.underline.key)) {
+      currentTextStyleList.add(Attribute.underline.uniqueKey);
+    }
+    if (format.containsKey(Attribute.strikeThrough.key)) {
+      currentTextStyleList.add(Attribute.strikeThrough.uniqueKey);
+    }
+    setState(() {});
   }
 
 }

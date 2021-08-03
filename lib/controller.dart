@@ -4,11 +4,9 @@ import 'package:tun_editor/models/documents/document.dart';
 import 'package:tun_editor/models/quill_delta.dart';
 import 'package:tun_editor/tun_editor_api.dart';
 
-class TunEditorController extends ChangeNotifier {
+class TunEditorController {
 
   TunEditorApi? _tunEditorApi;
-
-  final List<ValueChanged<bool>> _subToolbarListeners = [];
 
   // Document.
   final Document document;
@@ -36,12 +34,11 @@ class TunEditorController extends ChangeNotifier {
     );
   }
 
-  @override
-  void dispose() {
-    _subToolbarListeners.clear();
-    _tunEditorApi = null;
+  List<ValueChanged<Map<String, dynamic>>> _formatListeners = [];
 
-    super.dispose();
+  void dispose() {
+    _formatListeners.clear();
+    _tunEditorApi = null;
   }
 
   // Replace text.
@@ -107,14 +104,24 @@ class TunEditorController extends ChangeNotifier {
     this._tunEditorApi = api;
   }
 
-  void syncSelection(int selStart, int selEnd) {
-    _selection = TextSelection(baseOffset: selStart, extentOffset: selEnd);
-    notifyListeners();
+  void addFormatListener(ValueChanged<Map<String, dynamic>> listener) {
+    _formatListeners.add(listener);
+  }
+
+  void removeFormatListener(ValueChanged<Map<String, dynamic>> listener) {
+    _formatListeners.remove(listener);
+  }
+
+  void syncSelection(int index, int length, Map<String, dynamic> format) {
+    _selection = TextSelection(baseOffset: index, extentOffset: index + length);
+
+    for (final listener in _formatListeners) {
+      listener(format);
+    }
   }
 
   void composeDocument(Delta delta) {
     document.compose(delta, ChangeSource.LOCAL);
-    notifyListeners();
   }
 
 }

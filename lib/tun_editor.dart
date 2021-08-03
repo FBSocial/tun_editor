@@ -157,10 +157,8 @@ class TunEditorState extends State<TunEditor> with TunEditorHandler {
   }
 
   @override
-  void onSelectionChanged(Map<dynamic, dynamic> status) {
-    final selStart = status["selStart"] as int;
-    final selEnd = status["selEnd"] as int;
-    controller.syncSelection(selStart, selEnd);
+  void onSelectionChange(int index, int length, Map<String, dynamic> format) {
+    controller.syncSelection(index, length, format);
   }
 
 }

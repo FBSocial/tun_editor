@@ -18,7 +18,7 @@ internal class TunEditorView(
 
     companion object {
         const val INVOKE_METHOD_ON_TEXT_CHANGE = "onTextChange"
-        const val INVOKE_METHOD_ON_SELECTION_CHANGED = "onSelectionChanged"
+        const val INVOKE_METHOD_ON_SELECTION_CHANGE = "onSelectionChange"
 
         // Content related.
         const val HANDLE_METHOD_REPLACE_TEXT = "replaceText"
@@ -46,6 +46,8 @@ internal class TunEditorView(
     }
 
     override fun dispose() {
+        quillEditor.setOnSelectionChangeListener(null)
+        quillEditor.setOnTextChangeListener(null)
         methodChannel.setMethodCallHandler(null)
     }
 
@@ -79,6 +81,13 @@ internal class TunEditorView(
             text["delta"] = delta
             text["oldDelta"] = oldDelta
             methodChannel.invokeMethod(INVOKE_METHOD_ON_TEXT_CHANGE, text)
+        }
+        quillEditor.setOnSelectionChangeListener { index, length, format ->
+            val args = HashMap<String, Any>()
+            args["index"] = index
+            args["length"] = length
+            args["format"] = format
+            methodChannel.invokeMethod(INVOKE_METHOD_ON_SELECTION_CHANGE, args)
         }
         methodChannel.setMethodCallHandler(this)
     }
