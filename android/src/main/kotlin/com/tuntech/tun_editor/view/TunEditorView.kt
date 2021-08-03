@@ -88,12 +88,10 @@ internal class TunEditorView(
             // Content related.
             HANDLE_METHOD_REPLACE_TEXT -> {
                 val args = call.arguments as? Map<*, *> ?: return
-                val index = args["index"] as? Int ?: 0
-                val len = args["len"] as? Int ?: 0
-                val data = args["data"] as? String ?: ""
-                val ignoreFocus = args["ignoreFocus"] as Boolean? ?: false
-                val autoAppendNewLineAfterImage = args["autoAppendNewLineAfterImage"] as Boolean? ?: true
-                quillEditor.replaceText(index, len, data, ignoreFocus, autoAppendNewLineAfterImage)
+                val index = args["index"] as? Int ?: return
+                val len = args["len"] as? Int ?: return
+                val data = args["data"] ?: return
+                quillEditor.replaceText(index, len, data)
                 result.success(null)
             }
             HANDLE_METHOD_INSERT_DIVIDER -> {

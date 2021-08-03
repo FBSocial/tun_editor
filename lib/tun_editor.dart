@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
-import 'package:tun_editor/models/documents/document.dart';
 import 'package:tun_editor/models/quill_delta.dart';
 import 'package:tun_editor/tun_editor_api.dart';
 import 'package:tun_editor/controller.dart';

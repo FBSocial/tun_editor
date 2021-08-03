@@ -91,6 +91,7 @@ class FullPageEditorState extends State<FullPageEditor> {
                   _controller.insertImage('https://avatars0.githubusercontent.com/u/1758864?s=460&v=4');
                 },
                 onEmojiClick: () {
+                  _controller.insert(_controller.selection.baseOffset, "🛹");
                 },
               ),
             ],

@@ -25,14 +25,18 @@
       var removeFormat;
       var removeCurrentFormat;
       var getSelection;
+      var setSelection;
       var setPlaceholder;
       var setPadding;
       var setReadOnly;
       var focus;
       var blur;
       var setContents;
+      var replaceText;
       document.addEventListener('DOMContentLoaded', () => {
         let BlockEmbed = Quill.import('blots/block/embed');
+        let Delta = Quill.import('delta');
+
         class DividerBlot extends BlockEmbed {
 
           static create(type) {
@@ -60,7 +64,6 @@
         var quill = new Quill('#editor', options);
 
         quill.on('text-change', function(delta, oldDelta, source) {
-          console.log(JSON.stringify(oldDelta));
           tun.onTextChange(JSON.stringify(delta), JSON.stringify(oldDelta), source)
         });
         quill.on('selection-change', function(range, oldRange, source) {
@@ -108,6 +111,9 @@
           var range = quill.getSelection()
           tun.getSelectionRes(range.index, range.length)
         }
+        setSelection = function(index, length) {
+          quill.setSelection(index, length)
+        }
         setPlaceholder = function(placeholder) {
           quill.root.dataset.placeholder = placeholder;
         }
@@ -127,6 +133,11 @@
         setContents = function(delta) {
           quill.setContents(delta);
         }
+        replaceText = function(index, length, data) {
+          var delta = new Delta().retain(index).delete(length).insert(data)
+          quill.updateContents(delta);
+        }
+        replaceText(0, 0, '🛹');
       })
     </script>
   </body>

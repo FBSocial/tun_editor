@@ -46,7 +46,6 @@ class TunEditorController extends ChangeNotifier {
 
   // Replace text.
   void replaceText(int index, int len, Object? data, TextSelection? textSelection) {
-    document.replace(index, len, data);
     _tunEditorApi?.replaceText(index, len, data);
 
     if (textSelection == null) {

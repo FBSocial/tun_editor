@@ -124,8 +124,12 @@ class QuillEditor: WebView {
         }
     }
 
-    fun replaceText(index: Int, length: Int, data: String, ignoreFocus: Boolean, autoAppendNewLineAfterImage: Boolean) {
-        exec("javascript::replaceText($index, $length, $data, $ignoreFocus, $autoAppendNewLineAfterImage)")
+    fun replaceText(index: Int, length: Int, data: Any) {
+        if (data is String) {
+            exec("javascript:replaceText($index, $length, \"$data\")")
+        } else {
+            exec("javascript:replaceText($index, $length, $data)")
+        }
     }
 
     fun insertImage(url: String) {
