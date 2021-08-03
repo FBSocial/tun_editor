@@ -42,13 +42,12 @@ class QuillEditor: WebView {
     private var placeholder: String = ""
     private var readOnly: Boolean = false
     private var autoFocus: Boolean = false
-    private var padding: List<Int> = listOf()
+    private var padding: List<Int> = listOf(12, 15, 12, 15)
     private var delta: List<*> = listOf<Map<String, Any>>()
 
     private var getSelectionResList: ArrayList<((Selection) -> Unit)> = ArrayList()
 
     private var onTextChangeListener: ((String, String) -> Unit)? = null
-    private var onFocusChangedListener: ((Boolean) -> Unit)? = null
 
     init {
         isVerticalScrollBarEnabled = false
@@ -77,11 +76,6 @@ class QuillEditor: WebView {
                     res(it)
                 }
                 getSelectionResList.clear()
-            },
-            onFocusChangedListener = { hasFocus ->
-                (context as Activity).runOnUiThread {
-                    onFocusChangedListener?.invoke(hasFocus)
-                }
             },
             onTextChangeListener = { delta, oldDelta ->
                 (context as Activity).runOnUiThread {
@@ -134,8 +128,8 @@ class QuillEditor: WebView {
         exec("javascript::replaceText($index, $length, $data, $ignoreFocus, $autoAppendNewLineAfterImage)")
     }
 
-    fun insertImage(url: String, alt: String) {
-        exec("javascript:insertImage(\"$url\", \"$alt\")")
+    fun insertImage(url: String) {
+        exec("javascript:insertImage(\"$url\")")
     }
 
     fun focus() {
@@ -153,10 +147,6 @@ class QuillEditor: WebView {
 
     fun setOnTextChangeListener(onTextChangeListener: ((String, String) -> Unit)) {
         this.onTextChangeListener = onTextChangeListener
-    }
-
-    fun setOnFocusChangeListener(onFocusChangedListener: (Boolean) -> Unit) {
-        this.onFocusChangedListener = onFocusChangedListener
     }
 
     private fun setPlaceholder(placeholder: String) {
@@ -177,7 +167,6 @@ class QuillEditor: WebView {
 
     private fun setContents(delta: List<*>) {
         exec("javascript:setContents(${JSONArray(delta)})")
-        Log.d(TAG, "javascript:setContents(${JSONArray(delta)})")
     }
 
     private fun exec(command: String) {
@@ -195,7 +184,6 @@ class QuillEditor: WebView {
 
     class JSInterface(
         private val onGetSelectionRes: (Selection) -> Unit,
-        private val onFocusChangedListener: (Boolean) -> Unit,
         private val onTextChangeListener: ((String, String) -> Unit)
     ) {
         @JavascriptInterface
@@ -203,19 +191,14 @@ class QuillEditor: WebView {
         }
 
         @JavascriptInterface
-        fun onFocusChanged(hasFocus: Boolean) {
-            onFocusChangedListener.invoke(hasFocus)
+        fun onTextChange(delta: String, oldDelta: String, source: String) {
+            onTextChangeListener(delta, oldDelta)
         }
 
         @JavascriptInterface
         fun getSelectionRes(index: Int, length: Int) {
             val selection = Selection(index, length)
             onGetSelectionRes(selection)
-        }
-
-        @JavascriptInterface
-        fun onTextChange(delta: String, oldDelta: String, source: String) {
-            onTextChangeListener(delta, oldDelta)
         }
     }
 
@@ -227,7 +210,6 @@ class QuillEditor: WebView {
             super.onPageFinished(view, url)
 
             if (url?.equals(URL, true) == true) {
-                // Page loaded.
                 onPageFinished.invoke()
             }
         }

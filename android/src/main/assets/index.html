@@ -83,7 +83,7 @@
           quill.insertEmbed(range.index + 1, 'divider', 'hr', Quill.sources.USER);
           quill.setSelection(range.index + 2, Quill.sources.SILENT);
         }
-        insertImage = function(url, alt) {
+        insertImage = function(url) {
           let range = quill.getSelection(true);
           quill.insertText(range.index, '\n', Quill.sources.USER);
           quill.insertEmbed(range.index + 1, 'image', url, Quill.sources.USER);

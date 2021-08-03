@@ -1,10 +1,7 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter/services.dart';
 import 'package:tun_editor/iconfont.dart';
-import 'package:tun_editor/tun_editor_controller.dart';
+import 'package:tun_editor/controller.dart';
 
 class TunEditorToolbar extends StatefulWidget {
 
@@ -38,16 +35,6 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
   TunEditorController get controller => widget.controller;
 
   @override
-  void initState() {
-    super.initState();
-
-    controller.attachTunEditorToolbar(onSelectionChanged: (Map status) {
-      // TODO Toggle text type and style.
-      debugPrint('on selection changed in toolbar');
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
@@ -65,13 +52,6 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
         ],
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    controller.detachTunEditorToolbar();
-
-    super.dispose();
   }
 
   Widget buildTextTypeToolbar() {
@@ -248,73 +228,6 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
       isShowTextStyle = !isShowTextStyle;
       isShowTextType = false;
     });
-  }
-
-}
-
-class NativeTunEditorToolbarState extends State<TunEditorToolbar> {
-
-  static const String VIEW_TYPE_TUN_EDITOR_TOOLBAR = "tun_editor_toolbar";
-  static const double TOOLBAR_HEIGHT_WITHOUT_SUB = 48;
-  static const double TOOLBAR_HEIGHT_WITH_SUB = 100;
-
-  TunEditorController get controller => widget.controller;
-
-  double toolbarHeight = TOOLBAR_HEIGHT_WITHOUT_SUB;
-
-  @override
-  Widget build(BuildContext context) {
-    Widget child;
-    if (Platform.isAndroid) {
-      child = PlatformViewLink(
-        viewType: VIEW_TYPE_TUN_EDITOR_TOOLBAR,
-        surfaceFactory: (BuildContext context, PlatformViewController controller) {
-          return AndroidViewSurface(
-            controller: controller as AndroidViewController,
-            gestureRecognizers: {},
-            hitTestBehavior: PlatformViewHitTestBehavior.opaque,
-          );
-        },
-        onCreatePlatformView: (PlatformViewCreationParams params) {
-          return PlatformViewsService.initSurfaceAndroidView(
-            id: params.id,
-            viewType: VIEW_TYPE_TUN_EDITOR_TOOLBAR,
-            layoutDirection: TextDirection.ltr,
-            creationParams: {},
-            creationParamsCodec: StandardMessageCodec(),
-          )
-            ..addOnPlatformViewCreatedListener(params.onPlatformViewCreated)
-            ..addOnPlatformViewCreatedListener((int id) {
-              controller.attachTunEditorToolbar(viewId: id);
-            })
-            ..create();
-        },
-      );
-    } else if (Platform.isIOS) {
-      child = UiKitView(
-        viewType: VIEW_TYPE_TUN_EDITOR_TOOLBAR,
-        layoutDirection: TextDirection.ltr,
-        creationParams: {},
-        creationParamsCodec: StandardMessageCodec(),
-        onPlatformViewCreated: (int id) {
-          controller.attachTunEditorToolbar(viewId: id);
-        },
-      );
-    } else {
-      throw UnsupportedError("Unsupported platform view");
-    }
-
-    return SizedBox(
-      height: TOOLBAR_HEIGHT_WITH_SUB,
-      child: child,
-    );
-  }
-
-  @override
-  void dispose() {
-    controller.detachTunEditorToolbar();
-  
-    super.dispose();
   }
 
 }

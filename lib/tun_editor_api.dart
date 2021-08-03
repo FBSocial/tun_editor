@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:tun_editor/models/documents/attribute.dart';
 
@@ -31,11 +30,6 @@ class TunEditorApi {
         _handler.onSelectionChanged(call.arguments);
         break;
 
-      case 'onFocusChange':
-        final hasFocus = call.arguments as bool;
-        _handler.onFocusChanged(hasFocus);
-        break;
-
       default:
         throw MissingPluginException(
           '${call.method} was invoked but has no handler',
@@ -43,30 +37,27 @@ class TunEditorApi {
     }
   }
 
-  // Common tools.
-  void undo() {
-    _channel.invokeMethod('undo');
+  // Content related.
+  void replaceText(int index, int len, Object? data) {
+    _channel.invokeMethod('replaceText', {
+      'index': index,
+      'len': len,
+      'data': data,
+    });
   }
-  void redo() {
-    _channel.invokeMethod('redo');
+  void insertDivider() {
+    _channel.invokeMethod('insertDivider');
   }
-  void clearTextType() {
-    _channel.invokeMethod('clearTextType');
+  void insertImage(String url) {
+    _channel.invokeMethod('insertImage', url);
   }
-  void clearTextStyle() {
-    _channel.invokeMethod('clearTextStyle');
-  }
+
+  // Format related.
   void setTextType(String textType) {
     _channel.invokeMethod('setTextType', textType);
   }
   void setTextStyle(List<dynamic> textStyle) {
     _channel.invokeMethod('setTextStyle', textStyle);
-  }
-  void updateSelection(TextSelection selection) {
-    _channel.invokeMethod('updateSelection', {
-      'selStart': selection.baseOffset,
-      'selEnd': selection.extentOffset,
-    });
   }
   void formatText(int index, int len, Attribute attribute) {
     _channel.invokeMethod('formatText', {
@@ -76,36 +67,16 @@ class TunEditorApi {
       'value': attribute.value,
     });
   }
-  void replaceText(int index, int len, Object? data, {
-    bool ignoreFocus = false,
-    bool autoAppendNewlineAfterImage = true
-  }) {
-    _channel.invokeMethod('replaceText', {
-      'index': index,
-      'len': len,
-      'data': data,
+
+  // Selection related.
+  void updateSelection(TextSelection selection) {
+    _channel.invokeMethod('updateSelection', {
+      'selStart': selection.baseOffset,
+      'selEnd': selection.extentOffset,
     });
   }
-  void insert(int index, Object? data, {
-    int replaceLength = 0,
-    bool autoAppendNewlineAfterImage = true,
-  }) {
-    _channel.invokeMethod('insert', {
-      'index': index,
-      'data': data,
-      'replaceLength': replaceLength,
-      'autoAppendNewlineAfterImage': autoAppendNewlineAfterImage,
-    });
-  }
-  void insertDivider() {
-    _channel.invokeMethod('insertDivider');
-  }
-  void insertImage(String url, String alt) {
-    _channel.invokeMethod('insertImage', {
-      'url': url,
-      'alt': alt,
-    });
-  }
+
+  // Editor related.
   void focus() {
     _channel.invokeMethod('focus');
   }
@@ -115,10 +86,7 @@ class TunEditorApi {
 
 }
 
-mixin TunEditorHandler on ChangeNotifier {
-  Future<void> onTextChange(
-    String delta, String oldDelta,
-  );
+mixin TunEditorHandler {
+  Future<void> onTextChange(String delta, String oldDelta);
   void onSelectionChanged(Map<dynamic, dynamic> status);
-  void onFocusChanged(bool hasFocus);
 }

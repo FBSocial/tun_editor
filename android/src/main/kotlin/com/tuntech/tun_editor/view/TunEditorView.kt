@@ -19,22 +19,20 @@ internal class TunEditorView(
     companion object {
         const val INVOKE_METHOD_ON_TEXT_CHANGE = "onTextChange"
         const val INVOKE_METHOD_ON_SELECTION_CHANGED = "onSelectionChanged"
-        const val INVOKE_METHOD_ON_FOCUS_CHANGED = "onFocusChanged"
 
-        const val HANDLE_METHOD_UNDO = "undo"
-        const val HANDLE_METHOD_REDO = "redo"
-        const val HANDLE_METHOD_FOCUS = "focus"
-        const val HANDLE_METHOD_BLUR = "blur"
-        const val HANDLE_METHOD_CLEAR_TEXT_TYPE = "clearTextType"
-        const val HANDLE_METHOD_CLEAR_TEXT_STYLE = "clearTextStyle"
-        const val HANDLE_METHOD_SET_TEXT_TYPE = "setTextType"
-        const val HANDLE_METHOD_SET_TEXT_STYLE = "setTextStyle"
-        const val HANDLE_METHOD_UPDATE_SELECTION = "updateSelection"
-        const val HANDLE_METHOD_FORMAT_TEXT = "formatText"
+        // Content related.
         const val HANDLE_METHOD_REPLACE_TEXT = "replaceText"
-        const val HANDLE_METHOD_INSERT = "insert"
         const val HANDLE_METHOD_INSERT_DIVIDER = "insertDivider"
         const val HANDLE_METHOD_INSERT_IMAGE = "insertImage"
+        // Format related.
+        const val HANDLE_METHOD_SET_TEXT_TYPE = "setTextType"
+        const val HANDLE_METHOD_SET_TEXT_STYLE = "setTextStyle"
+        const val HANDLE_METHOD_FORMAT_TEXT = "formatText"
+        // Selection related.
+        const val HANDLE_METHOD_UPDATE_SELECTION = "updateSelection"
+        // Editor related.
+        const val HANDLE_METHOD_FOCUS = "focus"
+        const val HANDLE_METHOD_BLUR = "blur"
     }
 
     // View.
@@ -82,78 +80,12 @@ internal class TunEditorView(
             text["oldDelta"] = oldDelta
             methodChannel.invokeMethod(INVOKE_METHOD_ON_TEXT_CHANGE, text)
         }
-        quillEditor.setOnFocusChangeListener { hasFocus ->
-            methodChannel.invokeMethod(INVOKE_METHOD_ON_FOCUS_CHANGED, hasFocus)
-        }
         methodChannel.setMethodCallHandler(this)
     }
 
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
         when (call.method) {
-            // Common tools.
-            HANDLE_METHOD_UNDO -> {
-                result.success(null)
-            }
-            HANDLE_METHOD_REDO -> {
-                result.success(null)
-            }
-            HANDLE_METHOD_FOCUS -> {
-                quillEditor.focus()
-                result.success(null)
-            }
-            HANDLE_METHOD_BLUR -> {
-                quillEditor.blur()
-                result.success(null)
-            }
-            HANDLE_METHOD_CLEAR_TEXT_TYPE -> {
-                result.success(null)
-            }
-            HANDLE_METHOD_CLEAR_TEXT_STYLE -> {
-                result.success(null)
-            }
-            HANDLE_METHOD_SET_TEXT_TYPE -> {
-                when (call.arguments as? String ?: TextCons.TEXT_TYPE_NORMAL) {
-                    TextCons.TEXT_TYPE_NORMAL -> quillEditor.removeCurrentFormat()
-                    TextCons.TEXT_TYPE_HEADLINE1 -> quillEditor.format("header", 1)
-                    TextCons.TEXT_TYPE_HEADLINE2 -> quillEditor.format("header", 2)
-                    TextCons.TEXT_TYPE_HEADLINE3 -> quillEditor.format("header", 3)
-                    TextCons.TEXT_TYPE_LIST_BULLET -> quillEditor.format("list", "bullet")
-                    TextCons.TEXT_TYPE_LIST_ORDERED -> quillEditor.format("list", "ordered")
-                    TextCons.TEXT_TYPE_QUOTE -> quillEditor.format("blockquote", true)
-                    TextCons.TEXT_TYPE_CODE_BLOCK -> quillEditor.format("code-block", true)
-                }
-                 result.success(null)
-            }
-            HANDLE_METHOD_SET_TEXT_STYLE -> {
-                val textStyleList: List<String> = (call.arguments as? List<*> ?: ArrayList<String>()).map {
-                    return@map it as String? ?: ""
-                }
-                quillEditor.format("bold", textStyleList.contains(TextCons.TEXT_STYLE_BOLD))
-                quillEditor.format("italic", textStyleList.contains(TextCons.TEXT_STYLE_ITALIC))
-                quillEditor.format("underline", textStyleList.contains(TextCons.TEXT_STYLE_UNDERLINE))
-                quillEditor.format("strike", textStyleList.contains(TextCons.TEXT_STYLE_STRIKE_THROUGH))
-                result.success(null)
-            }
-            HANDLE_METHOD_UPDATE_SELECTION -> {
-                val args = call.arguments as? Map<*, *> ?: return
-                val selStart = args["selStart"] as? Int ?: 0
-                val selEnd = args["selEnd"] as? Int ?: 0
-                if (selEnd > selStart) {
-                    quillEditor.setSelection(selStart, selEnd - selStart)
-                } else {
-                    quillEditor.setSelection(selEnd, selStart - selEnd)
-                }
-                result.success(null)
-            }
-            HANDLE_METHOD_FORMAT_TEXT -> {
-                val args = call.arguments as? Map<*, *> ?: return
-                val index = args["index"] as? Int ?: 0
-                val len = args["len"] as? Int ?: 0
-                val name = args["name"] as? String ?: return
-                val value = args["value"] as? String ?: return
-                quillEditor.formatText(index, len, name, value)
-                result.success(null)
-            }
+            // Content related.
             HANDLE_METHOD_REPLACE_TEXT -> {
                 val args = call.arguments as? Map<*, *> ?: return
                 val index = args["index"] as? Int ?: 0
@@ -168,10 +100,62 @@ internal class TunEditorView(
                 quillEditor.insertDivider()
             }
             HANDLE_METHOD_INSERT_IMAGE -> {
+                val url = call.arguments as? String ?: return
+                quillEditor.insertImage(url)
+            }
+            // Format related.
+            HANDLE_METHOD_SET_TEXT_TYPE -> {
+                when (call.arguments as? String ?: TextCons.TEXT_TYPE_NORMAL) {
+                    TextCons.TEXT_TYPE_NORMAL -> quillEditor.removeCurrentFormat()
+                    TextCons.TEXT_TYPE_HEADLINE1 -> quillEditor.format("header", 1)
+                    TextCons.TEXT_TYPE_HEADLINE2 -> quillEditor.format("header", 2)
+                    TextCons.TEXT_TYPE_HEADLINE3 -> quillEditor.format("header", 3)
+                    TextCons.TEXT_TYPE_LIST_BULLET -> quillEditor.format("list", "bullet")
+                    TextCons.TEXT_TYPE_LIST_ORDERED -> quillEditor.format("list", "ordered")
+                    TextCons.TEXT_TYPE_QUOTE -> quillEditor.format("blockquote", true)
+                    TextCons.TEXT_TYPE_CODE_BLOCK -> quillEditor.format("code-block", true)
+                }
+                result.success(null)
+            }
+            HANDLE_METHOD_SET_TEXT_STYLE -> {
+                val textStyleList: List<String> = (call.arguments as? List<*> ?: ArrayList<String>()).map {
+                    return@map it as String? ?: ""
+                }
+                quillEditor.format("bold", textStyleList.contains(TextCons.TEXT_STYLE_BOLD))
+                quillEditor.format("italic", textStyleList.contains(TextCons.TEXT_STYLE_ITALIC))
+                quillEditor.format("underline", textStyleList.contains(TextCons.TEXT_STYLE_UNDERLINE))
+                quillEditor.format("strike", textStyleList.contains(TextCons.TEXT_STYLE_STRIKE_THROUGH))
+                result.success(null)
+            }
+            HANDLE_METHOD_FORMAT_TEXT -> {
                 val args = call.arguments as? Map<*, *> ?: return
-                val url = args["url"] as? String ?: return
-                val alt = args["alt"] as? String ?: return
-                quillEditor.insertImage(url, alt)
+                val index = args["index"] as? Int ?: 0
+                val len = args["len"] as? Int ?: 0
+                val name = args["name"] as? String ?: return
+                val value = args["value"] as? String ?: return
+                quillEditor.formatText(index, len, name, value)
+                result.success(null)
+            }
+            // Selection related
+            HANDLE_METHOD_UPDATE_SELECTION -> {
+                val args = call.arguments as? Map<*, *> ?: return
+                val selStart = args["selStart"] as? Int ?: 0
+                val selEnd = args["selEnd"] as? Int ?: 0
+                if (selEnd > selStart) {
+                    quillEditor.setSelection(selStart, selEnd - selStart)
+                } else {
+                    quillEditor.setSelection(selEnd, selStart - selEnd)
+                }
+                result.success(null)
+            }
+            // Editor related.
+            HANDLE_METHOD_FOCUS -> {
+                quillEditor.focus()
+                result.success(null)
+            }
+            HANDLE_METHOD_BLUR -> {
+                quillEditor.blur()
+                result.success(null)
             }
 
             else -> {

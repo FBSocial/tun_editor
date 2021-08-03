@@ -5,7 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
-import 'package:tun_editor/tun_editor_controller.dart';
+import 'package:tun_editor/models/documents/document.dart';
+import 'package:tun_editor/models/quill_delta.dart';
+import 'package:tun_editor/tun_editor_api.dart';
+import 'package:tun_editor/controller.dart';
 
 class TunEditor extends StatefulWidget {
 
@@ -40,9 +43,11 @@ class TunEditor extends StatefulWidget {
 
 }
 
-class TunEditorState extends State<TunEditor> {
+class TunEditorState extends State<TunEditor> with TunEditorHandler {
 
   static const String VIEW_TYPE_TUN_EDITOR = "tun_editor";
+
+  late TunEditorApi _tunEditorApi;
 
   // Widget fields.
   TunEditorController get controller => widget.controller;
@@ -109,7 +114,8 @@ class TunEditorState extends State<TunEditor> {
             )
               ..addOnPlatformViewCreatedListener(params.onPlatformViewCreated)
               ..addOnPlatformViewCreatedListener((int id) {
-                controller.attachTunEditor(id);
+                _tunEditorApi = TunEditorApi(id, this);
+                controller.setTunEditorApi(_tunEditorApi);
               })
               ..create();
           },
@@ -124,7 +130,8 @@ class TunEditorState extends State<TunEditor> {
         creationParams: creationParams,
         creationParamsCodec: StandardMessageCodec(),
         onPlatformViewCreated: (int id) {
-          controller.attachTunEditor(id);
+          _tunEditorApi = TunEditorApi(id, this);
+          controller.setTunEditorApi(_tunEditorApi);
         },
       );
     } else {
@@ -134,9 +141,27 @@ class TunEditorState extends State<TunEditor> {
 
   @override
   void dispose() {
-    controller.detachTunEditorToolbar();
+    controller.setTunEditorApi(null);
   
     super.dispose();
+  }
+
+  @override
+  Future<void> onTextChange(
+    String delta, String oldDelta,
+  ) async {
+    final deltaMap = json.decode(delta) as Map;
+    if (deltaMap['ops'] is List<dynamic>) {
+      final deltaObj = deltaMap['ops'] as List<dynamic>;
+      controller.composeDocument(Delta.fromJson(deltaObj));
+    }
+  }
+
+  @override
+  void onSelectionChanged(Map<dynamic, dynamic> status) {
+    final selStart = status["selStart"] as int;
+    final selEnd = status["selEnd"] as int;
+    controller.syncSelection(selStart, selEnd);
   }
 
 }

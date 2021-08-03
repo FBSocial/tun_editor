@@ -30,31 +30,26 @@
       var setReadOnly;
       var focus;
       var blur;
+      var setContents;
+      var replaceText;
       document.addEventListener('DOMContentLoaded', () => {
         let BlockEmbed = Quill.import('blots/block/embed');
-        class DividerBlot extends BlockEmbed { }
-        DividerBlot.blotName = 'divider';
-        DividerBlot.tagName = 'hr';
-        Quill.register(DividerBlot);
+        class DividerBlot extends BlockEmbed {
 
-        class ImageBlot extends BlockEmbed {
-          static create(value) {
+          static create(type) {
             let node = super.create();
-            node.setAttribute('alt', value.alt);
-            node.setAttribute('src', value.url);
+            node.setAttribute('type', type);
             return node;
           }
 
           static value(node) {
-            return {
-              alt: node.getAttribute('alt'),
-              url: node.getAttribute('src')
-            };
+            return node.getAttribute('type');
           }
+
         }
-        ImageBlot.blotName = 'image';
-        ImageBlot.tagName = 'img';
-        Quill.register(ImageBlot);
+        DividerBlot.blotName = 'divider';
+        DividerBlot.tagName = 'hr';
+        Quill.register(DividerBlot);
 
         var options = {
           readOnly: false,
@@ -66,23 +61,14 @@
         var quill = new Quill('#editor', options);
 
         quill.on('text-change', function(delta, oldDelta, source) {
+          console.log(JSON.stringify(oldDelta));
           // tun.onTextChange(JSON.stringify(delta), JSON.stringify(oldDelta), source)
         });
         quill.on('selection-change', function(range, oldRange, source) {
           if (range) {
             var format = quill.getFormat()
-            console.log(format)
-            if (range.length == 0) {
-              console.log('User cursor is on', range.index);
-            } else {
-              var text = quill.getText(range.index, range.length);
-              console.log('User has highlighted', text);
-            }
+            console.log('format', JSON.stringify(format))
             // tun.onSelectionChanged()
-            // tun.onFocusChanged(true)
-          } else {
-            console.log('Cursor not in the editor');
-            // tun.onFocusChanged(false)
           }
         });
 
@@ -95,17 +81,15 @@
         insertDivider = function() {
           let range = quill.getSelection(true);
           quill.insertText(range.index, '\n', Quill.sources.USER);
-          quill.insertEmbed(range.index + 1, 'divider', true, Quill.sources.USER);
+          quill.insertEmbed(range.index + 1, 'divider', 'hr', Quill.sources.USER);
           quill.setSelection(range.index + 2, Quill.sources.SILENT);
         }
-        insertImage = function(url, alt) {
+        insertImage = function(url) {
           let range = quill.getSelection(true);
           quill.insertText(range.index, '\n', Quill.sources.USER);
-          quill.insertEmbed(range.index + 1, 'image', {
-            alt: alt,
-            url: url,
-          }, Quill.sources.USER);
-          quill.setSelection(range.index + 2, Quill.sources.SILENT);
+          quill.insertEmbed(range.index + 1, 'image', url, Quill.sources.USER);
+          quill.insertText(range.index + 2, '\n', Quill.sources.USER);
+          quill.setSelection(range.index + 3, Quill.sources.SILENT);
         }
         format = function(name, value) {
           quill.format(name, value, 'user');
@@ -141,6 +125,18 @@
         }
         blur = function() {
           quill.blur();
+        }
+        setContents = function(delta) {
+          quill.setContents(delta);
+        }
+        replaceText = function(index, length, data) {
+          var delta = [];
+          delta.push({ retain: index })
+          if (length > 0) {
+            delta.push({ delete: length })
+          }
+          delta.push({ insert: data })
+          quill.updateContent(delta)
         }
       })
     </script>

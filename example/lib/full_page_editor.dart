@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:tun_editor/models/documents/document.dart';
 import 'package:tun_editor/tun_editor.dart';
-import 'package:tun_editor/tun_editor_controller.dart';
 import 'package:tun_editor/tun_editor_toolbar.dart';
+import 'package:tun_editor/controller.dart';
 
 class FullPageEditor extends StatefulWidget {
 
@@ -22,8 +22,6 @@ class FullPageEditorState extends State<FullPageEditor> {
 
   bool isLoading = true;
   late TunEditorController _controller;
-
-  String _previewText = "";
 
   FocusNode focusNode = FocusNode();
 
@@ -67,6 +65,10 @@ class FullPageEditorState extends State<FullPageEditor> {
               Expanded(
                 child: TunEditor(
                   controller: _controller,
+                  padding: EdgeInsets.symmetric(
+                    vertical: 12,
+                    horizontal: 15,
+                  ),
                   placeholder: "Hello World!",
                   focusNode: focusNode,
                   autoFocus: true,
@@ -86,10 +88,7 @@ class FullPageEditorState extends State<FullPageEditor> {
                 onAtClick: () {
                 },
                 onImageClick: () {
-                  _controller.insertImage(
-                    'https://avatars0.githubusercontent.com/u/1758864?s=460&v=4',
-                    'test iamge',
-                  );
+                  _controller.insertImage('https://avatars0.githubusercontent.com/u/1758864?s=460&v=4');
                 },
                 onEmojiClick: () {
                 },
@@ -123,10 +122,6 @@ class FullPageEditorState extends State<FullPageEditor> {
 
       final doc = json.encode(_controller.document.toDelta().toJson());
       debugPrint('document: $doc');
-
-      setState(() {
-        _previewText = doc;
-      });
     });
     focusNode.addListener(() {
       debugPrint('focus node listener: ${focusNode.hasFocus}');
