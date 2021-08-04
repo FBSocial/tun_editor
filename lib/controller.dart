@@ -15,16 +15,9 @@ class TunEditorController {
   TextSelection get selection => _selection;
   TextSelection _selection;
 
-  VoidCallback? onAt;
-  VoidCallback? onImage;
-  VoidCallback? onEmoji;
-
   TunEditorController({
     required this.document,
     required TextSelection selection,
-    this.onAt,
-    this.onImage,
-    this.onEmoji,
   }): _selection = selection;
 
   factory TunEditorController.basic() {
@@ -41,7 +34,9 @@ class TunEditorController {
     _tunEditorApi = null;
   }
 
-  // Replace text.
+  /// Insert [data] at the given [index].
+  /// And delete some words with [len] size.
+  /// It will update selection, if [textSelection] is not null.
   void replaceText(int index, int len, Object? data, TextSelection? textSelection) {
     _tunEditorApi?.replaceText(index, len, data);
 
@@ -55,24 +50,33 @@ class TunEditorController {
     }
   }
 
-  // Insert.
+  /// Insert [data] at the given [index].
+  /// This is a shortcut of [replaceText].
   void insert(int index, Object? data) {
     replaceText(index, 0, data, TextSelection.collapsed(offset: selection.baseOffset));
   }
 
-  /// Insert image with given [url].
+  /// Insert image with given [url] to current [selection].
   void insertImage(String url) {
     _tunEditorApi?.insertImage(url);
   }
 
+  /// Insert divider to current [selection].
   void insertDivider() {
     _tunEditorApi?.insertDivider();
   }
 
+  /// Format current [selection] with text type.
+  /// Text type will affects all the text in the [selection] line.
+  /// And all text type are mutually exclusive, only the last selected
+  /// [textType] will be actived.
   void setTextType(String textType) {
     _tunEditorApi?.setTextType(textType);
   }
 
+  /// Format current [selection] with text style.
+  /// Text style will affects inline text. 
+  /// And all text style support integration.
   void setTextStyle(List<dynamic> textStyle) {
     _tunEditorApi?.setTextStyle(textStyle);
   }
@@ -92,13 +96,17 @@ class TunEditorController {
     _tunEditorApi?.updateSelection(textSelection);
   }
 
+  /// Request focus to editor.
   void focus() {
     _tunEditorApi?.focus();
   }
 
+  /// Request unfocus to editor.
   void blur() {
     _tunEditorApi?.blur();
   }
+
+  // ================== Below methods are internal ==================
 
   void setTunEditorApi(TunEditorApi? api) {
     this._tunEditorApi = api;

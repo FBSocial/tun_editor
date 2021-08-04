@@ -9,10 +9,49 @@
     <script src="quill.min.js" charset="utf-8"></script>
     <script src="markdown.js" charset="utf-8"></script>
     <style>
+      .ql-container {
+        font-size: 16px;
+        color: #363940;
+      }
       .ql-container.ql-snow {
          border: none !important;
          height: 100vh;
        }
+      .ql-snow .ql-editor h1 {
+        font-size: 22px;
+      }
+      .ql-snow .ql-editor h2 {
+        font-size: 20px;
+      }
+      .ql-snow .ql-editor h3 {
+        font-size: 18px;
+      }
+      .ql-editor ol li:before {
+        color: #5562F2;
+        font-size: 16px;
+      }
+      .ql-editor ul > li::before {
+        color: #5562F2;
+      }
+      .ql-editor ol,
+      .ql-editor ul {
+        padding-left: 3px;
+      }
+      .ql-editor ol li:not(.ql-direction-rtl),
+      .ql-editor ul li:not(.ql-direction-rtl) {
+        padding-left: 20px;
+      }
+      .ql-editor ul > li::before {
+        width: 12px;
+      }
+      .ql-editor li:not(.ql-direction-rtl)::before {
+        text-align: left;
+        margin-left: -20px;
+        margin-right: 8px;
+      }
+      .ql-editor li::before {
+        width: auto;
+      }
     </style>
   </head>
   <body>
@@ -64,7 +103,7 @@
         var quill = new Quill('#editor', options);
 
         quill.on('text-change', function(delta, oldDelta, source) {
-          tun.onTextChange(JSON.stringify(delta), JSON.stringify(oldDelta), source)
+          // tun.onTextChange(JSON.stringify(delta), JSON.stringify(oldDelta), source)
         });
         quill.on('selection-change', function(range, oldRange, source) {
           if (range) {
