@@ -9,10 +9,87 @@
     <script src="quill.min.js" charset="utf-8"></script>
     <script src="markdown.js" charset="utf-8"></script>
     <style>
+      .ql-container {
+        font-size: 16px;
+        color: #363940;
+      }
       .ql-container.ql-snow {
          border: none !important;
          height: 100vh;
        }
+      .ql-snow .ql-editor h1 {
+        font-size: 22px;
+      }
+      .ql-snow .ql-editor h2 {
+        font-size: 20px;
+      }
+      .ql-snow .ql-editor h3 {
+        font-size: 18px;
+      }
+      .ql-editor ol li:before {
+        color: #5562F2;
+        font-size: 16px;
+      }
+      .ql-editor ul > li::before {
+        color: #5562F2;
+      }
+      .ql-editor ol,
+      .ql-editor ul {
+        padding-left: 3px;
+      }
+      .ql-editor ol li:not(.ql-direction-rtl),
+      .ql-editor ul li:not(.ql-direction-rtl) {
+        padding-left: 20px;
+      }
+      .ql-editor ul > li::before {
+        width: 12px;
+      }
+      .ql-editor li:not(.ql-direction-rtl)::before {
+        text-align: left;
+        margin-left: -20px;
+        margin-right: 8px;
+      }
+      .ql-editor li::before {
+        width: auto;
+      }
+      hr {
+        border: 1px solid #8f959e1e;
+      }
+      .ql-snow .ql-editor blockquote {
+        border-left: 2px solid #5562F2;
+        padding-left: 12px;
+      }
+      .ql-snow .ql-editor pre.ql-syntax {
+        font-size: 14px;
+        color: #646A73;
+        background-color: #F5F5F8;
+        border-radius: 4px;
+        border: 1px solid rgba(143, 149, 158, 0.2);
+        margin: 0;
+        padding: 24px 16px;
+        box-sizing: border-box;
+        counter-reset: line;
+      }
+      .ql-snow .ql-editor pre.ql-syntax span {
+        display: block;
+        line-height: 1.5rem;
+      }
+      .ql-snow .ql-editor pre.ql-syntax span:before {
+        counter-increment: line;
+        content: counter(line);
+        display: inline-block;
+        border-right: 1px solid #ddd;
+        padding: 0 .5em;
+        margin-right: .5em;
+        color: #888
+      }
+      .ql-snow .ql-editor code,
+      .ql-snow .ql-editor pre {
+        color: #646A73;
+        background-color: #F5F5F8;
+        border-radius: 4px;
+        border: 1px solid rgba(143, 149, 158, 0.2);
+      }
     </style>
   </head>
   <body>
@@ -24,7 +101,7 @@
       var format;
       var removeFormat;
       var removeCurrentFormat;
-      var getSelection;
+      var setSelection;
       var setPlaceholder;
       var setPadding;
       var setReadOnly;
@@ -34,6 +111,8 @@
       var replaceText;
       document.addEventListener('DOMContentLoaded', () => {
         let BlockEmbed = Quill.import('blots/block/embed');
+        let Delta = Quill.import('delta');
+
         class DividerBlot extends BlockEmbed {
 
           static create(type) {
@@ -51,24 +130,53 @@
         DividerBlot.tagName = 'hr';
         Quill.register(DividerBlot);
 
+        let bindings = {
+          'code exit': {
+            key: 'Enter',
+            collapsed: true,
+            format: ['code-block'],
+            prefix: /\n$/,
+            suffix: /^\s+$/,
+            handler: function(range) {
+              const [line, offset] = this.quill.getLine(range.index);
+              const delta = new Delta()
+                .retain(range.index + line.length() - offset - 1)
+                .retain(1, { 'code-block': null })
+                .delete(1);
+              this.quill.updateContents(delta, Quill.sources.USER);
+            }
+          }
+        }
         var options = {
           readOnly: false,
           theme: 'snow',
           modules: {
             toolbar: false,
+            keyboard: {
+              bindings: bindings
+            }
           }
         };
         var quill = new Quill('#editor', options);
 
         quill.on('text-change', function(delta, oldDelta, source) {
-          console.log(JSON.stringify(oldDelta));
-          // tun.onTextChange(JSON.stringify(delta), JSON.stringify(oldDelta), source)
+          // tun.onTextChange(JSON.stringify(delta), JSON.stringify(oldDelta), source);
+          window.webkit.messageHandlers.onTextChange.postMessage({
+             delta: JSON.stringify(delta),
+             oldDelta: JSON.stringify(oldDelta),
+             source: source,
+          });
         });
         quill.on('selection-change', function(range, oldRange, source) {
           if (range) {
             var format = quill.getFormat()
-            console.log('format', JSON.stringify(format))
-            // tun.onSelectionChanged()
+            console.log(`on selection change ${range.index} ${range.length} ${JSON.stringify(format)}`)
+            window.webkit.messageHandlers.onSelectionChange.postMessage({
+               index: range.index,
+               length: range.length,
+               format: JSON.stringify(format),
+            });
+            // tun.onSelectionChange(range.index, range.length, JSON.stringify(format));
           }
         });
 
@@ -88,8 +196,7 @@
           let range = quill.getSelection(true);
           quill.insertText(range.index, '\n', Quill.sources.USER);
           quill.insertEmbed(range.index + 1, 'image', url, Quill.sources.USER);
-          quill.insertText(range.index + 2, '\n', Quill.sources.USER);
-          quill.setSelection(range.index + 3, Quill.sources.SILENT);
+          quill.setSelection(range.index + 2, Quill.sources.SILENT);
         }
         format = function(name, value) {
           quill.format(name, value, 'user');
@@ -106,9 +213,8 @@
              quill.removeFormat(range.index, range.length);
           }
         }
-        getSelection = function() {
-          var range = quill.getSelection()
-          // tun.getSelectionRes(range.index, range.length)
+        setSelection = function(index, length) {
+          quill.setSelection(index, length)
         }
         setPlaceholder = function(placeholder) {
           quill.root.dataset.placeholder = placeholder;
@@ -130,13 +236,8 @@
           quill.setContents(delta);
         }
         replaceText = function(index, length, data) {
-          var delta = [];
-          delta.push({ retain: index })
-          if (length > 0) {
-            delta.push({ delete: length })
-          }
-          delta.push({ insert: data })
-          quill.updateContent(delta)
+          var delta = new Delta().retain(index).delete(length).insert(data)
+          quill.updateContents(delta);
         }
       })
     </script>

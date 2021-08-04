@@ -101,7 +101,6 @@
       var format;
       var removeFormat;
       var removeCurrentFormat;
-      var getSelection;
       var setSelection;
       var setPlaceholder;
       var setPadding;
@@ -203,10 +202,6 @@
           } else {
              quill.removeFormat(range.index, range.length);
           }
-        }
-        getSelection = function() {
-          var range = quill.getSelection()
-          tun.getSelectionRes(range.index, range.length)
         }
         setSelection = function(index, length) {
           quill.setSelection(index, length)

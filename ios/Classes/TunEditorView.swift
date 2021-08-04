@@ -78,6 +78,12 @@ class TunEditorView: NSObject, FlutterPlatformView {
         super.init()
 
         _editor.frame = frame
+        _editor.setOnTextChangeListener { args in
+            self.methodChannel.invokeMethod("onTextChange", arguments: args)
+        }
+        _editor.setOnSelectionChangeListener { args in
+            self.methodChannel.invokeMethod("onSelectionChange", arguments: args)
+        }
         methodChannel.setMethodCallHandler(handle)
     }
 
@@ -112,6 +118,11 @@ class TunEditorView: NSObject, FlutterPlatformView {
                 ? call.arguments as! String
                 : TextType.normal.rawValue
             switch textType {
+            case TextType.normal.rawValue:
+                _editor.format(name: "header", value: false)
+                _editor.format(name: "list", value: false)
+                _editor.format(name: "blockquote", value: false)
+                _editor.format(name: "code-block", value: false)
             case TextType.headline1.rawValue:
                 _editor.format(name: "header", value: 1)
             case TextType.headline2.rawValue:
@@ -139,7 +150,7 @@ class TunEditorView: NSObject, FlutterPlatformView {
         case "formatText":
             if let args = call.arguments as? Dictionary<String, Any> {
                 let index = args["index"] as? Int
-                let length = args["length"] as? Int
+                let length = args["len"] as? Int
                 let name = args["name"] as? String
                 let value = args["value"]
                 if index == nil || length == nil || name == nil || value == nil {
@@ -151,12 +162,16 @@ class TunEditorView: NSObject, FlutterPlatformView {
         // Selection related.
         case "updateSelection":
             if let args = call.arguments as? Dictionary<String, Any> {
-                let index = args["index"] as? Int
-                let length = args["length"] as? Int
-                if index == nil || length == nil {
+                let selStart = args["selStart"] as? Int
+                let selEnd = args["selEnd"] as? Int
+                if selStart == nil || selEnd == nil {
                     return
                 }
-                _editor.setSelection(index: index!, length: length!)
+                if selEnd! > selStart! {
+                    _editor.setSelection(index: selStart!, length: selEnd! - selStart!)
+                } else {
+                    _editor.setSelection(index: selEnd!, length: selStart! - selEnd!)
+                }
             }
 
         // Editor related.

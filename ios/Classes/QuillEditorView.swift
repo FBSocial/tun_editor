@@ -8,13 +8,18 @@
 import UIKit
 import WebKit
 
-class QuillEditorView: WKWebView, WKNavigationDelegate {
+class QuillEditorView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler {
+    
+    weak var scriptDelegate: WKScriptMessageHandler?
     
     var placeholder: String = ""
     var padding: [Int] = [12, 15, 12, 15]
     var readOnly: Bool = false
     var autoFocus: Bool = false
     var delta: [Any] = []
+    
+    var onSelectionChangeHandler: (([String: AnyObject]) -> Void)? = nil
+    var onTextChangeHandler: (([String: AnyObject]) -> Void)? = nil
         
     public override init(frame: CGRect, configuration: WKWebViewConfiguration) {
         super.init(frame: frame, configuration: configuration)
@@ -44,7 +49,7 @@ class QuillEditorView: WKWebView, WKNavigationDelegate {
         super.init(frame: frame, configuration: configuration)
         setup()
     }
-    
+
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         setPlaceholder(placeholder)
         setPadding(padding)
@@ -55,6 +60,29 @@ class QuillEditorView: WKWebView, WKNavigationDelegate {
             focus()
         } else {
             blur()
+        }
+    }
+    
+    func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+        debugPrint("receive message: \(message.name) \(message.body) \(message.body is [String: Any])")
+        switch message.name {
+        case "onTextChange":
+//            onTextChangeHandler?(message.body)
+            if let args = message.body as? [String: AnyObject] {
+                onTextChangeHandler?(args)
+            }
+        case "onSelectionChange":
+            if var args = message.body as? [String: AnyObject] {
+                if let index = args["index"] as? Int {
+                    args["index"] = index as AnyObject
+                }
+                if let length = args["length"] as? Int {
+                    args["length"] = length as AnyObject
+                }
+                onSelectionChangeHandler?(args)
+            }
+        default:
+            debugPrint("missing message handler in quill editor \(message.name)")
         }
     }
     
@@ -102,6 +130,14 @@ class QuillEditorView: WKWebView, WKNavigationDelegate {
         exec("blur()")
     }
     
+    func setOnTextChangeListener(_ handler: @escaping (([String: AnyObject]) -> Void)) {
+        self.onTextChangeHandler = handler
+    }
+    
+    func setOnSelectionChangeListener(_ handler: @escaping (([String: AnyObject]) -> Void)) {
+        self.onSelectionChangeHandler = handler
+    }
+    
     private func setPlaceholder(_ placeholder: String) {
         exec("setPlaceholder(\"\(placeholder)\")")
     }
@@ -125,6 +161,8 @@ class QuillEditorView: WKWebView, WKNavigationDelegate {
     private func setup() {
         self.backgroundColor = .white
         self.navigationDelegate = self
+        self.configuration.userContentController.add(self, name: "onTextChange")
+        self.configuration.userContentController.add(self, name: "onSelectionChange")
         
         if let filePath = Bundle.main.path(forResource: "index", ofType: "html") {
             let url = URL(fileURLWithPath: filePath, isDirectory: false)
