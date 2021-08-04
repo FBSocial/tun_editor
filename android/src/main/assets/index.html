@@ -68,6 +68,20 @@
         margin: 0;
         padding: 24px 16px;
         box-sizing: border-box;
+        counter-reset: line;
+      }
+      .ql-snow .ql-editor pre.ql-syntax span {
+        display: block;
+        line-height: 1.5rem;
+      }
+      .ql-snow .ql-editor pre.ql-syntax span:before {
+        counter-increment: line;
+        content: counter(line);
+        display: inline-block;
+        border-right: 1px solid #ddd;
+        padding: 0 .5em;
+        margin-right: .5em;
+        color: #888
       }
       .ql-snow .ql-editor code,
       .ql-snow .ql-editor pre {
@@ -117,23 +131,43 @@
         DividerBlot.tagName = 'hr';
         Quill.register(DividerBlot);
 
+        let bindings = {
+          'code exit': {
+            key: 'Enter',
+            collapsed: true,
+            format: ['code-block'],
+            prefix: /\n$/,
+            suffix: /^\s+$/,
+            handler: function(range) {
+              const [line, offset] = this.quill.getLine(range.index);
+              const delta = new Delta()
+                .retain(range.index + line.length() - offset - 1)
+                .retain(1, { 'code-block': null })
+                .delete(1);
+              this.quill.updateContents(delta, Quill.sources.USER);
+            }
+          }
+        }
         var options = {
           readOnly: false,
           theme: 'snow',
           modules: {
             toolbar: false,
+            keyboard: {
+              bindings: bindings
+            }
           }
         };
         var quill = new Quill('#editor', options);
 
         quill.on('text-change', function(delta, oldDelta, source) {
-          tun.onTextChange(JSON.stringify(delta), JSON.stringify(oldDelta), source)
+          tun.onTextChange(JSON.stringify(delta), JSON.stringify(oldDelta), source);
         });
         quill.on('selection-change', function(range, oldRange, source) {
           if (range) {
             var format = quill.getFormat()
             console.log(`on selection change ${range.index} ${range.length} ${JSON.stringify(format)}`)
-            tun.onSelectionChange(range.index, range.length, JSON.stringify(format))
+            tun.onSelectionChange(range.index, range.length, JSON.stringify(format));
           }
         });
 

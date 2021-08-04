@@ -232,6 +232,7 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
           SizedBox(width: 8),
           buildButton(IconFont.textStyle, toggleTextStyleView, isShowTextStyle),
           Spacer(),
+          // Send button.
           GestureDetector(
             onTap: onSendClick,
             child: Container(
