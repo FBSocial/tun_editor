@@ -52,6 +52,30 @@
       .ql-editor li::before {
         width: auto;
       }
+      hr {
+        border: 1px solid #8f959e1e;
+      }
+      .ql-snow .ql-editor blockquote {
+        border-left: 2px solid #5562F2;
+        padding-left: 12px;
+      }
+      .ql-snow .ql-editor pre.ql-syntax {
+        font-size: 14px;
+        color: #646A73;
+        background-color: #F5F5F8;
+        border-radius: 4px;
+        border: 1px solid rgba(143, 149, 158, 0.2);
+        margin: 0;
+        padding: 24px 16px;
+        box-sizing: border-box;
+      }
+      .ql-snow .ql-editor code,
+      .ql-snow .ql-editor pre {
+        color: #646A73;
+        background-color: #F5F5F8;
+        border-radius: 4px;
+        border: 1px solid rgba(143, 149, 158, 0.2);
+      }
     </style>
   </head>
   <body>
@@ -103,7 +127,7 @@
         var quill = new Quill('#editor', options);
 
         quill.on('text-change', function(delta, oldDelta, source) {
-          // tun.onTextChange(JSON.stringify(delta), JSON.stringify(oldDelta), source)
+          tun.onTextChange(JSON.stringify(delta), JSON.stringify(oldDelta), source)
         });
         quill.on('selection-change', function(range, oldRange, source) {
           if (range) {
