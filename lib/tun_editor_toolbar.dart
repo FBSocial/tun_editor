@@ -82,7 +82,7 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
   Widget buildTextTypeToolbar() {
     return Padding(
       padding: EdgeInsets.symmetric(
-        horizontal: 10,
+        horizontal: 4,
       ),
       child: Container(
         height: 44,
@@ -161,7 +161,7 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
   Widget buildTextStyleToolbar() {
     return Padding(
       padding: EdgeInsets.symmetric(
-        horizontal: 10,
+        horizontal: 4,
       ),
       child: Container(
         height: 44,
