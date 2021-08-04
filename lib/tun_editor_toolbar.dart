@@ -37,11 +37,21 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
 
   TunEditorController get controller => widget.controller;
 
+  bool isCanSend = false;
+
   @override
   void initState() {
     super.initState();
   
     controller.addFormatListener(syncFormat);
+    // controller.document.changes.listen((event) {
+    //   // final isCanSendNew = !controller.document.isEmpty();
+    //   // if (isCanSend != isCanSendNew) {
+    //   //   setState(() {
+    //   //     isCanSend = !isCanSend;
+    //   //   });
+    //   // }
+    // });
   }
 
   @override
@@ -225,13 +235,17 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
           GestureDetector(
             onTap: onSendClick,
             child: Container(
-              width: 50,
+              width: 48,
               height: 36,
               decoration: BoxDecoration(
-                color: Color(0xFFEEEFF0),
+                color: Color(0x268F959E),
                 borderRadius: BorderRadius.circular(18),
               ),
-              child: Icon(IconFont.send, size: 24),
+              child: Icon(
+                IconFont.send,
+                size: 24,
+                color: isCanSend ? Color(0xFF5562F2) : Color(0xA6363940),
+              ),
             ),
           ),
         ],
