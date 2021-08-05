@@ -24,9 +24,11 @@ internal class TunEditorView(
         const val HANDLE_METHOD_REPLACE_TEXT = "replaceText"
         const val HANDLE_METHOD_INSERT_DIVIDER = "insertDivider"
         const val HANDLE_METHOD_INSERT_IMAGE = "insertImage"
+        const val HANDLE_METHOD_INSERT_LINK = "insertLink"
         // Format related.
         const val HANDLE_METHOD_SET_TEXT_TYPE = "setTextType"
         const val HANDLE_METHOD_SET_TEXT_STYLE = "setTextStyle"
+        const val HANDLE_METHOD_FORMAT = "format"
         const val HANDLE_METHOD_FORMAT_TEXT = "formatText"
         // Selection related.
         const val HANDLE_METHOD_UPDATE_SELECTION = "updateSelection"
@@ -76,9 +78,9 @@ internal class TunEditorView(
         }
 
         quillEditor = QuillEditor(context, placeholder, padding, readOnly, autoFocus, delta)
-        quillEditor.setOnTextChangeListener { delta, oldDelta ->
+        quillEditor.setOnTextChangeListener { changeDelta, oldDelta ->
             val text = HashMap<String, String>()
-            text["delta"] = delta
+            text["delta"] = changeDelta
             text["oldDelta"] = oldDelta
             methodChannel.invokeMethod(INVOKE_METHOD_ON_TEXT_CHANGE, text)
         }
@@ -110,6 +112,12 @@ internal class TunEditorView(
                 val url = call.arguments as? String ?: return
                 quillEditor.insertImage(url)
             }
+            HANDLE_METHOD_INSERT_LINK -> {
+                val args = call.arguments as? Map<*, *> ?: return
+                val text = args["text"] as? String ?: return
+                val url = args["url"] as? String ?: return
+                quillEditor.insertLink(text, url)
+            }
             // Format related.
             HANDLE_METHOD_SET_TEXT_TYPE -> {
                 when (call.arguments as? String ?: TextCons.TEXT_TYPE_NORMAL) {
@@ -138,6 +146,12 @@ internal class TunEditorView(
                 quillEditor.format("underline", textStyleList.contains(TextCons.TEXT_STYLE_UNDERLINE))
                 quillEditor.format("strike", textStyleList.contains(TextCons.TEXT_STYLE_STRIKE_THROUGH))
                 result.success(null)
+            }
+            HANDLE_METHOD_FORMAT -> {
+                val args = call.arguments as? Map<*, *> ?: return
+                val name = args["name"] as? String ?: return
+                val value = args["value"] ?: return
+                quillEditor.format(name, value)
             }
             HANDLE_METHOD_FORMAT_TEXT -> {
                 val args = call.arguments as? Map<*, *> ?: return

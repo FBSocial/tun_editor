@@ -98,6 +98,7 @@
     <script>
       var insertDivider;
       var insertImage;
+      var insertLink;
       var format;
       var removeFormat;
       var removeCurrentFormat;
@@ -197,6 +198,11 @@
           quill.insertText(range.index, '\n', Quill.sources.USER);
           quill.insertEmbed(range.index + 1, 'image', url, Quill.sources.USER);
           quill.setSelection(range.index + 2, Quill.sources.SILENT);
+        }
+        insertLink = function(text, url) {
+          let range = quill.getSelection(true);
+          quill.insertText(range.index, text, "link", url, Quill.sources.USER);
+          quill.setSelection(range.index + text.length, Quill.sources.SILENT)
         }
         format = function(name, value) {
           quill.format(name, value, 'user');

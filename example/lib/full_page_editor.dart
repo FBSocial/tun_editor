@@ -71,7 +71,7 @@ class FullPageEditorState extends State<FullPageEditor> {
                   ),
                   placeholder: "Hello World!",
                   focusNode: focusNode,
-                  autoFocus: true,
+                  autoFocus: false,
                   readOnly: false,
                 ),
               ),
@@ -85,14 +85,26 @@ class FullPageEditorState extends State<FullPageEditor> {
               // ),
               TunEditorToolbar(
                 controller: _controller,
-                onAtClick: () {
+                showingAt: false,
+                showingImage: false,
+                showingEmoji: false,
+                onAtChange: (bool isShow) {
+                  debugPrint('show at subtoolbar change: $isShow');
                 },
-                onImageClick: () {
-                  _controller.insertImage('https://avatars0.githubusercontent.com/u/1758864?s=460&v=4');
+                onImageChange: (bool isShow) {
+                  debugPrint('show image subtoolbar change: $isShow');
                 },
-                onEmojiClick: () {
-                  _controller.insert(_controller.selection.baseOffset, "🛹");
+                onEmojiChange: (bool isShow) {
+                  debugPrint('show emoji sub toolbar change: $isShow');
                 },
+                // onAtClick: () {
+                // },
+                // onImageClick: () {
+                //   _controller.insertImage('https://avatars0.githubusercontent.com/u/1758864?s=460&v=4');
+                // },
+                // onEmojiClick: () {
+                //   _controller.insert(_controller.selection.baseOffset, "🛹");
+                // },
               ),
             ],
           ),

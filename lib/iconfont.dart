@@ -12,6 +12,7 @@ class IconFont {
   static const IconData emoji = IconData(0xe654, fontFamily: fontFamily, fontPackage: fontPackage);
   static const IconData textType = IconData(0xe642, fontFamily: fontFamily, fontPackage: fontPackage);
   static const IconData textStyle = IconData(0xe637, fontFamily: fontFamily, fontPackage: fontPackage);
+  static const IconData link = IconData(0xe67c, fontFamily: fontFamily, fontPackage: fontPackage);
   static const IconData headline1 = IconData(0xe63e, fontFamily: fontFamily, fontPackage: fontPackage);
   static const IconData headline2 = IconData(0xe63c, fontFamily: fontFamily, fontPackage: fontPackage);
   static const IconData headline3 = IconData(0xe643, fontFamily: fontFamily, fontPackage: fontPackage);

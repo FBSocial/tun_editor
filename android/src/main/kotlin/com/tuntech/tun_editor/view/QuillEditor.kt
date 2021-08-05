@@ -85,8 +85,24 @@ class QuillEditor: WebView {
         loadUrl(URL)
     }
 
+    fun replaceText(index: Int, length: Int, data: Any) {
+        if (data is String) {
+            exec("javascript:replaceText($index, $length, \"$data\")")
+        } else {
+            exec("javascript:replaceText($index, $length, $data)")
+        }
+    }
+
     fun insertDivider() {
         exec("javascript:insertDivider()")
+    }
+
+    fun insertImage(url: String) {
+        exec("javascript:insertImage(\"$url\")")
+    }
+
+    fun insertLink(text: String, url: String) {
+        exec("javascript:insertLink(\"$text\", \"$url\")")
     }
 
     fun format(name: String, value: Any) {
@@ -97,10 +113,6 @@ class QuillEditor: WebView {
         }
     }
 
-    fun setSelection(index: Int, length: Int) {
-        exec("javascript:setSelection($index, $length)")
-    }
-
     fun formatText(index: Int, length: Int, name: String, value: Any) {
         if (value is String) {
             exec("javascript:formatText($index, $length, $name, \"$value\")")
@@ -109,16 +121,8 @@ class QuillEditor: WebView {
         }
     }
 
-    fun replaceText(index: Int, length: Int, data: Any) {
-        if (data is String) {
-            exec("javascript:replaceText($index, $length, \"$data\")")
-        } else {
-            exec("javascript:replaceText($index, $length, $data)")
-        }
-    }
-
-    fun insertImage(url: String) {
-        exec("javascript:insertImage(\"$url\")")
+    fun setSelection(index: Int, length: Int) {
+        exec("javascript:setSelection($index, $length)")
     }
 
     fun focus() {

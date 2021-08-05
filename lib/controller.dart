@@ -66,6 +66,11 @@ class TunEditorController {
     _tunEditorApi?.insertDivider();
   }
 
+  /// Insert [text] with [link] format to current [selection].
+  void insertLink(String text, String url) {
+    _tunEditorApi?.insertLink(text, url);
+  }
+
   /// Format current [selection] with text type.
   /// Text type will affects all the text in the [selection] line.
   /// And all text type are mutually exclusive, only the last selected
@@ -79,6 +84,11 @@ class TunEditorController {
   /// And all text style support integration.
   void setTextStyle(List<dynamic> textStyle) {
     _tunEditorApi?.setTextStyle(textStyle);
+  }
+
+  /// Format the text in current [selection] with given [name] and [value].
+  void format(String name, dynamic value) {
+    _tunEditorApi?.format(name, value);
   }
 
   /// Format text which in range from [index] with [len] size with [attribute].

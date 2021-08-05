@@ -60,6 +60,12 @@ class TunEditorApi {
   void insertImage(String url) {
     _channel.invokeMethod('insertImage', url);
   }
+  void insertLink(String text, String url) {
+    _channel.invokeMethod('insertLink', {
+      'text': text,
+      'url': url,
+    });
+  }
 
   // Format related.
   void setTextType(String textType) {
@@ -67,6 +73,12 @@ class TunEditorApi {
   }
   void setTextStyle(List<dynamic> textStyle) {
     _channel.invokeMethod('setTextStyle', textStyle);
+  }
+  void format(String name, dynamic value) {
+    _channel.invokeMethod('format', {
+      'name': name,
+      'value': value,
+    });
   }
   void formatText(int index, int len, Attribute attribute) {
     _channel.invokeMethod('formatText', {

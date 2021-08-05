@@ -94,6 +94,18 @@ class QuillEditorView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler {
         }
     }
     
+    func insertDivider() {
+        exec("insertDivider()")
+    }
+    
+    func insertImage(_ url: String) {
+        exec("insertImage(\"\(url)\")")
+    }
+    
+    func insertLink(_ text: String, _ url: String) {
+        exec("insertLink(\"\(text)\", \"\(url)\")")
+    }
+    
     func format(name: String, value: Any) {
         if (value is String) {
             exec("format(\"\(name)\", \"\(value)\")")
@@ -109,14 +121,7 @@ class QuillEditorView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler {
             exec("formatText(\(index), \(length), \"\(name)\", \(value))")
         }
     }
-    
-    func insertDivider() {
-        exec("insertDivider()")
-    }
-    
-    func insertImage(_ url: String) {
-        exec("insertImage(\"\(url)\")")
-    }
+
     
     func setSelection(index: Int, length: Int) {
         exec("setSelection(\(index), \(length)")

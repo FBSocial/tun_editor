@@ -123,11 +123,12 @@ class TunEditorState extends State<TunEditor> with TunEditorHandler {
 
     } else if (Platform.isIOS) {
       // IOS platform.
+      debugPrint('creation params: $creationParams');
       return UiKitView(
         viewType: VIEW_TYPE_TUN_EDITOR,
         layoutDirection: TextDirection.ltr,
         creationParams: creationParams,
-        creationParamsCodec: StandardMessageCodec(),
+        creationParamsCodec: const StandardMessageCodec(),
         onPlatformViewCreated: (int id) {
           _tunEditorApi = TunEditorApi(id, this);
           controller.setTunEditorApi(_tunEditorApi);

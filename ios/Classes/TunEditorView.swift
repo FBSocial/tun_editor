@@ -46,7 +46,7 @@ class TunEditorView: NSObject, FlutterPlatformView {
         var autoFocus: Bool = false
         var delta: [Any] = []
         
-        if let argsMap = args as? Dictionary<String, Any> {
+        if let argsMap = args as? [String: Any] {
             if let optPlaceholder = argsMap["placeholder"] as? String {
                 placeholder = optPlaceholder
             }
@@ -62,8 +62,6 @@ class TunEditorView: NSObject, FlutterPlatformView {
             if let optDelta = argsMap["delta"] as? [Any] {
                 delta = optDelta
             }
-        } else {
-            debugPrint("invalid args \(args == nil)")
         }
         _editor = QuillEditorView(
             frame: frame,
@@ -96,7 +94,7 @@ class TunEditorView: NSObject, FlutterPlatformView {
         switch call.method {
         // Content related.
         case "replaceText":
-            if let args = call.arguments as? Dictionary<String, Any> {
+            if let args = call.arguments as? [String: Any] {
                 let index = args["index"] as? Int
                 let length = args["length"] as? Int
                 let data = args["data"]
@@ -110,6 +108,15 @@ class TunEditorView: NSObject, FlutterPlatformView {
         case "insertImage":
             if let url = call.arguments as? String {
                 _editor.insertImage(url)
+            }
+        case "insertLink":
+            if let args = call.arguments as? [String: Any] {
+                let text = args["text"] as? String
+                let url = args["url"] as? String
+                if text == nil || url == nil {
+                    return
+                }
+                _editor.insertLink(text!, url!)
             }
 
         // Format related.
@@ -146,6 +153,15 @@ class TunEditorView: NSObject, FlutterPlatformView {
                 _editor.format(name: "italic", value: styles.contains(TextStyle.italic.rawValue))
                 _editor.format(name: "underline", value: styles.contains(TextStyle.underline.rawValue))
                 _editor.format(name: "strike", value: styles.contains(TextStyle.strikeThrough.rawValue))
+            }
+        case "format":
+            if let args = call.arguments as? [String: Any] {
+                let name = args["name"] as? String
+                let value = args["value"]
+                if name == nil || value == nil {
+                    return
+                }
+                _editor.format(name: name!, value: value!)
             }
         case "formatText":
             if let args = call.arguments as? Dictionary<String, Any> {

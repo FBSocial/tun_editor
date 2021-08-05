@@ -8,16 +8,25 @@ class TunEditorToolbar extends StatefulWidget {
 
   final TunEditorController controller;
 
-  final VoidCallback? onAtClick;
-  final VoidCallback? onImageClick;
-  final VoidCallback? onEmojiClick;
+  final bool showingAt;
+  final bool showingImage;
+  final bool showingEmoji;
+  final ValueChanged<bool>? onAtChange;
+  final ValueChanged<bool>? onImageChange;
+  final ValueChanged<bool>? onEmojiChange;
+
+  final VoidCallback? onSend;
 
   const TunEditorToolbar({
     Key? key,
     required this.controller,
-    this.onAtClick,
-    this.onImageClick,
-    this.onEmojiClick,
+    this.showingAt = false,
+    this.showingImage = false,
+    this.showingEmoji = false,
+    this.onAtChange,
+    this.onImageChange,
+    this.onEmojiChange,
+    this.onSend,
   }) : super(key: key);
 
   @override
@@ -29,13 +38,27 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
 
   static const String FORMAT_TEXT_TYPE_NORMAL = "normal";
 
-  bool isShowTextType = false;
-  bool isShowTextStyle = false;
+  TunEditorController get controller => widget.controller;
+  bool get showingAt => widget.showingAt;
+  bool get showingImage => widget.showingImage;
+  bool get showingEmoji => widget.showingEmoji;
+  ValueChanged<bool>? get onAtChange => widget.onAtChange;
+  ValueChanged<bool>? get onImageChange => widget.onImageChange;
+  ValueChanged<bool>? get onEmojiChange => widget.onEmojiChange;
+  VoidCallback? get onSend => widget.onSend;
 
+  // Sub toolbar.
+  SubToolbar showingSubToolbar = SubToolbar.none;
+
+  // Text type and style.
   String currentTextType = FORMAT_TEXT_TYPE_NORMAL;
   List<String> currentTextStyleList = [];
 
-  TunEditorController get controller => widget.controller;
+  // Link related.
+  bool get isSelectNonLinkText => !controller.selection.isCollapsed
+      && !currentTextStyleList.contains(Attribute.link.uniqueKey);
+  late TextEditingController textCtrl;
+  late TextEditingController urlCtrl;
 
   bool isCanSend = false;
 
@@ -43,28 +66,22 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
   void initState() {
     super.initState();
   
+    textCtrl = TextEditingController();
+    urlCtrl = TextEditingController();
     controller.addFormatListener(syncFormat);
-    // controller.document.changes.listen((event) {
-    //   // final isCanSendNew = !controller.document.isEmpty();
-    //   // if (isCanSend != isCanSendNew) {
-    //   //   setState(() {
-    //   //     isCanSend = !isCanSend;
-    //   //   });
-    //   // }
-    // });
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      height: (isShowTextType || isShowTextStyle ? 96 : 48) + 1,
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          isShowTextType ? buildTextTypeToolbar() : SizedBox.shrink(),
-          isShowTextStyle ? buildTextStyleToolbar() : SizedBox.shrink(),
-          isShowTextType || isShowTextStyle ? SizedBox(height: 4) : SizedBox.shrink(),
+          buildSubToolbar(),
+          showingSubToolbar == SubToolbar.textType
+            || showingSubToolbar == SubToolbar.textStyle ? SizedBox(height: 4) : SizedBox.shrink(),
           Divider(height: 1, thickness: 1, color: Color(0x148F959E)),
           buildMainToolbar(),
         ],
@@ -79,6 +96,89 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
     super.dispose();
   }
 
+  // Main toolbar.
+  Widget buildMainToolbar() {
+    return Container(
+      width: double.infinity,
+      height: 48,
+      padding: EdgeInsets.symmetric(
+        horizontal: 12,
+      ),
+      child: Row(
+        children: [
+          buildButton(
+            IconFont.at,
+            () => toggleSubToolbar(SubToolbar.at),
+            false,
+          ),
+          SizedBox(width: 8),
+          buildButton(
+            IconFont.image,
+            () => toggleSubToolbar(SubToolbar.image),
+            false,
+          ),
+          SizedBox(width: 8),
+          buildButton(
+            IconFont.emoji,
+            () => toggleSubToolbar(SubToolbar.emoji),
+            false,
+          ),
+          SizedBox(width: 8),
+          buildButton(
+            IconFont.textType,
+            () => toggleSubToolbar(SubToolbar.textType),
+            showingSubToolbar == SubToolbar.textType,
+          ),
+          SizedBox(width: 8),
+          buildButton(
+            IconFont.textStyle,
+            () => toggleSubToolbar(SubToolbar.textStyle),
+            showingSubToolbar == SubToolbar.textStyle,
+          ),
+          SizedBox(width: 8),
+          buildButton(
+            IconFont.link,
+            () => toggleSubToolbar(SubToolbar.link),
+            showingSubToolbar == SubToolbar.link,
+          ),
+          Spacer(),
+          // Send button.
+          GestureDetector(
+            onTap: onSendClick,
+            child: Container(
+              width: 48,
+              height: 36,
+              decoration: BoxDecoration(
+                color: Color(0x268F959E),
+                borderRadius: BorderRadius.circular(18),
+              ),
+              child: Icon(
+                IconFont.send,
+                size: 24,
+                color: isCanSend ? Color(0xFF5562F2) : Color(0xA6363940),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Sub toolbar.
+  Widget buildSubToolbar() {
+    switch (showingSubToolbar) {
+      case SubToolbar.textType:
+        return buildTextTypeToolbar();
+      case SubToolbar.textStyle:
+        return buildTextStyleToolbar();
+      case SubToolbar.link:
+        return buildLinkToolbar();
+      default: 
+        return SizedBox.shrink();
+    }
+  }
+
+  // Text type sub toolbar.
   Widget buildTextTypeToolbar() {
     return Padding(
       padding: EdgeInsets.symmetric(
@@ -136,7 +236,7 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
             SizedBox(width: 8),
             buildOutlineButton(
               IconFont.divider,
-              insertDivider,
+              onDividerClick,
               false,
             ),
             SizedBox(width: 8),
@@ -158,6 +258,7 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
     );
   }
 
+  // Text style sub toolbar.
   Widget buildTextStyleToolbar() {
     return Padding(
       padding: EdgeInsets.symmetric(
@@ -213,42 +314,123 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
     );
   }
 
-  Widget buildMainToolbar() {
-    return Container(
-      width: double.infinity,
-      height: 48,
-      padding: EdgeInsets.symmetric(
+  // Link sub toolbar.
+  Widget buildLinkToolbar() {
+    final labelStyle = TextStyle(
+      color: Color(0xFF363940),
+      fontWeight: FontWeight.w500,
+      fontSize: 16,
+    );
+    final hintStyle = TextStyle(
+      color: Color(0xFF8F959E),
+      fontSize: 16,
+      height: 1.25,
+    );
+    final fieldStyle = TextStyle(
+      color: Color(0xFF363940),
+      fontSize: 16,
+      height: 1.25,
+    );
+    final inputDecoration = InputDecoration(
+      filled: true,
+      fillColor: Color(0x1A8F959E),
+      hintStyle: hintStyle,
+      contentPadding: EdgeInsets.symmetric(
         horizontal: 12,
       ),
-      child: Row(
+      border: OutlineInputBorder(
+        borderSide: BorderSide.none,
+        borderRadius: BorderRadius.circular(4),
+      ),
+    );
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.fromBorderSide(BorderSide(
+          color: Color(0xFFE3E4E7),
+          width: 1,
+        )),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          buildButton(IconFont.at, onAtClick, false),
-          SizedBox(width: 8),
-          buildButton(IconFont.image, onImageClick, false),
-          SizedBox(width: 8),
-          buildButton(IconFont.emoji, onEmojiClick, false),
-          SizedBox(width: 8),
-          buildButton(IconFont.textType, toggleTextTypeView, isShowTextType),
-          SizedBox(width: 8),
-          buildButton(IconFont.textStyle, toggleTextStyleView, isShowTextStyle),
-          Spacer(),
-          // Send button.
-          GestureDetector(
-            onTap: onSendClick,
-            child: Container(
-              width: 48,
-              height: 36,
-              decoration: BoxDecoration(
-                color: Color(0x268F959E),
-                borderRadius: BorderRadius.circular(18),
+          SizedBox(height: 10),
+          // Link text.
+          isSelectNonLinkText ? SizedBox.shrink() : Row(
+            children: [
+              SizedBox(width: 12),
+              Text(
+                "文本",
+                style: labelStyle,
               ),
-              child: Icon(
-                IconFont.send,
-                size: 24,
-                color: isCanSend ? Color(0xFF5562F2) : Color(0xA6363940),
+              SizedBox(width: 12),
+              SizedBox(
+                width: 230,
+                height: 40,
+                child: TextField(
+                  style: fieldStyle,
+                  cursorColor: Color(0xFF5562F2),
+                  textInputAction: TextInputAction.next,
+                  decoration: inputDecoration.copyWith(
+                    hintText: "输入文本",
+                  ),
+                  controller: textCtrl,
+                ),
               ),
-            ),
+            ],
           ),
+          isSelectNonLinkText ? SizedBox.shrink() : SizedBox(height: 10),
+          // Link value.
+          Row(
+            children: [
+              SizedBox(width: 12),
+              Text(
+                "链接",
+                style: labelStyle,
+              ),
+              SizedBox(width: 12),
+              SizedBox(
+                width: 230,
+                height: 40,
+                child: TextField(
+                  style: fieldStyle,
+                  cursorColor: Color(0xFF5562F2),
+                  decoration: inputDecoration.copyWith(
+                    hintText: "粘贴或输入一个链接",
+                  ),
+                  controller: urlCtrl,
+                  onSubmitted: (_) => onLinkSubmit(),
+                ),
+              ),
+              SizedBox(width: 12),
+              SizedBox(
+                width: 65,
+                height: 40,
+                child: OutlinedButton(
+                  onPressed: onLinkSubmit,
+                  style: ButtonStyle(
+                    foregroundColor: MaterialStateProperty.all(Colors.white),
+                    backgroundColor: MaterialStateProperty.all(Color(0xFF5562F2)),
+                    side: MaterialStateProperty.all(BorderSide.none),
+                    shape: MaterialStateProperty.all(
+                      RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(3),
+                      ),
+                    ),
+                    textStyle: MaterialStateProperty.all(
+                      TextStyle(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 16,
+                      ),
+                    ),
+                   ),
+                  child: Text("确定"),
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 10),
         ],
       ),
     );
@@ -284,40 +466,40 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
     );
   }
 
-  void onAtClick() {
-    setState(() {
-      isShowTextType = false;
-      isShowTextStyle = false;
-    });
-    widget.onAtClick?.call();
-  }
-
-  void onImageClick() {
-    setState(() {
-      isShowTextType = false;
-      isShowTextStyle = false;
-    });
-    widget.onImageClick?.call();
-  }
-
-  void onEmojiClick() {
-    setState(() {
-      isShowTextType = false;
-      isShowTextStyle = false;
-    });
-    widget.onEmojiClick?.call();
-  }
-
   void onSendClick() {
     setState(() {});
   }
 
-  void insertDivider() {
+  void onDividerClick() {
     // Disable insert divider if in code block.
     if (currentTextType == Attribute.codeBlock.uniqueKey) {
       return;
     }
     controller.insertDivider();
+  }
+
+  void onLinkSubmit() {
+    if (isSelectNonLinkText) {
+      // Format link.
+      if (urlCtrl.text.isEmpty) {
+        return;
+      }
+      controller.format(Attribute.link.key, urlCtrl.text);
+      // Clear text field and hide sub toolbar.
+      textCtrl.text = '';
+      urlCtrl.text = '';
+      toggleSubToolbar(SubToolbar.link);
+    } else {
+      // Insert text with link format.
+      if (textCtrl.text.isEmpty || urlCtrl.text.isEmpty) {
+        return;
+      }
+      controller.insertLink(textCtrl.text, urlCtrl.text);
+      // Clear text field and hide sub toolbar.
+      textCtrl.text = '';
+      urlCtrl.text = '';
+      toggleSubToolbar(SubToolbar.link);
+    }
   }
 
   void toggleTextType(String textType) {
@@ -340,22 +522,31 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
     controller.setTextStyle(currentTextStyleList);
   }
 
-  void toggleTextTypeView() {
-    setState(() {
-      isShowTextType = !isShowTextType;
-      isShowTextStyle = false;
-    });
-  }
+  void toggleSubToolbar(SubToolbar subToolbar) {
+    if (showingSubToolbar == subToolbar) {
+      showingSubToolbar = SubToolbar.none;
+    } else {
+      showingSubToolbar = subToolbar;
+    }
+    setState(() {});
 
-  void toggleTextStyleView() {
-    setState(() {
-      isShowTextStyle = !isShowTextStyle;
-      isShowTextType = false;
-    });
+    // Check if the value of at, image and emoji have changed.
+    final showingAtNew = showingSubToolbar == SubToolbar.at;
+    final showingImageNew = showingSubToolbar == SubToolbar.image;
+    final showingEmojiNew = showingSubToolbar == SubToolbar.emoji;
+    if (showingAtNew != showingAt) {
+      onAtChange?.call(showingAtNew);
+    }
+    if (showingImageNew != showingImage) {
+      onImageChange?.call(showingImageNew);
+    }
+    if (showingEmojiNew != showingEmoji) {
+      onEmojiChange?.call(showingEmojiNew);
+    }
   }
 
   void syncFormat(Map<String, dynamic> format) {
-    debugPrint('sync format: $format');
+    debugPrint('sync format: ${controller.selection.baseOffset} - ${controller.selection.extentOffset} - $format');
     // Check text type.
     if (format.containsKey(Attribute.header.key)) {
       final level = format[Attribute.header.key] as int?;
@@ -401,7 +592,20 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
     if (format.containsKey(Attribute.strikeThrough.key)) {
       currentTextStyleList.add(Attribute.strikeThrough.uniqueKey);
     }
+    if (format.containsKey(Attribute.link.key)) {
+      currentTextStyleList.add(Attribute.link.uniqueKey);
+    }
     setState(() {});
   }
 
+}
+
+enum SubToolbar {
+  none,
+  at,
+  image,
+  emoji,
+  textType,
+  textStyle,
+  link,
 }

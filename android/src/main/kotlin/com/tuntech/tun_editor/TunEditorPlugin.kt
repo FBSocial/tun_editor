@@ -12,7 +12,6 @@ class TunEditorPlugin: FlutterPlugin {
 
     val registry: PlatformViewRegistry = binding.platformViewRegistry
     registry.registerViewFactory("tun_editor", TunEditorViewFactory(messenger))
-    registry.registerViewFactory("tun_editor_toolbar", TunEditorToolbarViewFactory(messenger))
   }
 
   override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
