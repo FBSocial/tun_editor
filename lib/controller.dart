@@ -139,6 +139,7 @@ class TunEditorController {
   }
 
   void composeDocument(Delta delta) {
+    debugPrint('compose new delta: ${delta.toJson()}');
     document.compose(delta, ChangeSource.LOCAL);
   }
 

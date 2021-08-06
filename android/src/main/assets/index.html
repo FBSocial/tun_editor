@@ -6,8 +6,11 @@
     <title>Tun Editor</title>
     <link rel="stylesheet" href="normalize.css" type="text/css" charset="utf-8">
     <link rel="stylesheet" href="snow.css" type="text/css" charset="utf-8">
-    <script src="quill.min.js" charset="utf-8"></script>
+    <link rel="stylesheet" href="highlight.min.css" type="text/css" charset="utf-8">
+    <script src="highlight.min.js" charset="utf-8"></script>
+    <script src="highlightjs-line-numbers.min.js" charset="utf-8"></script>
     <script src="markdown.js" charset="utf-8"></script>
+    <script src="quill.min.js" charset="utf-8"></script>
     <style>
       .ql-container {
         font-size: 16px;
@@ -68,20 +71,6 @@
         margin: 0;
         padding: 24px 16px;
         box-sizing: border-box;
-        counter-reset: line;
-      }
-      .ql-snow .ql-editor pre.ql-syntax span {
-        display: block;
-        line-height: 1.5rem;
-      }
-      .ql-snow .ql-editor pre.ql-syntax span:before {
-        counter-increment: line;
-        content: counter(line);
-        display: inline-block;
-        border-right: 1px solid #ddd;
-        padding: 0 .5em;
-        margin-right: .5em;
-        color: #888
       }
       .ql-snow .ql-editor code,
       .ql-snow .ql-editor pre {
@@ -110,9 +99,11 @@
       var blur;
       var setContents;
       var replaceText;
+
       document.addEventListener('DOMContentLoaded', () => {
         let BlockEmbed = Quill.import('blots/block/embed');
         let Delta = Quill.import('delta');
+        let CodeBlock = Quill.import('formats/code-block');
 
         class DividerBlot extends BlockEmbed {
 
@@ -152,6 +143,7 @@
           readOnly: false,
           theme: 'snow',
           modules: {
+            syntax: true,
             toolbar: false,
             keyboard: {
               bindings: bindings
@@ -161,7 +153,16 @@
         var quill = new Quill('#editor', options);
 
         quill.on('text-change', function(delta, oldDelta, source) {
+          if (source === Quill.sources.SILENT) {
+            return;
+          }
           tun.onTextChange(JSON.stringify(delta), JSON.stringify(oldDelta), source);
+
+          let range = quill.getSelection(true);
+          if (range) {
+            var format = quill.getFormat()
+            tun.onSelectionChange(range.index, range.length, JSON.stringify(format));
+          }
         });
         quill.on('selection-change', function(range, oldRange, source) {
           if (range) {
@@ -229,7 +230,7 @@
           quill.blur();
         }
         setContents = function(delta) {
-          quill.setContents(delta);
+          quill.setContents(delta, Quill.sources.SILENT);
         }
         replaceText = function(index, length, data) {
           var delta = new Delta().retain(index).delete(length).insert(data)
