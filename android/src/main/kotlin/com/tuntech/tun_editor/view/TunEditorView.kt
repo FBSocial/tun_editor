@@ -158,7 +158,7 @@ internal class TunEditorView(
                 val index = args["index"] as? Int ?: 0
                 val len = args["len"] as? Int ?: 0
                 val name = args["name"] as? String ?: return
-                val value = args["value"] as? String ?: return
+                val value = args["value"]
                 quillEditor.formatText(index, len, name, value)
                 result.success(null)
             }

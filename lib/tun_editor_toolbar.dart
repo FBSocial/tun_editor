@@ -129,10 +129,10 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
             showingSubToolbar == SubToolbar.textStyle,
           ),
           SizedBox(width: 8),
-          buildButton(
+          buildOutlineButton(
             IconFont.link,
-            () => showLinkFormatDialog(),
-            showingSubToolbar == SubToolbar.link,
+            () => onLinkFormatClick(),
+            currentTextStyleList.contains(Attribute.link.uniqueKey),
           ),
           Spacer(),
           // Send button.
@@ -390,44 +390,36 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
     }
   }
 
-  Future<void> showLinkFormatDialog() async {
+  Future<void> onLinkFormatClick() async {
     final selection = controller.selection;
+    int baseOffset = selection.baseOffset;
+    int extentOffset = selection.extentOffset;
+    if (baseOffset > extentOffset) {
+      baseOffset = selection.extentOffset;
+      extentOffset = selection.baseOffset;
+    }
+
+    // Remove link format if has link format.
     final hasLinkFormat = currentTextStyleList.contains(Attribute.link.key);
+    if (hasLinkFormat) {
+      final range = _getLinkNode(selection);
+      if (range == null) {
+        return;
+      }
+      debugPrint('link node: ${range.baseOffset} - ${range.extentOffset}');
+      controller.formatText(
+        range.baseOffset,
+        range.extentOffset - range.baseOffset,
+        Attribute('link', AttributeScope.INLINE, false),
+      );
+      return;
+    }
+
     String defaultText = '';
     String defaultUrl = '';
     int textStartIndex = -1;
     int textEndIndex = -1;
-    if (hasLinkFormat) {
-      // Get selected node's attribute.
-      final child = controller.document.queryChild(selection.baseOffset);
-
-      // Document offset.
-      final documentOffset = child.node?.documentOffset ?? 0; 
-
-      // Line offset.
-      final childOffset = child.offset;
-      final childExtentOffset = child.offset + (selection.extentOffset - selection.baseOffset);
-
-      final deltaList = child.node?.toDelta().toList() ?? [];
-      int index = 0;
-      for (final op in deltaList) {
-        // If has link attribute.
-        final opLength = op.length ?? 0;
-        final extentOffset = index + opLength;
-        if (index <= childOffset && extentOffset >= childExtentOffset
-            && op.attributes?.keys.contains(Attribute.link.key) == true
-            && op.attributes?[Attribute.link.key] is String
-            && op.value is String) {
-          // Found link node.
-          defaultText = op.value as String;
-          defaultUrl = op.attributes?[Attribute.link.key] as String;
-          textStartIndex = documentOffset + index;
-          textEndIndex = documentOffset + extentOffset;
-          break;
-        }
-        index = index + opLength;
-      }
-    } else if (!selection.isCollapsed) {
+    if (!selection.isCollapsed) {
       textStartIndex = selection.baseOffset;
       textEndIndex = selection.extentOffset;
       defaultText = controller.document.toPlainText().substring(textStartIndex, textEndIndex);
@@ -438,17 +430,20 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
       defaultText: defaultText,
       defaultUrl: defaultUrl,
     );
-    // Format link.
     if (res != null && res.length >= 2) {
       final text = res[0];
       final url = res[1];
 
-      if (textStartIndex != -1 && textEndIndex != -1) {
+      if (selection.isCollapsed) {
+        // Insert new link.
+        controller.insertLink(text, url);
+        controller.focus();
+      } else {
         // Remove link format.
         controller.formatText(
           textStartIndex,
           textEndIndex - textStartIndex,
-          LinkAttribute(null),
+          Attribute('link', AttributeScope.INLINE, false),
         );
         // Replace text.
         controller.replaceText(
@@ -459,16 +454,12 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
             offset: textStartIndex + text.length,
           ),
         );
-        // Format text.
+        // Format text with link.
         controller.formatText(
           textStartIndex,
           text.length,
           LinkAttribute(url),
         );
-      } else {
-        // Insert new link.
-        controller.insertLink(text, url);
-        controller.focus();
       }
     }
   }
@@ -525,6 +516,35 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
       currentTextStyleList.add(Attribute.link.uniqueKey);
     }
     setState(() {});
+  }
+
+  TextSelection? _getLinkNode(TextSelection cursorSelection) {
+    // Get selected node's attribute.
+    // FIXME What if link has two lines?
+    final child = controller.document.queryChild(cursorSelection.baseOffset);
+
+    // Document offset.
+    final documentOffset = child.node?.documentOffset ?? 0; 
+
+    // Line offset.
+    final cursorLineOffset = child.offset;
+    final cursorLineExtentOffset = child.offset + (cursorSelection.extentOffset - cursorSelection.baseOffset);
+
+    int opLineOffset = 0;
+    final deltaList = child.node?.toDelta().toList() ?? [];
+    for (final op in deltaList) {
+      // If has link attribute.
+      final opLength = op.length ?? 0;
+      final opLineExtentOffset = opLineOffset + opLength;
+      if (opLineOffset <= cursorLineOffset && opLineExtentOffset >= cursorLineExtentOffset
+          && op.attributes?.keys.contains(Attribute.link.key) == true
+          && op.attributes?[Attribute.link.key] is String
+          && op.value is String) {
+        return TextSelection(baseOffset: documentOffset + opLineOffset, extentOffset: documentOffset + opLineExtentOffset);
+      }
+      opLineOffset = opLineOffset + opLength;
+    }
+    return null;
   }
 
 }

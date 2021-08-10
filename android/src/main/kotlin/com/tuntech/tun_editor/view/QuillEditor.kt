@@ -113,7 +113,7 @@ class QuillEditor: WebView {
         }
     }
 
-    fun formatText(index: Int, length: Int, name: String, value: Any) {
+    fun formatText(index: Int, length: Int, name: String, value: Any?) {
         if (value is String) {
             exec("javascript:formatText($index, $length, \"$name\", \"$value\")")
         } else {
