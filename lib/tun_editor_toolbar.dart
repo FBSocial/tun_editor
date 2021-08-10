@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:tun_editor/iconfont.dart';
 import 'package:tun_editor/controller.dart';
+import 'package:tun_editor/link_format_dialog.dart';
 import 'package:tun_editor/models/documents/attribute.dart';
 
 class TunEditorToolbar extends StatefulWidget {
@@ -54,20 +55,12 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
   String currentTextType = FORMAT_TEXT_TYPE_NORMAL;
   List<String> currentTextStyleList = [];
 
-  // Link related.
-  bool get isSelectNonLinkText => !controller.selection.isCollapsed
-      && !currentTextStyleList.contains(Attribute.link.uniqueKey);
-  late TextEditingController textCtrl;
-  late TextEditingController urlCtrl;
-
   bool isCanSend = false;
 
   @override
   void initState() {
     super.initState();
-  
-    textCtrl = TextEditingController();
-    urlCtrl = TextEditingController();
+
     controller.addFormatListener(syncFormat);
   }
 
@@ -138,7 +131,7 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
           SizedBox(width: 8),
           buildButton(
             IconFont.link,
-            () => toggleSubToolbar(SubToolbar.link),
+            () => showLinkFormatDialog(),
             showingSubToolbar == SubToolbar.link,
           ),
           Spacer(),
@@ -171,8 +164,6 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
         return buildTextTypeToolbar();
       case SubToolbar.textStyle:
         return buildTextStyleToolbar();
-      case SubToolbar.link:
-        return buildLinkToolbar();
       default: 
         return SizedBox.shrink();
     }
@@ -314,128 +305,6 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
     );
   }
 
-  // Link sub toolbar.
-  Widget buildLinkToolbar() {
-    final labelStyle = TextStyle(
-      color: Color(0xFF363940),
-      fontWeight: FontWeight.w500,
-      fontSize: 16,
-    );
-    final hintStyle = TextStyle(
-      color: Color(0xFF8F959E),
-      fontSize: 16,
-      height: 1.25,
-    );
-    final fieldStyle = TextStyle(
-      color: Color(0xFF363940),
-      fontSize: 16,
-      height: 1.25,
-    );
-    final inputDecoration = InputDecoration(
-      filled: true,
-      fillColor: Color(0x1A8F959E),
-      hintStyle: hintStyle,
-      contentPadding: EdgeInsets.symmetric(
-        horizontal: 12,
-      ),
-      border: OutlineInputBorder(
-        borderSide: BorderSide.none,
-        borderRadius: BorderRadius.circular(4),
-      ),
-    );
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border.fromBorderSide(BorderSide(
-          color: Color(0xFFE3E4E7),
-          width: 1,
-        )),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          SizedBox(height: 10),
-          // Link text.
-          isSelectNonLinkText ? SizedBox.shrink() : Row(
-            children: [
-              SizedBox(width: 12),
-              Text(
-                "文本",
-                style: labelStyle,
-              ),
-              SizedBox(width: 12),
-              SizedBox(
-                width: 230,
-                height: 40,
-                child: TextField(
-                  style: fieldStyle,
-                  cursorColor: Color(0xFF5562F2),
-                  textInputAction: TextInputAction.next,
-                  decoration: inputDecoration.copyWith(
-                    hintText: "输入文本",
-                  ),
-                  controller: textCtrl,
-                ),
-              ),
-            ],
-          ),
-          isSelectNonLinkText ? SizedBox.shrink() : SizedBox(height: 10),
-          // Link value.
-          Row(
-            children: [
-              SizedBox(width: 12),
-              Text(
-                "链接",
-                style: labelStyle,
-              ),
-              SizedBox(width: 12),
-              SizedBox(
-                width: 230,
-                height: 40,
-                child: TextField(
-                  style: fieldStyle,
-                  cursorColor: Color(0xFF5562F2),
-                  decoration: inputDecoration.copyWith(
-                    hintText: "粘贴或输入一个链接",
-                  ),
-                  controller: urlCtrl,
-                  onSubmitted: (_) => onLinkSubmit(),
-                ),
-              ),
-              SizedBox(width: 12),
-              SizedBox(
-                width: 65,
-                height: 40,
-                child: OutlinedButton(
-                  onPressed: onLinkSubmit,
-                  style: ButtonStyle(
-                    foregroundColor: MaterialStateProperty.all(Colors.white),
-                    backgroundColor: MaterialStateProperty.all(Color(0xFF5562F2)),
-                    side: MaterialStateProperty.all(BorderSide.none),
-                    shape: MaterialStateProperty.all(
-                      RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(3),
-                      ),
-                    ),
-                    textStyle: MaterialStateProperty.all(
-                      TextStyle(
-                        fontWeight: FontWeight.w500,
-                        fontSize: 16,
-                      ),
-                    ),
-                   ),
-                  child: Text("确定"),
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: 10),
-        ],
-      ),
-    );
-  }
-
   Widget buildButton(IconData iconData, VoidCallback onPressed, bool isActive) {
     return GestureDetector(
       onTap: onPressed,
@@ -476,30 +345,6 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
       return;
     }
     controller.insertDivider();
-  }
-
-  void onLinkSubmit() {
-    if (isSelectNonLinkText) {
-      // Format link.
-      if (urlCtrl.text.isEmpty) {
-        return;
-      }
-      controller.format(Attribute.link.key, urlCtrl.text);
-      // Clear text field and hide sub toolbar.
-      textCtrl.text = '';
-      urlCtrl.text = '';
-      toggleSubToolbar(SubToolbar.link);
-    } else {
-      // Insert text with link format.
-      if (textCtrl.text.isEmpty || urlCtrl.text.isEmpty) {
-        return;
-      }
-      controller.insertLink(textCtrl.text, urlCtrl.text);
-      // Clear text field and hide sub toolbar.
-      textCtrl.text = '';
-      urlCtrl.text = '';
-      toggleSubToolbar(SubToolbar.link);
-    }
   }
 
   void toggleTextType(String textType) {
@@ -545,6 +390,90 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
     }
   }
 
+  Future<void> showLinkFormatDialog() async {
+    final selection = controller.selection;
+    final hasLinkFormat = currentTextStyleList.contains(Attribute.link.key);
+    String defaultText = '';
+    String defaultUrl = '';
+    int textStartIndex = -1;
+    int textEndIndex = -1;
+    if (hasLinkFormat) {
+      // Get selected node's attribute.
+      final child = controller.document.queryChild(selection.baseOffset);
+
+      // Document offset.
+      final documentOffset = child.node?.documentOffset ?? 0; 
+
+      // Line offset.
+      final childOffset = child.offset;
+      final childExtentOffset = child.offset + (selection.extentOffset - selection.baseOffset);
+
+      final deltaList = child.node?.toDelta().toList() ?? [];
+      int index = 0;
+      for (final op in deltaList) {
+        // If has link attribute.
+        final opLength = op.length ?? 0;
+        final extentOffset = index + opLength;
+        if (index <= childOffset && extentOffset >= childExtentOffset
+            && op.attributes?.keys.contains(Attribute.link.key) == true
+            && op.attributes?[Attribute.link.key] is String
+            && op.value is String) {
+          // Found link node.
+          defaultText = op.value as String;
+          defaultUrl = op.attributes?[Attribute.link.key] as String;
+          textStartIndex = documentOffset + index;
+          textEndIndex = documentOffset + extentOffset;
+          break;
+        }
+        index = index + opLength;
+      }
+    } else if (!selection.isCollapsed) {
+      textStartIndex = selection.baseOffset;
+      textEndIndex = selection.extentOffset;
+      defaultText = controller.document.toPlainText().substring(textStartIndex, textEndIndex);
+    }
+
+    final res = await LinkFomratDialog.show(
+      context,
+      defaultText: defaultText,
+      defaultUrl: defaultUrl,
+    );
+    // Format link.
+    if (res != null && res.length >= 2) {
+      final text = res[0];
+      final url = res[1];
+
+      if (textStartIndex != -1 && textEndIndex != -1) {
+        // Remove link format.
+        controller.formatText(
+          textStartIndex,
+          textEndIndex - textStartIndex,
+          LinkAttribute(null),
+        );
+        // Replace text.
+        controller.replaceText(
+          textStartIndex,
+          textEndIndex - textStartIndex,
+          text,
+          TextSelection.collapsed(
+            offset: textStartIndex + text.length,
+          ),
+        );
+        // Format text.
+        controller.formatText(
+          textStartIndex,
+          text.length,
+          LinkAttribute(url),
+        );
+      } else {
+        // Insert new link.
+        controller.insertLink(text, url);
+        controller.focus();
+      }
+    }
+  }
+
+  // Sync toolbar' status with format.
   void syncFormat(Map<String, dynamic> format) {
     debugPrint('sync format: ${controller.selection.baseOffset} - ${controller.selection.extentOffset} - $format');
     // Check text type.

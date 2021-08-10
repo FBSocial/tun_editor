@@ -94,6 +94,7 @@
       var insertImage;
       var insertLink;
       var format;
+      var formatText;
       var removeFormat;
       var removeCurrentFormat;
       var setSelection;
@@ -199,11 +200,15 @@
         }
         insertLink = function(text, url) {
           let range = quill.getSelection(true);
-          quill.insertText(range.index, text, "link", url, Quill.sources.USER);
+          quill.insertText(range.index, text, 'link', url, Quill.sources.USER);
           quill.setSelection(range.index + text.length, Quill.sources.SILENT)
         }
         format = function(name, value) {
           quill.format(name, value, 'user');
+        }
+        formatText = function(index, length, format, value) {
+          console.log(index, length, format, value);
+          quill.formatText(index, length, format, value, Quill.sources.USER);
         }
         removeFormat = function(index, length) {
           quill.removeFormat(index, length, 'user');
