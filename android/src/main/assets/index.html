@@ -85,6 +85,11 @@
     <div id="editor"></div>
 
     <script>
+      let u = navigator.userAgent;
+      let isAndroid = u.indexOf('Android') > -1 || u.indexOf('Adr') > -1;
+      let isIOS = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/);
+      console.log('is android', isAndroid);
+      console.log('is ios', isIOS);
       var insertDivider;
       var insertImage;
       var insertLink;
@@ -158,11 +163,13 @@
           }
           tun.onTextChange(JSON.stringify(delta), JSON.stringify(oldDelta), source);
 
-          let range = quill.getSelection(true);
-          if (range) {
-            var format = quill.getFormat()
-            tun.onSelectionChange(range.index, range.length, JSON.stringify(format));
-          }
+          setTimeout(function() {
+            let range = quill.getSelection(true);
+            if (range) {
+              var format = quill.getFormat();
+              tun.onSelectionChange(range.index, range.length, JSON.stringify(format));
+            }
+          }, 200);
         });
         quill.on('selection-change', function(range, oldRange, source) {
           if (range) {
