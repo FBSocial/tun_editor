@@ -340,10 +340,11 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
   }
 
   void onDividerClick() {
-    // Disable insert divider if in code block.
-    if (currentTextType == Attribute.codeBlock.uniqueKey) {
+    // Can not insert divider with text type.
+    if (currentTextType != FORMAT_TEXT_TYPE_NORMAL) {
       return;
     }
+    // Disable text type first.
     controller.insertDivider();
   }
 

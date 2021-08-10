@@ -44,11 +44,12 @@ class FullPageEditorState extends State<FullPageEditor> {
         title: GestureDetector(
           child: Text("Editor"),
           onTap: () {
-            if (focusNode.hasFocus) {
-              focusNode.unfocus();
-            } else {
-              focusNode.requestFocus();
-            }
+            // if (focusNode.hasFocus) {
+            //   focusNode.unfocus();
+            // } else {
+            //   focusNode.requestFocus();
+            // }
+            // _controller.insertImage('https://avatars0.githubusercontent.com/u/1758864?s=460&v=4');
             // _controller.formatText(0, 2, Attribute.h1);
             // _controller.insert(2, 'Bye Bye');
             // _controller.replaceText(6, 5, 'Jeffrey Wu', null);
