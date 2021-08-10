@@ -406,7 +406,6 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
       if (range == null) {
         return;
       }
-      debugPrint('link node: ${range.baseOffset} - ${range.extentOffset}');
       controller.formatText(
         range.baseOffset,
         range.extentOffset - range.baseOffset,
@@ -429,6 +428,7 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
       context,
       defaultText: defaultText.replaceAll('\n', ' '),
       defaultUrl: defaultUrl,
+      isUrlAutofocus: !selection.isCollapsed,
     );
     if (res != null && res.length >= 2) {
       final text = res[0];
@@ -437,7 +437,6 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
       if (selection.isCollapsed) {
         // Insert new link.
         controller.insertLink(text, url);
-        controller.focus();
       } else {
         // Remove link format.
         controller.formatText(
@@ -461,6 +460,7 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
           LinkAttribute(url),
         );
       }
+      Future.delayed(Duration(milliseconds: 200), () => controller.focus());
     }
   }
 

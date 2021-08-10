@@ -4,11 +4,13 @@ class LinkFomratDialog extends StatefulWidget {
 
   final String defaultText;
   final String defaultUrl;
+  final bool isUrlAutofocus;
 
   const LinkFomratDialog({
     Key? key,
     this.defaultText = '',
     this.defaultUrl = '',
+    this.isUrlAutofocus = false,
   }) : super(key: key);
 
   @override
@@ -18,6 +20,7 @@ class LinkFomratDialog extends StatefulWidget {
     BuildContext context, {
       String defaultText = '',
       String defaultUrl = '',
+      bool isUrlAutofocus = false,
     }
   ) {
     return showDialog<List<String>?>(
@@ -26,6 +29,7 @@ class LinkFomratDialog extends StatefulWidget {
       builder: (BuildContext context) => LinkFomratDialog(
         defaultText: defaultText,
         defaultUrl: defaultUrl,
+        isUrlAutofocus: isUrlAutofocus,
       ),
     );
   }
@@ -36,6 +40,7 @@ class LinkFomratDialogState extends State<LinkFomratDialog> {
 
   String get defaultText => widget.defaultText;
   String get defaultUrl => widget.defaultUrl;
+  bool get isUrlAutofocus => widget.isUrlAutofocus;
 
   late TextEditingController textCtrl;
   late TextEditingController urlCtrl;
@@ -118,8 +123,8 @@ class LinkFomratDialogState extends State<LinkFomratDialog> {
                     decoration: inputDecoration.copyWith(
                       hintText: "输入文本",
                     ),
+                    autofocus: !isUrlAutofocus,
                     controller: textCtrl,
-                    autofocus: true,
                   ),
                 ),
               ],
@@ -143,6 +148,7 @@ class LinkFomratDialogState extends State<LinkFomratDialog> {
                     decoration: inputDecoration.copyWith(
                       hintText: "粘贴或输入一个链接",
                     ),
+                    autofocus: isUrlAutofocus,
                     controller: urlCtrl,
                     onSubmitted: (_) => onLinkSubmit(),
                   ),
