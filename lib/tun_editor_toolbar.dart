@@ -427,7 +427,7 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
 
     final res = await LinkFomratDialog.show(
       context,
-      defaultText: defaultText,
+      defaultText: defaultText.replaceAll('\n', ' '),
       defaultUrl: defaultUrl,
     );
     if (res != null && res.length >= 2) {
