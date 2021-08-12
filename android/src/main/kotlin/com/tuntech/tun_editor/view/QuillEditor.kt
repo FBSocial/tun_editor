@@ -93,6 +93,10 @@ class QuillEditor: WebView {
         }
     }
 
+    fun insertMention(id: String, text: String) {
+        exec("javascript:insertMention(\"$id\", \"$text\")")
+    }
+
     fun insertDivider() {
         exec("javascript:insertDivider()")
     }

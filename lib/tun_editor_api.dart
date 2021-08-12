@@ -54,6 +54,12 @@ class TunEditorApi {
       'data': data,
     });
   }
+  void insertMention(String id, String text) {
+    _channel.invokeMethod('insertMention', {
+      'id': id,
+      'text': text,
+    });
+  }
   void insertDivider() {
     _channel.invokeMethod('insertDivider');
   }

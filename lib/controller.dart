@@ -50,6 +50,11 @@ class TunEditorController {
     }
   }
 
+  /// Insert mention with [id] and [text], [id] should be unqiue, will be used on click event.
+  void insertMention(String id, String text) {
+    _tunEditorApi?.insertMention(id, text);
+  }
+
   /// Insert [data] at the given [index].
   /// This is a shortcut of [replaceText].
   void insert(int index, Object? data) {

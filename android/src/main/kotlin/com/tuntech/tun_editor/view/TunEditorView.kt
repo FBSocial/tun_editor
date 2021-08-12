@@ -22,6 +22,7 @@ internal class TunEditorView(
 
         // Content related.
         const val HANDLE_METHOD_REPLACE_TEXT = "replaceText"
+        const val HANDLE_METHOD_INSERT_MENTION = "insertMention"
         const val HANDLE_METHOD_INSERT_DIVIDER = "insertDivider"
         const val HANDLE_METHOD_INSERT_IMAGE = "insertImage"
         const val HANDLE_METHOD_INSERT_LINK = "insertLink"
@@ -104,6 +105,12 @@ internal class TunEditorView(
                 val data = args["data"] ?: return
                 quillEditor.replaceText(index, len, data)
                 result.success(null)
+            }
+            HANDLE_METHOD_INSERT_MENTION -> {
+                val args = call.arguments as? Map<*, *> ?: return
+                val id = args["id"] as? String ?: return
+                val text = args["text"] as? String ?: return
+                quillEditor.insertMention(id, text)
             }
             HANDLE_METHOD_INSERT_DIVIDER -> {
                 quillEditor.insertDivider()

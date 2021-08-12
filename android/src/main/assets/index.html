@@ -7,10 +7,12 @@
     <link rel="stylesheet" href="normalize.css" type="text/css" charset="utf-8">
     <link rel="stylesheet" href="snow.css" type="text/css" charset="utf-8">
     <link rel="stylesheet" href="highlight.min.css" type="text/css" charset="utf-8">
+    <link rel="stylesheet" href="quill.mention.min.css" type="text/css" charset="utf-8">
     <script src="highlight.min.js" charset="utf-8"></script>
     <script src="highlightjs-line-numbers.min.js" charset="utf-8"></script>
     <script src="markdown.js" charset="utf-8"></script>
     <script src="quill.min.js" charset="utf-8"></script>
+    <script src="quill.mention.min.js" charset="utf-8"></script>
     <style>
       .ql-container {
         font-size: 16px;
@@ -20,6 +22,9 @@
          border: none !important;
          height: 100vh;
        }
+      .ql-editor {
+        line-height: 1.5;
+      }
       .ql-snow .ql-editor h1 {
         font-size: 22px;
       }
@@ -88,6 +93,12 @@
         margin-left: -16px;
         margin-right: 16px;
       }
+      span.mention {
+        background-color: #5562F2;
+        padding: 4px 12px;
+        border-radius: 20px;
+        color: #FFFFFF;
+      }
     </style>
   </head>
   <body>
@@ -112,6 +123,7 @@
         },
       }
 
+      var insertMention;
       var insertDivider;
       var insertImage;
       var insertLink;
@@ -167,6 +179,19 @@
             }
           }
         }
+        async function suggestPeople(searchTerm) {
+          const allPeople = [
+            {
+              id: 1,
+              value: "Fredrik Sundqvist"
+            },
+            {
+              id: 2,
+              value: "Patrik Sjölin"
+            }
+          ];
+          return allPeople.filter(person => person.value.includes(searchTerm));
+        }
         var options = {
           readOnly: false,
           theme: 'snow',
@@ -194,7 +219,14 @@
             toolbar: false,
             keyboard: {
               bindings: bindings
-            }
+            },
+            mention: {
+              mentionDenotationChars: ["@"],
+              source: async function(searchTerm, renderList) {
+                const matchedPeople = await suggestPeople(searchTerm);
+                renderList(matchedPeople);
+              },
+            },
           }
         };
         var quill = new Quill('#editor', options);
@@ -226,6 +258,13 @@
         new QuillMarkdown(quill, markdownOptions);
 
         // Insert divider.
+        insertMention = function(id, name) {
+          quill.getModule('mention').insertItem({
+            denotationChar: "@",
+            id: id,
+            value: name,
+          }, true);
+        }
         insertDivider = function() {
           let range = quill.getSelection(true);
           quill.insertText(range.index, '\n', Quill.sources.USER);
