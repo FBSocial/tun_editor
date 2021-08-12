@@ -72,12 +72,21 @@
         padding: 24px 16px;
         box-sizing: border-box;
       }
-      .ql-snow .ql-editor code,
       .ql-snow .ql-editor pre {
         color: #646A73;
         background-color: #F5F5F8;
         border-radius: 4px;
         border: 1px solid rgba(143, 149, 158, 0.2);
+        counter-reset: line-numbering;
+      }
+      pre .hljs-line::before {
+        display: inline-block;
+        content: counter(line-numbering);
+        counter-increment: line-numbering;
+        width: 30px;
+        text-align: right;
+        margin-left: -16px;
+        margin-right: 16px;
       }
     </style>
   </head>
@@ -88,8 +97,21 @@
       let u = navigator.userAgent;
       let isAndroid = u.indexOf('Android') > -1 || u.indexOf('Adr') > -1;
       let isIOS = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/);
-      console.log('is android', isAndroid);
-      console.log('is ios', isIOS);
+      let bridge = {
+        onTextChange: function(delta, oldDelta, source) {
+          if (isAndroid) {
+            tun.onTextChange(delta, oldDelta, source);
+          } else if (isIOS) {
+          }
+        },
+        onSelectionChange: function(index, length, format) {
+          if (isAndroid) {
+            tun.onSelectionChange(index, length, format);
+          } else if (isIOS) {
+          }
+        },
+      }
+
       var insertDivider;
       var insertImage;
       var insertLink;
@@ -133,8 +155,8 @@
             key: 'Enter',
             collapsed: true,
             format: ['code-block'],
-            prefix: /\n$/,
-            suffix: /^\s+$/,
+            // prefix: /\n$/,
+            // suffix: /^\s+$/,
             handler: function(range) {
               const [line, offset] = this.quill.getLine(range.index);
               const delta = new Delta()
@@ -149,7 +171,26 @@
           readOnly: false,
           theme: 'snow',
           modules: {
-            syntax: true,
+            syntax: {
+              highlight: (function() {
+                if (window.hljs == null) return null;
+                return function(text) {
+                  let lines = text.split('\n');
+                  let spanLines = lines.map(function(line, index) {
+                    if (index == lines.length - 1) {
+                      return '';
+                    }
+                    if (line === '') {
+                      return '<span class="hljs-line">&ZeroWidthSpace;</span>'
+                    }
+                    return '<span class="hljs-line">' + line + '</span>';
+                  });
+                  let res = spanLines.join('\n');
+                  return res;
+                };
+              })(),
+              interval: 0,
+            },
             toolbar: false,
             keyboard: {
               bindings: bindings
@@ -162,21 +203,20 @@
           if (source === Quill.sources.SILENT) {
             return;
           }
-          tun.onTextChange(JSON.stringify(delta), JSON.stringify(oldDelta), source);
+          bridge.onTextChange(JSON.stringify(delta), JSON.stringify(oldDelta), source);
 
           setTimeout(function() {
             let range = quill.getSelection(true);
             if (range) {
               var format = quill.getFormat();
-              tun.onSelectionChange(range.index, range.length, JSON.stringify(format));
+              bridge.onSelectionChange(range.index, range.length, JSON.stringify(format));
             }
           }, 200);
         });
         quill.on('selection-change', function(range, oldRange, source) {
           if (range) {
             var format = quill.getFormat()
-            console.log(`on selection change ${range.index} ${range.length} ${JSON.stringify(format)}`)
-            tun.onSelectionChange(range.index, range.length, JSON.stringify(format));
+            bridge.onSelectionChange(range.index, range.length, JSON.stringify(format));
           }
         });
 
@@ -207,7 +247,6 @@
           quill.format(name, value, 'user');
         }
         formatText = function(index, length, format, value) {
-          console.log(index, length, format, value);
           quill.formatText(index, length, format, value, Quill.sources.USER);
         }
         removeFormat = function(index, length) {

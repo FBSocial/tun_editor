@@ -76,14 +76,6 @@ class FullPageEditorState extends State<FullPageEditor> {
                   readOnly: false,
                 ),
               ),
-              // SizedBox(
-              //   height: 50,
-              //   child: SingleChildScrollView(
-              //     child: Text(
-              //       _previewText,
-              //     ),
-              //   ),
-              // ),
               TunEditorToolbar(
                 controller: _controller,
                 showingAt: false,
