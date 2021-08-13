@@ -121,6 +121,18 @@ class TunEditorController {
     _tunEditorApi?.blur();
   }
 
+  void scrollTo(int offset) {
+    _tunEditorApi?.scrollTo(offset);
+  }
+
+  void scrollToTop() {
+    _tunEditorApi?.scrollToTop();
+  }
+
+  void scrollToBottom() {
+    _tunEditorApi?.scrollToBottom();
+  }
+
   // ================== Below methods are internal ==================
 
   void setTunEditorApi(TunEditorApi? api) {

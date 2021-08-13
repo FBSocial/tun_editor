@@ -122,6 +122,15 @@ class TunEditorApi {
   void blur() {
     _channel.invokeMethod('blur');
   }
+  void scrollTo(int offset) {
+    _channel.invokeMethod('scrollTo', offset);
+  }
+  void scrollToTop() {
+    _channel.invokeMethod('scrollToTop');
+  }
+  void scrollToBottom() {
+    _channel.invokeMethod('scrollToBottom');
+  }
 
 }
 

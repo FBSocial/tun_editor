@@ -24,8 +24,6 @@ class TunEditor extends StatefulWidget {
   final bool autoFocus;
   final FocusNode? focusNode;
 
-  final ScrollController? scrollController;
-
   final MentionClickCallback? onMentionClick;
   final LinkClickCallback? onLinkClick;
 
@@ -40,7 +38,6 @@ class TunEditor extends StatefulWidget {
     ),
     this.autoFocus = false,
     this.focusNode,
-    this.scrollController,
     this.onMentionClick,
     this.onLinkClick,
   }) : super(key: key);
@@ -63,7 +60,6 @@ class TunEditorState extends State<TunEditor> with TunEditorHandler {
   EdgeInsets get padding => widget.padding;
   bool get autoFocus => widget.autoFocus;
   FocusNode? get focusNode => widget.focusNode;
-  ScrollController? get scrollController => widget.scrollController;
   MentionClickCallback? get mentionClickCallback => widget.onMentionClick;
   LinkClickCallback? get linkClickCallback => widget.onLinkClick;
   

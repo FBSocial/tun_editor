@@ -1,13 +1,16 @@
 package com.tuntech.tun_editor.view
 
 import android.content.Context
-import android.util.Log
 import android.view.View
 import com.tuntech.tun_editor.TextCons
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.platform.PlatformView
+import android.animation.ObjectAnimator
+
+
+
 
 internal class TunEditorView(
     val context: Context,
@@ -38,6 +41,9 @@ internal class TunEditorView(
         // Editor related.
         const val HANDLE_METHOD_FOCUS = "focus"
         const val HANDLE_METHOD_BLUR = "blur"
+        const val HANDLE_SCROLL_TO = "scrollTo"
+        const val HANDLE_SCROLL_TO_TOP = "scrollToTop"
+        const val HANDLE_SCROLL_TO_BOTTOM = "scrollToBottom"
     }
 
     // View.
@@ -201,6 +207,24 @@ internal class TunEditorView(
             }
             HANDLE_METHOD_BLUR -> {
                 quillEditor.blur()
+                result.success(null)
+            }
+            HANDLE_SCROLL_TO -> {
+                val offset = call.arguments as? Int ?: return
+                val anim = ObjectAnimator.ofInt(
+                    quillEditor, "scrollY",
+                    quillEditor.scrollY, offset
+                )
+                anim.duration = 400
+                anim.start()
+                result.success(null)
+            }
+            HANDLE_SCROLL_TO_TOP -> {
+                quillEditor.pageUp(true)
+                result.success(null)
+            }
+            HANDLE_SCROLL_TO_BOTTOM -> {
+                quillEditor.pageDown(true)
                 result.success(null)
             }
 
