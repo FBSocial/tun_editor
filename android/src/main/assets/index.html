@@ -95,7 +95,7 @@
       }
       span.mention {
         background-color: #5562F2;
-        padding: 4px 12px;
+        padding: 2px 12px;
         border-radius: 20px;
         color: #FFFFFF;
       }
@@ -211,7 +211,7 @@
                     return '<span class="hljs-line">' + line + '</span>';
                   });
                   let res = spanLines.join('\n');
-                  return res;
+                  return text;
                 };
               })(),
               interval: 0,
@@ -223,8 +223,6 @@
             mention: {
               mentionDenotationChars: ["@"],
               source: async function(searchTerm, renderList) {
-                const matchedPeople = await suggestPeople(searchTerm);
-                renderList(matchedPeople);
               },
             },
           }

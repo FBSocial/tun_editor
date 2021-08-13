@@ -44,7 +44,6 @@ class FullPageEditorState extends State<FullPageEditor> {
         title: GestureDetector(
           child: Text("Editor"),
           onTap: () {
-            _controller.insertMention('1', 'Jeffrey Wu');
             // if (focusNode.hasFocus) {
             //   focusNode.unfocus();
             // } else {
@@ -91,6 +90,30 @@ class FullPageEditorState extends State<FullPageEditor> {
                 onEmojiChange: (bool isShow) {
                   debugPrint('show emoji sub toolbar change: $isShow');
                 },
+                onSend: () {
+                  debugPrint('send click');
+                },
+
+                // menu: [
+                //   ToolbarMenu.textType,
+                //   ToolbarMenu.textTypeHeadline1,
+                //   ToolbarMenu.textTypeHeadline2,
+                //   ToolbarMenu.textTypeHeadline3,
+
+                //   ToolbarMenu.textStyle,
+                //   ToolbarMenu.textStyleBold,
+                //   ToolbarMenu.textStyleItalic,
+
+                //   ToolbarMenu.link,
+                // ],
+                // children: [
+                //   IconButton(
+                //     icon: Icon(Icons.add),
+                //     onPressed: () {
+                //     },
+                //   ),
+                // ],
+
                 // onAtClick: () {
                 // },
                 // onImageClick: () {

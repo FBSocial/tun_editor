@@ -9,6 +9,7 @@ class TunEditorToolbar extends StatefulWidget {
 
   final TunEditorController controller;
 
+  // Sub toolbar panel showing status.
   final bool showingAt;
   final bool showingImage;
   final bool showingEmoji;
@@ -17,6 +18,12 @@ class TunEditorToolbar extends StatefulWidget {
   final ValueChanged<bool>? onEmojiChange;
 
   final VoidCallback? onSend;
+
+  // Menu decides which tool should be showed in toolbar.
+  final List<ToolbarMenu> menu;
+
+  // Children is the custom tool menu.
+  final List<Widget>? children;
 
   const TunEditorToolbar({
     Key? key,
@@ -28,6 +35,8 @@ class TunEditorToolbar extends StatefulWidget {
     this.onImageChange,
     this.onEmojiChange,
     this.onSend,
+    this.menu = ToolbarMenu.values,
+    this.children,
   }) : super(key: key);
 
   @override
@@ -47,6 +56,8 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
   ValueChanged<bool>? get onImageChange => widget.onImageChange;
   ValueChanged<bool>? get onEmojiChange => widget.onEmojiChange;
   VoidCallback? get onSend => widget.onSend;
+  List<ToolbarMenu> get menu => widget.menu;
+  List<Widget>? get children => widget.children;
 
   // Sub toolbar.
   SubToolbar showingSubToolbar = SubToolbar.none;
@@ -91,6 +102,76 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
 
   // Main toolbar.
   Widget buildMainToolbar() {
+    final List<Widget> menuList = [];
+    if (menu.contains(ToolbarMenu.at)) {
+      menuList.addAll([
+        buildButton(
+          IconFont.at,
+          () => toggleSubToolbar(SubToolbar.at),
+          false,
+        ),
+        SizedBox(width: 8),
+      ]);
+    }
+    if (menu.contains(ToolbarMenu.image)) {
+      menuList.addAll([
+        buildButton(
+          IconFont.image,
+          () => toggleSubToolbar(SubToolbar.image),
+          false,
+        ),
+        SizedBox(width: 8),
+      ]);
+    }
+    if (menu.contains(ToolbarMenu.emoji)) {
+      menuList.addAll([
+        buildButton(
+          IconFont.emoji,
+          () => toggleSubToolbar(SubToolbar.emoji),
+          false,
+        ),
+        SizedBox(width: 8),
+      ]);
+    }
+    if (menu.contains(ToolbarMenu.textType)) {
+      menuList.addAll([
+        buildButton(
+          IconFont.textType,
+          () => toggleSubToolbar(SubToolbar.textType),
+          showingSubToolbar == SubToolbar.textType,
+        ),
+        SizedBox(width: 8),
+      ]);
+    }
+    if (menu.contains(ToolbarMenu.textStyle)) {
+      menuList.addAll([
+        buildButton(
+          IconFont.textStyle,
+          () => toggleSubToolbar(SubToolbar.textStyle),
+          showingSubToolbar == SubToolbar.textStyle,
+        ),
+        SizedBox(width: 8),
+      ]);
+    }
+    if (menu.contains(ToolbarMenu.link)) {
+      menuList.addAll([
+        buildOutlineButton(
+          IconFont.link,
+          () => onLinkFormatClick(),
+          currentTextStyleList.contains(Attribute.link.uniqueKey),
+        ),
+        SizedBox(width: 8),
+      ]);
+    }
+    if (menuList.isNotEmpty) {
+      // Remove last sized box.
+      menuList.removeLast();
+    }
+    if (children == null) {
+      menuList.add(Spacer());
+    } else {
+      menuList.addAll(children!);
+    }
     return Container(
       width: double.infinity,
       height: 48,
@@ -99,42 +180,8 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
       ),
       child: Row(
         children: [
-          buildButton(
-            IconFont.at,
-            () => toggleSubToolbar(SubToolbar.at),
-            false,
-          ),
-          SizedBox(width: 8),
-          buildButton(
-            IconFont.image,
-            () => toggleSubToolbar(SubToolbar.image),
-            false,
-          ),
-          SizedBox(width: 8),
-          buildButton(
-            IconFont.emoji,
-            () => toggleSubToolbar(SubToolbar.emoji),
-            false,
-          ),
-          SizedBox(width: 8),
-          buildButton(
-            IconFont.textType,
-            () => toggleSubToolbar(SubToolbar.textType),
-            showingSubToolbar == SubToolbar.textType,
-          ),
-          SizedBox(width: 8),
-          buildButton(
-            IconFont.textStyle,
-            () => toggleSubToolbar(SubToolbar.textStyle),
-            showingSubToolbar == SubToolbar.textStyle,
-          ),
-          SizedBox(width: 8),
-          buildOutlineButton(
-            IconFont.link,
-            () => onLinkFormatClick(),
-            currentTextStyleList.contains(Attribute.link.uniqueKey),
-          ),
-          Spacer(),
+          ...menuList,
+
           // Send button.
           GestureDetector(
             onTap: onSendClick,
@@ -171,6 +218,90 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
 
   // Text type sub toolbar.
   Widget buildTextTypeToolbar() {
+    final List<Widget> textTypeMenuList = [];
+    if (menu.contains(ToolbarMenu.textTypeHeadline1)) {
+      textTypeMenuList.addAll([
+        buildOutlineButton(
+          IconFont.headline1,
+          () => toggleTextType(Attribute.h1.uniqueKey),
+          currentTextType == Attribute.h1.uniqueKey,
+        ),
+        SizedBox(width: 8),
+      ]);
+    }
+    if (menu.contains(ToolbarMenu.textTypeHeadline2)) {
+      textTypeMenuList.addAll([
+        buildOutlineButton(
+          IconFont.headline2,
+          () => toggleTextType(Attribute.h2.uniqueKey),
+          currentTextType == Attribute.h2.uniqueKey,
+        ),
+        SizedBox(width: 8),
+      ]);
+    }
+    if (menu.contains(ToolbarMenu.textTypeHeadline3)) {
+      textTypeMenuList.addAll([
+        buildOutlineButton(
+          IconFont.headline3,
+          () => toggleTextType(Attribute.h3.uniqueKey),
+          currentTextType == Attribute.h3.uniqueKey,
+        ),
+        SizedBox(width: 8),
+      ]);
+    }
+    if (menu.contains(ToolbarMenu.textTypeListBullet)) {
+      textTypeMenuList.addAll([
+        buildOutlineButton(
+          IconFont.listBullet,
+          () => toggleTextType(Attribute.ul.uniqueKey),
+          currentTextType == Attribute.ul.uniqueKey,
+        ),
+        SizedBox(width: 8),
+      ]);
+    }
+    if (menu.contains(ToolbarMenu.textTypeListOrdered)) {
+      textTypeMenuList.addAll([
+        buildOutlineButton(
+          IconFont.listOrdered,
+          () => toggleTextType(Attribute.ol.uniqueKey),
+          currentTextType == Attribute.ol.uniqueKey,
+        ),
+        SizedBox(width: 8),
+      ]);
+    }
+    if (menu.contains(ToolbarMenu.textTypeDivider)) {
+      textTypeMenuList.addAll([
+        buildOutlineButton(
+          IconFont.divider,
+          onDividerClick,
+          false,
+        ),
+        SizedBox(width: 8),
+      ]);
+    }
+    if (menu.contains(ToolbarMenu.textTypeQuote)) {
+      textTypeMenuList.addAll([
+        buildOutlineButton(
+          IconFont.quote,
+          () => toggleTextType(Attribute.blockQuote.uniqueKey),
+          currentTextType == Attribute.blockQuote.uniqueKey,
+        ),
+        SizedBox(width: 8),
+      ]);
+    }
+    if (menu.contains(ToolbarMenu.textTypeCodeBlock)) {
+      textTypeMenuList.addAll([
+        buildOutlineButton(
+          IconFont.codeBlock,
+          () => toggleTextType(Attribute.codeBlock.uniqueKey),
+          currentTextType == Attribute.codeBlock.uniqueKey,
+        ),
+        SizedBox(width: 8),
+      ]);
+    }
+    if (textTypeMenuList.isNotEmpty) {
+      textTypeMenuList.removeLast();
+    }
     return Padding(
       padding: EdgeInsets.symmetric(
         horizontal: 4,
@@ -195,53 +326,7 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
           mainAxisSize: MainAxisSize.min,
           children: [
             SizedBox(width: 10),
-            buildOutlineButton(
-              IconFont.headline1,
-              () => toggleTextType(Attribute.h1.uniqueKey),
-              currentTextType == Attribute.h1.uniqueKey,
-            ),
-            SizedBox(width: 8),
-            buildOutlineButton(
-              IconFont.headline2,
-              () => toggleTextType(Attribute.h2.uniqueKey),
-              currentTextType == Attribute.h2.uniqueKey,
-            ),
-            SizedBox(width: 8),
-            buildOutlineButton(
-              IconFont.headline3,
-              () => toggleTextType(Attribute.h3.uniqueKey),
-              currentTextType == Attribute.h3.uniqueKey,
-            ),
-            SizedBox(width: 8),
-            buildOutlineButton(
-              IconFont.listBullet,
-              () => toggleTextType(Attribute.ul.uniqueKey),
-              currentTextType == Attribute.ul.uniqueKey,
-            ),
-            SizedBox(width: 8),
-            buildOutlineButton(
-              IconFont.listOrdered,
-              () => toggleTextType(Attribute.ol.uniqueKey),
-              currentTextType == Attribute.ol.uniqueKey,
-            ),
-            SizedBox(width: 8),
-            buildOutlineButton(
-              IconFont.divider,
-              onDividerClick,
-              false,
-            ),
-            SizedBox(width: 8),
-            buildOutlineButton(
-              IconFont.quote,
-              () => toggleTextType(Attribute.blockQuote.uniqueKey),
-              currentTextType == Attribute.blockQuote.uniqueKey,
-            ),
-            SizedBox(width: 8),
-            buildOutlineButton(
-              IconFont.codeBlock,
-              () => toggleTextType(Attribute.codeBlock.uniqueKey),
-              currentTextType == Attribute.codeBlock.uniqueKey,
-            ),
+            ...textTypeMenuList,
             SizedBox(width: 10),
           ],
         ),
@@ -251,6 +336,50 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
 
   // Text style sub toolbar.
   Widget buildTextStyleToolbar() {
+    final List<Widget> textStyleMenuList = [];
+    if (menu.contains(ToolbarMenu.textStyleBold)) {
+      textStyleMenuList.addAll([
+        buildOutlineButton(
+          IconFont.bold,
+          () => toggleTextStyle(Attribute.bold.uniqueKey),
+          currentTextStyleList.contains(Attribute.bold.uniqueKey),
+        ),
+        SizedBox(width: 8),
+      ]);
+    }
+    if (menu.contains(ToolbarMenu.textStyleItalic)) {
+      textStyleMenuList.addAll([
+        buildOutlineButton(
+          IconFont.italic,
+          () => toggleTextStyle(Attribute.italic.uniqueKey),
+          currentTextStyleList.contains(Attribute.italic.uniqueKey),
+        ),
+        SizedBox(width: 8),
+      ]);
+    }
+    if (menu.contains(ToolbarMenu.textStyleUnderline)) {
+      textStyleMenuList.addAll([
+        buildOutlineButton(
+          IconFont.underline,
+          () => toggleTextStyle(Attribute.underline.uniqueKey),
+          currentTextStyleList.contains(Attribute.underline.uniqueKey),
+        ),
+        SizedBox(width: 8),
+      ]);
+    }
+    if (menu.contains(ToolbarMenu.textStyleStrikeThrough)) {
+      textStyleMenuList.addAll([
+        buildOutlineButton(
+          IconFont.strikeThrough,
+          () => toggleTextStyle(Attribute.strikeThrough.uniqueKey),
+          currentTextStyleList.contains(Attribute.strikeThrough.uniqueKey),
+        ),
+        SizedBox(width: 8),
+      ]);
+    }
+    if (textStyleMenuList.isNotEmpty) {
+      textStyleMenuList.removeLast();
+    }
     return Padding(
       padding: EdgeInsets.symmetric(
         horizontal: 4,
@@ -275,29 +404,7 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
           mainAxisSize: MainAxisSize.min,
           children: [
             SizedBox(width: 10),
-            buildOutlineButton(
-              IconFont.bold,
-              () => toggleTextStyle(Attribute.bold.uniqueKey),
-              currentTextStyleList.contains(Attribute.bold.uniqueKey),
-            ),
-            SizedBox(width: 8),
-            buildOutlineButton(
-              IconFont.italic,
-              () => toggleTextStyle(Attribute.italic.uniqueKey),
-              currentTextStyleList.contains(Attribute.italic.uniqueKey),
-            ),
-            SizedBox(width: 8),
-            buildOutlineButton(
-              IconFont.underline,
-              () => toggleTextStyle(Attribute.underline.uniqueKey),
-              currentTextStyleList.contains(Attribute.underline.uniqueKey),
-            ),
-            SizedBox(width: 8),
-            buildOutlineButton(
-              IconFont.strikeThrough,
-              () => toggleTextStyle(Attribute.strikeThrough.uniqueKey),
-              currentTextStyleList.contains(Attribute.strikeThrough.uniqueKey),
-            ),
+            ...textStyleMenuList,
             SizedBox(width: 10),
           ],
         ),
@@ -336,6 +443,7 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
   }
 
   void onSendClick() {
+    widget.onSend?.call();
     setState(() {});
   }
 
@@ -521,7 +629,6 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
 
   TextSelection? _getLinkNode(TextSelection cursorSelection) {
     // Get selected node's attribute.
-    // FIXME What if link has two lines?
     final child = controller.document.queryChild(cursorSelection.baseOffset);
 
     // Document offset.
@@ -557,5 +664,31 @@ enum SubToolbar {
   emoji,
   textType,
   textStyle,
+  link,
+}
+
+enum ToolbarMenu {
+  at,
+  image,
+  emoji,
+
+  // Text type.
+  textType,
+  textTypeHeadline1,
+  textTypeHeadline2,
+  textTypeHeadline3,
+  textTypeListBullet,
+  textTypeListOrdered,
+  textTypeDivider,
+  textTypeQuote,
+  textTypeCodeBlock,
+
+  // Text style.
+  textStyle,
+  textStyleBold,
+  textStyleItalic,
+  textStyleUnderline,
+  textStyleStrikeThrough,
+
   link,
 }
