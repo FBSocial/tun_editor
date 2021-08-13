@@ -52,6 +52,7 @@ class FullPageEditorState extends State<FullPageEditor> {
             // _controller.insertImage('https://avatars0.githubusercontent.com/u/1758864?s=460&v=4');
             // _controller.formatText(0, 2, Attribute.h1);
             // _controller.insert(2, 'Bye Bye');
+            //   _controller.insert(_controller.selection.baseOffset, "🛹");
             // _controller.replaceText(6, 5, 'Jeffrey Wu', null);
           },
         ),
@@ -74,6 +75,13 @@ class FullPageEditorState extends State<FullPageEditor> {
                   focusNode: focusNode,
                   autoFocus: false,
                   readOnly: false,
+
+                  onMentionClick: (String id, String text) {
+                    debugPrint('metion click $id, $text');
+                  },
+                  onLinkClick: (String url) {
+                    debugPrint('link click $url');
+                  },
                 ),
               ),
               TunEditorToolbar(
@@ -113,15 +121,6 @@ class FullPageEditorState extends State<FullPageEditor> {
                 //     },
                 //   ),
                 // ],
-
-                // onAtClick: () {
-                // },
-                // onImageClick: () {
-                //   _controller.insertImage('https://avatars0.githubusercontent.com/u/1758864?s=460&v=4');
-                // },
-                // onEmojiClick: () {
-                //   _controller.insert(_controller.selection.baseOffset, "🛹");
-                // },
               ),
             ],
           ),

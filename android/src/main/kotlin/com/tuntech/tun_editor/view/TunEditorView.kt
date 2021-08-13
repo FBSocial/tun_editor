@@ -19,6 +19,8 @@ internal class TunEditorView(
     companion object {
         const val INVOKE_METHOD_ON_TEXT_CHANGE = "onTextChange"
         const val INVOKE_METHOD_ON_SELECTION_CHANGE = "onSelectionChange"
+        const val INVOKE_METHOD_ON_MENTION_CLICK = "onMentionClick"
+        const val INVOKE_METHOD_ON_LINK_CLICK = "onLinkClick"
 
         // Content related.
         const val HANDLE_METHOD_REPLACE_TEXT = "replaceText"
@@ -51,6 +53,8 @@ internal class TunEditorView(
     override fun dispose() {
         quillEditor.setOnSelectionChangeListener(null)
         quillEditor.setOnTextChangeListener(null)
+        quillEditor.setOnMentionClickListener(null)
+        quillEditor.setOnLinkClickListener(null)
         methodChannel.setMethodCallHandler(null)
     }
 
@@ -91,6 +95,15 @@ internal class TunEditorView(
             args["length"] = length
             args["format"] = format
             methodChannel.invokeMethod(INVOKE_METHOD_ON_SELECTION_CHANGE, args)
+        }
+        quillEditor.setOnMentionClickListener { mentionId, text ->
+            val args = HashMap<String, Any>()
+            args["id"] = mentionId
+            args["text"] = text
+            methodChannel.invokeMethod(INVOKE_METHOD_ON_MENTION_CLICK, args)
+        }
+        quillEditor.setOnLinkClickListener { url ->
+            methodChannel.invokeMethod(INVOKE_METHOD_ON_LINK_CLICK, url)
         }
         methodChannel.setMethodCallHandler(this)
     }

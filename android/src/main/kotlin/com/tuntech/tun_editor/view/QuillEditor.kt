@@ -47,6 +47,8 @@ class QuillEditor: WebView {
 
     private var onTextChangeListener: ((String, String) -> Unit)? = null
     private var onSelectionChangeListener: ((Int, Int, String) -> Unit)? = null
+    private var onMentionClickListener: ((String, String) -> Unit)? = null
+    private var onLinkClickListener: ((String) -> Unit)? = null
 
     init {
         isVerticalScrollBarEnabled = false
@@ -78,6 +80,16 @@ class QuillEditor: WebView {
             onSelectionChangeListener = { index, length, format ->
                 (context as Activity).runOnUiThread {
                     onSelectionChangeListener?.invoke(index, length, format)
+                }
+            },
+            onMentionClickListener = { id, text ->
+                (context as Activity).runOnUiThread {
+                    onMentionClickListener?.invoke(id, text)
+                }
+            },
+            onLinkClickListener = { url ->
+                (context as Activity).runOnUiThread {
+                    onLinkClickListener?.invoke(url)
                 }
             }
         ), "tun")
@@ -150,6 +162,14 @@ class QuillEditor: WebView {
         this.onSelectionChangeListener = onSelectionChangeListener
     }
 
+    fun setOnMentionClickListener(onMentionClick: ((String, String) -> Unit)?) {
+        this.onMentionClickListener = onMentionClick
+    }
+
+    fun setOnLinkClickListener(onLinkClick: ((String) -> Unit)?) {
+        this.onLinkClickListener = onLinkClick
+    }
+
     private fun setPlaceholder(placeholder: String) {
         exec("javascript:setPlaceholder(\"$placeholder\")")
     }
@@ -185,7 +205,9 @@ class QuillEditor: WebView {
 
     class JSInterface(
         private val onTextChangeListener: ((String, String) -> Unit),
-        private val onSelectionChangeListener: (Int, Int, String) -> Unit
+        private val onSelectionChangeListener: (Int, Int, String) -> Unit,
+        private val onMentionClickListener: ((String, String) -> Unit),
+        private val onLinkClickListener: ((String) -> Unit)
     ) {
         @JavascriptInterface
         fun onSelectionChange(index: Int, length: Int, format: String) {
@@ -195,6 +217,16 @@ class QuillEditor: WebView {
         @JavascriptInterface
         fun onTextChange(delta: String, oldDelta: String, source: String) {
             onTextChangeListener(delta, oldDelta)
+        }
+
+        @JavascriptInterface
+        fun onMentionClick(id: String, text: String) {
+            onMentionClickListener(id, text)
+        }
+
+        @JavascriptInterface
+        fun onLinkClick(url: String) {
+            onLinkClickListener(url)
         }
     }
 

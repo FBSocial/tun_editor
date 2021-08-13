@@ -9,6 +9,9 @@ import 'package:tun_editor/models/quill_delta.dart';
 import 'package:tun_editor/tun_editor_api.dart';
 import 'package:tun_editor/controller.dart';
 
+typedef MentionClickCallback = Function(String, String);
+typedef LinkClickCallback = Function(String);
+
 class TunEditor extends StatefulWidget {
 
   final TunEditorController controller;
@@ -23,10 +26,13 @@ class TunEditor extends StatefulWidget {
 
   final ScrollController? scrollController;
 
+  final MentionClickCallback? onMentionClick;
+  final LinkClickCallback? onLinkClick;
+
   const TunEditor({
     Key? key,
     required this.controller,
-    this.placeholder = "",
+    this.placeholder = '',
     this.readOnly = false,
     this.padding = const EdgeInsets.symmetric(
       vertical: 15,
@@ -35,6 +41,8 @@ class TunEditor extends StatefulWidget {
     this.autoFocus = false,
     this.focusNode,
     this.scrollController,
+    this.onMentionClick,
+    this.onLinkClick,
   }) : super(key: key);
 
   @override
@@ -44,7 +52,7 @@ class TunEditor extends StatefulWidget {
 
 class TunEditorState extends State<TunEditor> with TunEditorHandler {
 
-  static const String VIEW_TYPE_TUN_EDITOR = "tun_editor";
+  static const String VIEW_TYPE_TUN_EDITOR = 'tun_editor';
 
   late TunEditorApi _tunEditorApi;
 
@@ -56,6 +64,8 @@ class TunEditorState extends State<TunEditor> with TunEditorHandler {
   bool get autoFocus => widget.autoFocus;
   FocusNode? get focusNode => widget.focusNode;
   ScrollController? get scrollController => widget.scrollController;
+  MentionClickCallback? get mentionClickCallback => widget.onMentionClick;
+  LinkClickCallback? get linkClickCallback => widget.onLinkClick;
   
   @override
   void initState() {
@@ -135,7 +145,7 @@ class TunEditorState extends State<TunEditor> with TunEditorHandler {
         },
       );
     } else {
-      throw UnsupportedError("Unsupported platform view");
+      throw UnsupportedError('Unsupported platform view');
     }
   }
 
@@ -160,6 +170,16 @@ class TunEditorState extends State<TunEditor> with TunEditorHandler {
   @override
   void onSelectionChange(int index, int length, Map<String, dynamic> format) {
     controller.syncSelection(index, length, format);
+  }
+
+  @override
+  void onMentionClick(String id, String text) {
+    mentionClickCallback?.call(id, text);
+  }
+
+  @override
+  void onLinkClick(String url) {
+    linkClickCallback?.call(url);
   }
 
 }

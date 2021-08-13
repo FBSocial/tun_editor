@@ -19,16 +19,16 @@ class TunEditorApi {
     switch (call.method) {
       case 'onTextChange':
         final args = call.arguments as Map<dynamic, dynamic>;
-        final delta = args["delta"] as String;
-        final oldDelta = args["oldDelta"] as String;
+        final delta = args['delta'] as String;
+        final oldDelta = args['oldDelta'] as String;
         _handler.onTextChange(delta, oldDelta);
         break;
 
       case 'onSelectionChange':
         try {
           final args = call.arguments as Map<dynamic, dynamic>;
-          final index = args["index"] as int;
-          final length = args["length"] as int;
+          final index = args['index'] as int;
+          final length = args['length'] as int;
           final format = args['format'] is String
               ? json.decode(args['format'])
               : {};
@@ -36,6 +36,18 @@ class TunEditorApi {
         } catch(e, s) {
           print('on selection change $e $s');
         }
+        break;
+
+      case 'onMentionClick':
+        final args = call.arguments as Map<dynamic, dynamic>;
+        final id = args['id'] as String;
+        final text = args['text'] as String;
+        _handler.onMentionClick(id, text);
+        break;
+
+      case 'onLinkClick':
+        final url = call.arguments as String;
+        _handler.onLinkClick(url);
         break;
 
       default:
@@ -116,4 +128,6 @@ class TunEditorApi {
 mixin TunEditorHandler {
   Future<void> onTextChange(String delta, String oldDelta);
   void onSelectionChange(int index, int length, Map<String, dynamic> format);
+  void onMentionClick(String id, String text);
+  void onLinkClick(String url);
 }

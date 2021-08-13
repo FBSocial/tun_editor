@@ -121,6 +121,18 @@
           } else if (isIOS) {
           }
         },
+        onMentionClick: function(id, name) {
+          if (isAndroid) {
+            tun.onMentionClick(id, name);
+          } else if (isIOS) {
+          }
+        },
+        onLinkClick: function(url) {
+          if (isAndroid) {
+            tun.onLinkClick(url);
+          } else if (isIOS) {
+          }
+        },
       }
 
       var insertMention;
@@ -144,6 +156,8 @@
         let BlockEmbed = Quill.import('blots/block/embed');
         let Delta = Quill.import('delta');
         let CodeBlock = Quill.import('formats/code-block');
+        let Parchment = Quill.import('parchment');
+        let MentionBlot = Quill.import('formats/mention');
 
         class DividerBlot extends BlockEmbed {
 
@@ -224,10 +238,35 @@
               mentionDenotationChars: ["@"],
               source: async function(searchTerm, renderList) {
               },
+              onSelect(item, insertItem) {
+                console.log(item);
+              },
             },
           }
         };
         var quill = new Quill('#editor', options);
+        quill.root.addEventListener('click', (ev) => {
+          if (ev.target.tagName === 'A') {
+            // Link click.
+            bridge.onLinkClick(ev.target.href);
+            ev.preventDefault();
+          }
+
+          // Mention click.
+          if (ev.target.tagName === 'SPAN') {
+            if (ev.target.className === 'mention') {
+              bridge.onMentionClick(ev.target.attributes['data-id'].value, ev.target.attributes['data-value'].value);
+            } else if (ev.target.className === 'ql-mention-denotation-char') {
+              let mentionNode = ev.target.parentElement.parentElement;
+              bridge.onMentionClick(mentionNode.attributes['data-id'].value, mentionNode.attributes['data-value'].value);
+            } else if (ev.target.attributes['contenteditable']
+                  && ev.target.attributes['contenteditable'].value === 'false'
+                  && ev.target.parentElement.className === 'mention') {
+              let mentionNode = ev.target.parentElement;
+              bridge.onMentionClick(mentionNode.attributes['data-id'].value, mentionNode.attributes['data-value'].value);
+            }
+          }
+        });
 
         quill.on('text-change', function(delta, oldDelta, source) {
           if (source === Quill.sources.SILENT) {
@@ -324,6 +363,9 @@
           var delta = new Delta().retain(index).delete(length).insert(data)
           quill.updateContents(delta);
         }
+        insertMention('1', 'Jeffrey Wu');
+        insertLink('Hello Jeffrey Wu', 'https://www.wujianhui.com');
+        setReadOnly(false);
       })
     </script>
   </body>
