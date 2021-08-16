@@ -51,7 +51,7 @@ class FullPageEditorState extends State<FullPageEditor> {
         title: GestureDetector(
           child: Text("Editor"),
           onTap: () {
-            // _controller.insertMention('1', 'Jeffrey Wu');
+            _controller.insertMention('1', 'Jeffrey Wu');
             // if (focusNode.hasFocus) {
             //   focusNode.unfocus();
             // } else {

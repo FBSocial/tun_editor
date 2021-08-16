@@ -176,7 +176,7 @@ class QuillEditor: WebView {
         this.onLinkClickListener = onLinkClick
     }
 
-    fun setOnFocusChangeListener(onFocusChangeListener: ((Boolean) -> Unit)?) {
+    fun setOnQuillFocusChangeListener(onFocusChangeListener: ((Boolean) -> Unit)?) {
         this.onFocusChangeListener = onFocusChangeListener
     }
 

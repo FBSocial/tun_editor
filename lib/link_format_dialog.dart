@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class LinkFomratDialog extends StatefulWidget {
 
@@ -62,16 +63,16 @@ class LinkFomratDialogState extends State<LinkFomratDialog> {
     final labelStyle = TextStyle(
       color: Color(0xFF363940),
       fontWeight: FontWeight.w500,
-      fontSize: 16,
+      fontSize: 16.w,
     );
     final hintStyle = TextStyle(
       color: Color(0xFF8F959E),
-      fontSize: 16,
+      fontSize: 16.w,
       height: 1.25,
     );
     final fieldStyle = TextStyle(
       color: Color(0xFF363940),
-      fontSize: 16,
+      fontSize: 16.w,
       height: 1.25,
     );
     final inputDecoration = InputDecoration(
@@ -79,108 +80,110 @@ class LinkFomratDialogState extends State<LinkFomratDialog> {
       fillColor: Color(0x1A8F959E),
       hintStyle: hintStyle,
       contentPadding: EdgeInsets.symmetric(
-        horizontal: 12,
+        horizontal: 12.w,
       ),
       border: OutlineInputBorder(
         borderSide: BorderSide.none,
-        borderRadius: BorderRadius.circular(4),
+        borderRadius: BorderRadius.circular(4.w),
       ),
     );
     return Dialog(
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(4),
+        borderRadius: BorderRadius.circular(4.w),
       ),
       child: Container(
         width: double.infinity,
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(4),
+          borderRadius: BorderRadius.circular(4.w),
         ),
         padding: EdgeInsets.symmetric(
-          vertical: 12,
-          horizontal: 16,
+          vertical: 12.w,
+          horizontal: 16.w,
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            SizedBox(height: 10),
+            SizedBox(height: 10.w),
             // Link text.
             Row(
               children: [
-                SizedBox(width: 12),
+                SizedBox(width: 12.w),
                 Text(
                   "文本",
                   style: labelStyle,
                 ),
-                SizedBox(width: 12),
-                SizedBox(
-                  width: 230,
-                  height: 40,
-                  child: TextField(
-                    style: fieldStyle,
-                    cursorColor: Color(0xFF5562F2),
-                    textInputAction: TextInputAction.next,
-                    decoration: inputDecoration.copyWith(
-                      hintText: "输入文本",
+                SizedBox(width: 12.w),
+                Expanded(
+                  child: SizedBox(
+                    height: 40.w,
+                    child: TextField(
+                      style: fieldStyle,
+                      cursorColor: Color(0xFF5562F2),
+                      textInputAction: TextInputAction.next,
+                      decoration: inputDecoration.copyWith(
+                        hintText: "输入文本",
+                      ),
+                      autofocus: !isUrlAutofocus,
+                      controller: textCtrl,
                     ),
-                    autofocus: !isUrlAutofocus,
-                    controller: textCtrl,
                   ),
                 ),
               ],
             ),
-            SizedBox(height: 10),
+            SizedBox(height: 10.w),
             // Link value.
             Row(
               children: [
-                SizedBox(width: 12),
+                SizedBox(width: 12.w),
                 Text(
                   "链接",
                   style: labelStyle,
                 ),
-                SizedBox(width: 12),
-                SizedBox(
-                  width: 230,
-                  height: 40,
-                  child: TextField(
-                    style: fieldStyle,
-                    cursorColor: Color(0xFF5562F2),
-                    decoration: inputDecoration.copyWith(
-                      hintText: "粘贴或输入一个链接",
+                SizedBox(width: 12.w),
+                Expanded(
+                  child: SizedBox(
+                    height: 40.w,
+                    child: TextField(
+                      style: fieldStyle,
+                      cursorColor: Color(0xFF5562F2),
+                      decoration: inputDecoration.copyWith(
+                        hintText: "粘贴或输入一个链接",
+                      ),
+                      autofocus: isUrlAutofocus,
+                      controller: urlCtrl,
+                      onSubmitted: (_) => onLinkSubmit(),
                     ),
-                    autofocus: isUrlAutofocus,
-                    controller: urlCtrl,
-                    onSubmitted: (_) => onLinkSubmit(),
                   ),
                 ),
               ],
             ),
-            SizedBox(height: 10),
+            SizedBox(height: 10.w),
             // Button group.
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 SizedBox(
-                  width: 65,
-                  height: 40,
+                  width: 65.w,
+                  height: 40.w,
                   child: OutlinedButton(
                     onPressed: () => Navigator.of(context).pop(null),
                     style: ButtonStyle(
                       foregroundColor: MaterialStateProperty.all(Color(0xFF1F2125)),
                       backgroundColor: MaterialStateProperty.all(Colors.white),
                       side: MaterialStateProperty.all(BorderSide(
-                        width: 0.5,
+                        width: 0.5.w,
                         color: Color(0xFFDEE0E3),
                       )),
                       shape: MaterialStateProperty.all(
                         RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(3),
+                          borderRadius: BorderRadius.circular(3.w),
                         ),
                       ),
                       textStyle: MaterialStateProperty.all(
                         TextStyle(
                           fontWeight: FontWeight.w500,
-                          fontSize: 16,
+                          fontSize: 16.w,
                         ),
                       ),
                      ),
@@ -188,11 +191,11 @@ class LinkFomratDialogState extends State<LinkFomratDialog> {
                   ),
                 ),
 
-                SizedBox(width: 12),
+                SizedBox(width: 12.w),
 
                 SizedBox(
-                  width: 65,
-                  height: 40,
+                  width: 65.w,
+                  height: 40.w,
                   child: OutlinedButton(
                     onPressed: isFormValid ? onLinkSubmit : null,
                     style: ButtonStyle(
@@ -206,13 +209,13 @@ class LinkFomratDialogState extends State<LinkFomratDialog> {
                       side: MaterialStateProperty.all(BorderSide.none),
                       shape: MaterialStateProperty.all(
                         RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(3),
+                          borderRadius: BorderRadius.circular(3.w),
                         ),
                       ),
                       textStyle: MaterialStateProperty.all(
                         TextStyle(
                           fontWeight: FontWeight.w500,
-                          fontSize: 16,
+                          fontSize: 16.w,
                         ),
                       ),
                      ),

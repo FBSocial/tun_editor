@@ -189,6 +189,7 @@ class TunEditorState extends State<TunEditor> with TunEditorHandler {
 
   @override
   void onFocusChange(bool hasFocus) {
+    debugPrint('on focus chagne $hasFocus');
     onFocusChangeCallback?.call(hasFocus);
     // if (hasFocus) {
     //   focusNode?.requestFocus();

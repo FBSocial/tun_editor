@@ -60,7 +60,7 @@ internal class TunEditorView(
         quillEditor.setOnTextChangeListener(null)
         quillEditor.setOnMentionClickListener(null)
         quillEditor.setOnLinkClickListener(null)
-        quillEditor.setOnFocusChangeListener(null)
+        quillEditor.setOnQuillFocusChangeListener(null)
         methodChannel.setMethodCallHandler(null)
     }
 
@@ -111,7 +111,7 @@ internal class TunEditorView(
         quillEditor.setOnLinkClickListener { url ->
             methodChannel.invokeMethod(INVOKE_METHOD_ON_LINK_CLICK, url)
         }
-        quillEditor.setOnFocusChangeListener { hasFocus ->
+        quillEditor.setOnQuillFocusChangeListener { hasFocus ->
             methodChannel.invokeMethod(INVOKE_METHOD_ON_FOCUS_CHANGE, hasFocus)
         }
         methodChannel.setMethodCallHandler(this)

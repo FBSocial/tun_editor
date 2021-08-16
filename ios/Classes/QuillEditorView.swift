@@ -20,6 +20,9 @@ class QuillEditorView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler {
     
     var onSelectionChangeHandler: (([String: AnyObject]) -> Void)? = nil
     var onTextChangeHandler: (([String: AnyObject]) -> Void)? = nil
+    var onMentionClickHandler: (([String: AnyObject]) -> Void)? = nil
+    var onLinkClickHandler: (([String: AnyObject]) -> Void)? = nil
+    var onFocusChangeHandler: (([String: AnyObject]) -> Void)? = nil
         
     public override init(frame: CGRect, configuration: WKWebViewConfiguration) {
         super.init(frame: frame, configuration: configuration)
@@ -48,6 +51,14 @@ class QuillEditorView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler {
         
         super.init(frame: frame, configuration: configuration)
         setup()
+    }
+    
+    deinit {
+        onTextChangeHandler = nil
+        onSelectionChangeHandler = nil
+        onMentionClickHandler = nil
+        onLinkClickHandler = nil
+        onFocusChangeHandler = nil
     }
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
@@ -81,6 +92,18 @@ class QuillEditorView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler {
                 }
                 onSelectionChangeHandler?(args)
             }
+        case "onMentionClick":
+            if let args = message.body as? [String: AnyObject] {
+                onMentionClickHandler?(args)
+            }
+        case "onLinkClick":
+            if let args = message.body as? [String: AnyObject] {
+                onLinkClickHandler?(args)
+            }
+        case "onFocusChange":
+            if let args = message.body as? [String: AnyObject] {
+                onFocusChangeHandler?(args)
+            }
         default:
             debugPrint("missing message handler in quill editor \(message.name)")
         }
@@ -92,6 +115,10 @@ class QuillEditorView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler {
         } else {
             exec("replaceText(\(index), \(length), \(data))")
         }
+    }
+    
+    func insertMention(id: String, text: String) {
+        exec("insertMention(\"\(id)\", \"\(text)\")")
     }
     
     func insertDivider() {
@@ -143,6 +170,18 @@ class QuillEditorView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler {
         self.onSelectionChangeHandler = handler
     }
     
+    func setOnMentionClickListener(_ handler: @escaping (([String: AnyObject]) -> Void)) {
+        self.onMentionClickHandler = handler
+    }
+    
+    func setOnLinkClickListener(_ handler: @escaping (([String: AnyObject]) -> Void)) {
+        self.onLinkClickHandler = handler
+    }
+    
+    func setOnFocusChangeListener(_ handler: @escaping (([String: AnyObject]) -> Void)) {
+        self.onFocusChangeHandler = handler
+    }
+    
     private func setPlaceholder(_ placeholder: String) {
         exec("setPlaceholder(\"\(placeholder)\")")
     }
@@ -168,6 +207,10 @@ class QuillEditorView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler {
         self.navigationDelegate = self
         self.configuration.userContentController.add(self, name: "onTextChange")
         self.configuration.userContentController.add(self, name: "onSelectionChange")
+        self.configuration.userContentController.add(self, name: "onMentionClick")
+        self.configuration.userContentController.add(self, name: "onLinkClick")
+        self.configuration.userContentController.add(self, name: "onFocusChange")
+
         
         if let filePath = Bundle.main.path(forResource: "index", ofType: "html") {
             let url = URL(fileURLWithPath: filePath, isDirectory: false)

@@ -120,30 +120,50 @@
           if (isAndroid) {
             tun.onTextChange(delta, oldDelta, source);
           } else if (isIOS) {
+            window.webkit.messageHandlers.onTextChange.postMessage({
+               delta: delta,
+               oldDelta: oldDelta,
+               source: source,
+            });
           }
         },
         onSelectionChange: function(index, length, format) {
           if (isAndroid) {
             tun.onSelectionChange(index, length, format);
           } else if (isIOS) {
+            window.webkit.messageHandlers.onSelectionChange.postMessage({
+               index: index,
+               length: length,
+               format: format,
+            });
           }
         },
-        onMentionClick: function(id, name) {
+        onMentionClick: function(id, text) {
           if (isAndroid) {
-            tun.onMentionClick(id, name);
+            tun.onMentionClick(id, text);
           } else if (isIOS) {
+            window.webkit.messageHandlers.onMentionClick.postMessage({
+               id: id,
+               text: text,
+            });
           }
         },
         onLinkClick: function(url) {
           if (isAndroid) {
             tun.onLinkClick(url);
           } else if (isIOS) {
+            window.webkit.messageHandlers.onLinkClick.postMessage({
+               url: url,
+            });
           }
         },
         onFocusChange: function(hasFocus) {
           if (isAndroid) {
             tun.onFocusChange(hasFocus);
           } else if (isIOS) {
+            window.webkit.messageHandlers.onFocusChange.postMessage({
+               hasFocus: hasFocus,
+            });
           }
         },
       }

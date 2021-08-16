@@ -82,6 +82,22 @@ class TunEditorView: NSObject, FlutterPlatformView {
         _editor.setOnSelectionChangeListener { args in
             self.methodChannel.invokeMethod("onSelectionChange", arguments: args)
         }
+        _editor.setOnMentionClickListener { args in
+            print("on mention click \(args)")
+            self.methodChannel.invokeMethod("onMentionClick", arguments: args)
+        }
+        _editor.setOnLinkClickListener { args in
+            print("on link click \(args)")
+            if let url = args["url"] as? String {
+                self.methodChannel.invokeMethod("onLinkClick", arguments: url)
+            }
+        }
+        _editor.setOnFocusChangeListener { args in
+            print("on focus change \(args)")
+            if let hasFocus = args["hasFocus"] as? Bool {
+                self.methodChannel.invokeMethod("onFocusChange", arguments: hasFocus)
+            }
+        }
         methodChannel.setMethodCallHandler(handle)
     }
 
@@ -102,6 +118,15 @@ class TunEditorView: NSObject, FlutterPlatformView {
                     return
                 }
                 _editor.replaceText(index: index!, length: length!, data: data!)
+            }
+        case "insertMention":
+            if let args = call.arguments as? [String: Any] {
+                let id = args["id"] as? String
+                let text = args["text"] as? String
+                if id == nil || text == nil {
+                    return
+                }
+                _editor.insertMention(id: id!, text: text!)
             }
         case "insertDivider":
             _editor.insertDivider()
@@ -195,6 +220,15 @@ class TunEditorView: NSObject, FlutterPlatformView {
             _editor.focus()
         case "blur":
             _editor.blur()
+        case "scrollTo":
+            if let offset = call.arguments as? Int {
+                _editor.scrollView.setContentOffset(CGPoint(x: 0, y: offset), animated: true)
+            }
+        case "scrollToTop":
+            _editor.scrollView.setContentOffset(CGPoint(x: 0, y: 0), animated: true)
+        case "scrollToBottom":
+            let offset = CGPoint(x: 0, y: _editor.scrollView.contentSize.height - _editor.frame.size.height)
+            _editor.scrollView.setContentOffset(offset, animated: true)
             
         default:
             print("missing tun editor method")

@@ -2,12 +2,17 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width">
+    <meta name="viewport" content="width=device-width,user-scalable=no,minimum-scale=1.0,maximum-scale=1.0"/>
     <title>Tun Editor</title>
     <link rel="stylesheet" href="normalize.css" type="text/css" charset="utf-8">
     <link rel="stylesheet" href="snow.css" type="text/css" charset="utf-8">
-    <script src="quill.min.js" charset="utf-8"></script>
+    <link rel="stylesheet" href="highlight.min.css" type="text/css" charset="utf-8">
+    <link rel="stylesheet" href="quill.mention.min.css" type="text/css" charset="utf-8">
+    <script src="highlight.min.js" charset="utf-8"></script>
+    <script src="highlightjs-line-numbers.min.js" charset="utf-8"></script>
     <script src="markdown.js" charset="utf-8"></script>
+    <script src="quill.min.js" charset="utf-8"></script>
+    <script src="quill.mention.min.js" charset="utf-8"></script>
     <style>
       .ql-container {
         font-size: 16px;
@@ -17,6 +22,9 @@
          border: none !important;
          height: 100vh;
        }
+      .ql-editor {
+        line-height: 1.5;
+      }
       .ql-snow .ql-editor h1 {
         font-size: 22px;
       }
@@ -53,42 +61,50 @@
         width: auto;
       }
       hr {
-        border: 1px solid #8f959e1e;
+        border: 0 none;
+        height: 1px;
+        color: #8f959e1e;
+        background-color: #8f959e1e;
       }
       .ql-snow .ql-editor blockquote {
         border-left: 2px solid #5562F2;
         padding-left: 12px;
+        color: #646A73;
       }
       .ql-snow .ql-editor pre.ql-syntax {
         font-size: 14px;
         color: #646A73;
         background-color: #F5F5F8;
         border-radius: 4px;
-        border: 1px solid rgba(143, 149, 158, 0.2);
+        border: 0.5px solid #8f959e14;
         margin: 0;
-        padding: 24px 16px;
+        padding: 16px 24px;
         box-sizing: border-box;
-        counter-reset: line;
       }
-      .ql-snow .ql-editor pre.ql-syntax span {
-        display: block;
-        line-height: 1.5rem;
-      }
-      .ql-snow .ql-editor pre.ql-syntax span:before {
-        counter-increment: line;
-        content: counter(line);
-        display: inline-block;
-        border-right: 1px solid #ddd;
-        padding: 0 .5em;
-        margin-right: .5em;
-        color: #888
-      }
-      .ql-snow .ql-editor code,
       .ql-snow .ql-editor pre {
         color: #646A73;
         background-color: #F5F5F8;
         border-radius: 4px;
         border: 1px solid rgba(143, 149, 158, 0.2);
+        counter-reset: line-numbering;
+      }
+      .ql-snow a {
+        color: #5562F2;
+      }
+      pre .hljs-line::before {
+        display: inline-block;
+        content: counter(line-numbering);
+        counter-increment: line-numbering;
+        width: 30px;
+        text-align: right;
+        margin-left: -16px;
+        margin-right: 16px;
+      }
+      span.mention {
+        background-color: #5562F2;
+        padding: 2px 12px;
+        border-radius: 20px;
+        color: #FFFFFF;
       }
     </style>
   </head>
@@ -96,10 +112,69 @@
     <div id="editor"></div>
 
     <script>
+      let u = navigator.userAgent;
+      let isAndroid = u.indexOf('Android') > -1 || u.indexOf('Adr') > -1;
+      let isIOS = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/);
+      console.log("platform", isAndroid, isIOS)
+      let bridge = {
+        onTextChange: function(delta, oldDelta, source) {
+          if (isAndroid) {
+            tun.onTextChange(delta, oldDelta, source);
+          } else if (isIOS) {
+            window.webkit.messageHandlers.onTextChange.postMessage({
+               delta: delta,
+               oldDelta: oldDelta,
+               source: source,
+            });
+          }
+        },
+        onSelectionChange: function(index, length, format) {
+          if (isAndroid) {
+            tun.onSelectionChange(index, length, format);
+          } else if (isIOS) {
+            window.webkit.messageHandlers.onSelectionChange.postMessage({
+               index: index,
+               length: length,
+               format: format,
+            });
+          }
+        },
+        onMentionClick: function(id, text) {
+          if (isAndroid) {
+            tun.onMentionClick(id, text);
+          } else if (isIOS) {
+            window.webkit.messageHandlers.onMentionClick.postMessage({
+               id: id,
+               text: text,
+            });
+          }
+        },
+        onLinkClick: function(url) {
+          if (isAndroid) {
+            tun.onLinkClick(url);
+          } else if (isIOS) {
+            window.webkit.messageHandlers.onLinkClick.postMessage({
+               url: url,
+            });
+          }
+        },
+        onFocusChange: function(hasFocus) {
+          if (isAndroid) {
+            tun.onFocusChange(hasFocus);
+          } else if (isIOS) {
+            window.webkit.messageHandlers.onFocusChange.postMessage({
+               hasFocus: hasFocus,
+            });
+          }
+        },
+      }
+
+      var insertMention;
       var insertDivider;
       var insertImage;
       var insertLink;
       var format;
+      var formatText;
       var removeFormat;
       var removeCurrentFormat;
       var setSelection;
@@ -110,9 +185,13 @@
       var blur;
       var setContents;
       var replaceText;
+
       document.addEventListener('DOMContentLoaded', () => {
         let BlockEmbed = Quill.import('blots/block/embed');
         let Delta = Quill.import('delta');
+        let CodeBlock = Quill.import('formats/code-block');
+        let Parchment = Quill.import('parchment');
+        let MentionBlot = Quill.import('formats/mention');
 
         class DividerBlot extends BlockEmbed {
 
@@ -136,8 +215,8 @@
             key: 'Enter',
             collapsed: true,
             format: ['code-block'],
-            prefix: /\n$/,
-            suffix: /^\s+$/,
+            // prefix: /\n$/,
+            // suffix: /^\s+$/,
             handler: function(range) {
               const [line, offset] = this.quill.getLine(range.index);
               const delta = new Delta()
@@ -152,33 +231,89 @@
           readOnly: false,
           theme: 'snow',
           modules: {
+            syntax: {
+              highlight: (function() {
+                if (window.hljs == null) return null;
+                return function(text) {
+                  let lines = text.split('\n');
+                  let spanLines = lines.map(function(line, index) {
+                    if (index == lines.length - 1) {
+                      return '';
+                    }
+                    if (line === '') {
+                      return '<span class="hljs-line">&ZeroWidthSpace;</span>'
+                    }
+                    return '<span class="hljs-line">' + line + '</span>';
+                  });
+                  let res = spanLines.join('\n');
+                  return text;
+                };
+              })(),
+              interval: 0,
+            },
             toolbar: false,
             keyboard: {
               bindings: bindings
-            }
+            },
+            mention: {
+              mentionDenotationChars: ["@"],
+              source: async function(searchTerm, renderList) {
+              },
+              onSelect(item, insertItem) {
+                console.log(item);
+              },
+            },
           }
         };
         var quill = new Quill('#editor', options);
+        quill.root.addEventListener('click', (ev) => {
+          if (ev.target.tagName === 'A') {
+            // Link click.
+            bridge.onLinkClick(ev.target.href);
+            ev.preventDefault();
+          }
+
+          // Mention click.
+          if (ev.target.tagName === 'SPAN') {
+            if (ev.target.className === 'mention') {
+              bridge.onMentionClick(ev.target.attributes['data-id'].value, ev.target.attributes['data-value'].value);
+            } else if (ev.target.className === 'ql-mention-denotation-char') {
+              let mentionNode = ev.target.parentElement.parentElement;
+              bridge.onMentionClick(mentionNode.attributes['data-id'].value, mentionNode.attributes['data-value'].value);
+            } else if (ev.target.attributes['contenteditable']
+                  && ev.target.attributes['contenteditable'].value === 'false'
+                  && ev.target.parentElement.className === 'mention') {
+              let mentionNode = ev.target.parentElement;
+              bridge.onMentionClick(mentionNode.attributes['data-id'].value, mentionNode.attributes['data-value'].value);
+            }
+          }
+        });
 
         quill.on('text-change', function(delta, oldDelta, source) {
-          // tun.onTextChange(JSON.stringify(delta), JSON.stringify(oldDelta), source);
-          window.webkit.messageHandlers.onTextChange.postMessage({
-             delta: JSON.stringify(delta),
-             oldDelta: JSON.stringify(oldDelta),
-             source: source,
-          });
+          if (source === Quill.sources.SILENT) {
+            return;
+          }
+          bridge.onTextChange(JSON.stringify(delta), JSON.stringify(oldDelta), source);
+
+          setTimeout(function() {
+            let range = quill.getSelection(true);
+            if (range) {
+              var format = quill.getFormat();
+              bridge.onSelectionChange(range.index, range.length, JSON.stringify(format));
+            }
+          }, 200);
         });
         quill.on('selection-change', function(range, oldRange, source) {
           if (range) {
             var format = quill.getFormat()
-            console.log(`on selection change ${range.index} ${range.length} ${JSON.stringify(format)}`)
-            window.webkit.messageHandlers.onSelectionChange.postMessage({
-               index: range.index,
-               length: range.length,
-               format: JSON.stringify(format),
-            });
-            // tun.onSelectionChange(range.index, range.length, JSON.stringify(format));
+            bridge.onSelectionChange(range.index, range.length, JSON.stringify(format));
           }
+        });
+        quill.root.addEventListener('blur', function() {
+          bridge.onFocusChange(false);
+        });
+        quill.root.addEventListener('focus', function() {
+          bridge.onFocusChange(true);
         });
 
         var markdownOptions = {
@@ -187,6 +322,13 @@
         new QuillMarkdown(quill, markdownOptions);
 
         // Insert divider.
+        insertMention = function(id, name) {
+          quill.getModule('mention').insertItem({
+            denotationChar: "@",
+            id: id,
+            value: name,
+          }, true);
+        }
         insertDivider = function() {
           let range = quill.getSelection(true);
           quill.insertText(range.index, '\n', Quill.sources.USER);
@@ -201,11 +343,14 @@
         }
         insertLink = function(text, url) {
           let range = quill.getSelection(true);
-          quill.insertText(range.index, text, "link", url, Quill.sources.USER);
+          quill.insertText(range.index, text, 'link', url, Quill.sources.USER);
           quill.setSelection(range.index + text.length, Quill.sources.SILENT)
         }
         format = function(name, value) {
           quill.format(name, value, 'user');
+        }
+        formatText = function(index, length, format, value) {
+          quill.formatText(index, length, format, value, Quill.sources.USER);
         }
         removeFormat = function(index, length) {
           quill.removeFormat(index, length, 'user');
@@ -220,7 +365,7 @@
           }
         }
         setSelection = function(index, length) {
-          quill.setSelection(index, length)
+          quill.setSelection(index, length, Quill.sources.API)
         }
         setPlaceholder = function(placeholder) {
           quill.root.dataset.placeholder = placeholder;
@@ -239,7 +384,7 @@
           quill.blur();
         }
         setContents = function(delta) {
-          quill.setContents(delta);
+          quill.setContents(delta, Quill.sources.SILENT);
         }
         replaceText = function(index, length, data) {
           var delta = new Delta().retain(index).delete(length).insert(data)
