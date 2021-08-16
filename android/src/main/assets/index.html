@@ -228,6 +228,17 @@
               this.quill.updateContents(delta, Quill.sources.USER);
             }
           },
+          'code delete': {
+            key: Keyboard.keys.BACKSPACE,
+            collapsed: true,
+            format: ['code-block'],
+            prefix: /^$/,
+            suffix: /^\s+$/,
+            handler: function(range) {
+              console.log('code delete');
+              this.quill.format('code-block', false, Quill.sources.USER);
+            }
+          },
           'blockquote delete': {
             key: Keyboard.keys.BACKSPACE,
             collapsed: true,
@@ -236,6 +247,16 @@
             suffix: /^$/,
             handler: function(range) {
               this.quill.format('blockquote', false, Quill.sources.USER);
+            }
+          },
+          'header delete': {
+            key: Keyboard.keys.BACKSPACE,
+            collapsed: true,
+            format: ['header'],
+            prefix: /^$/,
+            suffix: /^$/,
+            handler: function(range) {
+              this.quill.format('header', false, Quill.sources.USER);
             }
           }
         }
