@@ -7,7 +7,6 @@
     <link rel="stylesheet" href="normalize.css" type="text/css" charset="utf-8">
     <link rel="stylesheet" href="snow.css" type="text/css" charset="utf-8">
     <link rel="stylesheet" href="highlight.min.css" type="text/css" charset="utf-8">
-    <link rel="stylesheet" href="quill.mention.min.css" type="text/css" charset="utf-8">
     <script src="highlight.min.js" charset="utf-8"></script>
     <script src="highlightjs-line-numbers.min.js" charset="utf-8"></script>
     <script src="markdown.js" charset="utf-8"></script>
@@ -77,7 +76,7 @@
         background-color: #F5F5F8;
         border-radius: 4px;
         border: 0.5px solid #8f959e14;
-        margin: 0;
+        margin: 5px 0;
         padding: 16px 24px;
         box-sizing: border-box;
       }
@@ -106,6 +105,9 @@
         border-radius: 20px;
         color: #FFFFFF;
       }
+      .ql-snow .ql-editor blockquote {
+        margin: 0;
+      }
     </style>
   </head>
   <body>
@@ -115,6 +117,8 @@
       let u = navigator.userAgent;
       let isAndroid = u.indexOf('Android') > -1 || u.indexOf('Adr') > -1;
       let isIOS = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/);
+      // let isAndroid = false;
+      // let isIOS = false;
       let bridge = {
         onTextChange: function(delta, oldDelta, source) {
           if (isAndroid) {
@@ -189,8 +193,6 @@
         let BlockEmbed = Quill.import('blots/block/embed');
         let Delta = Quill.import('delta');
         let CodeBlock = Quill.import('formats/code-block');
-        let Parchment = Quill.import('parchment');
-        let MentionBlot = Quill.import('formats/mention');
 
         class DividerBlot extends BlockEmbed {
 
