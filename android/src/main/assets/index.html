@@ -190,8 +190,9 @@
       var replaceText;
 
       document.addEventListener('DOMContentLoaded', () => {
-        let BlockEmbed = Quill.import('blots/block/embed');
         let Delta = Quill.import('delta');
+        let Keyboard = Quill.import('modules/keyboard');
+        let BlockEmbed = Quill.import('blots/block/embed');
         let CodeBlock = Quill.import('formats/code-block');
 
         class DividerBlot extends BlockEmbed {
@@ -213,11 +214,11 @@
 
         let bindings = {
           'code exit': {
-            key: 'Enter',
+            key: Keyboard.keys.ENTER,
             collapsed: true,
             format: ['code-block'],
-            // prefix: /\n$/,
-            // suffix: /^\s+$/,
+            prefix: /\n$/,
+            suffix: /^\s+$/,
             handler: function(range) {
               const [line, offset] = this.quill.getLine(range.index);
               const delta = new Delta()
@@ -225,6 +226,16 @@
                 .retain(1, { 'code-block': null })
                 .delete(1);
               this.quill.updateContents(delta, Quill.sources.USER);
+            }
+          },
+          'blockquote delete': {
+            key: Keyboard.keys.BACKSPACE,
+            collapsed: true,
+            format: ['blockquote'],
+            prefix: /^$/,
+            suffix: /^$/,
+            handler: function(range) {
+              this.quill.format('blockquote', false, Quill.sources.USER);
             }
           }
         }
