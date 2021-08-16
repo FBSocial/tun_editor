@@ -205,7 +205,7 @@ class QuillEditorView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler {
                exec("setContents(\(deltaJsonStr))")
             }
         } catch {
-            print("set contents failed")
+            print("set contents failed: \(error)")
         }
     }
     
