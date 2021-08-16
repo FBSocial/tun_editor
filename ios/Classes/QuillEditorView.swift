@@ -199,7 +199,14 @@ class QuillEditorView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler {
     }
     
     private func setContents(_ delta: [Any]) {
-        exec("setContents(\(delta))")
+        do {
+            let deltaJson = try JSONSerialization.data(withJSONObject: delta, options: JSONSerialization.WritingOptions(rawValue: 0))
+            if let deltaJsonStr = String(data: deltaJson, encoding: .utf8) {
+               exec("setContents(\(deltaJsonStr))")
+            }
+        } catch {
+            print("set contents failed")
+        }
     }
     
     private func setup() {
