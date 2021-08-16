@@ -10,8 +10,6 @@ import io.flutter.plugin.platform.PlatformView
 import android.animation.ObjectAnimator
 
 
-
-
 internal class TunEditorView(
     val context: Context,
     id: Int,
@@ -24,6 +22,7 @@ internal class TunEditorView(
         const val INVOKE_METHOD_ON_SELECTION_CHANGE = "onSelectionChange"
         const val INVOKE_METHOD_ON_MENTION_CLICK = "onMentionClick"
         const val INVOKE_METHOD_ON_LINK_CLICK = "onLinkClick"
+        const val INVOKE_METHOD_ON_FOCUS_CHANGE = "onFocusChange"
 
         // Content related.
         const val HANDLE_METHOD_REPLACE_TEXT = "replaceText"
@@ -61,6 +60,7 @@ internal class TunEditorView(
         quillEditor.setOnTextChangeListener(null)
         quillEditor.setOnMentionClickListener(null)
         quillEditor.setOnLinkClickListener(null)
+        quillEditor.setOnFocusChangeListener(null)
         methodChannel.setMethodCallHandler(null)
     }
 
@@ -110,6 +110,9 @@ internal class TunEditorView(
         }
         quillEditor.setOnLinkClickListener { url ->
             methodChannel.invokeMethod(INVOKE_METHOD_ON_LINK_CLICK, url)
+        }
+        quillEditor.setOnFocusChangeListener { hasFocus ->
+            methodChannel.invokeMethod(INVOKE_METHOD_ON_FOCUS_CHANGE, hasFocus)
         }
         methodChannel.setMethodCallHandler(this)
     }

@@ -116,11 +116,6 @@ class TunEditorController {
     _tunEditorApi?.focus();
   }
 
-  /// Request unfocus to editor.
-  void blur() {
-    _tunEditorApi?.blur();
-  }
-
   void scrollTo(int offset) {
     _tunEditorApi?.scrollTo(offset);
   }

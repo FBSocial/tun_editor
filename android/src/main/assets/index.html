@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width">
+    <meta name="viewport" content="width=device-width,user-scalable=no,minimum-scale=1.0,maximum-scale=1.0"/>
     <title>Tun Editor</title>
     <link rel="stylesheet" href="normalize.css" type="text/css" charset="utf-8">
     <link rel="stylesheet" href="snow.css" type="text/css" charset="utf-8">
@@ -61,20 +61,24 @@
         width: auto;
       }
       hr {
-        border: 1px solid #8f959e1e;
+        border: 0 none;
+        height: 1px;
+        color: #8f959e1e;
+        background-color: #8f959e1e;
       }
       .ql-snow .ql-editor blockquote {
         border-left: 2px solid #5562F2;
         padding-left: 12px;
+        color: #646A73;
       }
       .ql-snow .ql-editor pre.ql-syntax {
         font-size: 14px;
         color: #646A73;
         background-color: #F5F5F8;
         border-radius: 4px;
-        border: 1px solid rgba(143, 149, 158, 0.2);
+        border: 0.5px solid #8f959e14;
         margin: 0;
-        padding: 24px 16px;
+        padding: 16px 24px;
         box-sizing: border-box;
       }
       .ql-snow .ql-editor pre {
@@ -83,6 +87,9 @@
         border-radius: 4px;
         border: 1px solid rgba(143, 149, 158, 0.2);
         counter-reset: line-numbering;
+      }
+      .ql-snow a {
+        color: #5562F2;
       }
       pre .hljs-line::before {
         display: inline-block;
@@ -130,6 +137,12 @@
         onLinkClick: function(url) {
           if (isAndroid) {
             tun.onLinkClick(url);
+          } else if (isIOS) {
+          }
+        },
+        onFocusChange: function(hasFocus) {
+          if (isAndroid) {
+            tun.onFocusChange(hasFocus);
           } else if (isIOS) {
           }
         },
@@ -192,19 +205,6 @@
               this.quill.updateContents(delta, Quill.sources.USER);
             }
           }
-        }
-        async function suggestPeople(searchTerm) {
-          const allPeople = [
-            {
-              id: 1,
-              value: "Fredrik Sundqvist"
-            },
-            {
-              id: 2,
-              value: "Patrik Sjölin"
-            }
-          ];
-          return allPeople.filter(person => person.value.includes(searchTerm));
         }
         var options = {
           readOnly: false,
@@ -287,6 +287,12 @@
             var format = quill.getFormat()
             bridge.onSelectionChange(range.index, range.length, JSON.stringify(format));
           }
+        });
+        quill.root.addEventListener('blur', function() {
+          bridge.onFocusChange(false);
+        });
+        quill.root.addEventListener('focus', function() {
+          bridge.onFocusChange(true);
         });
 
         var markdownOptions = {

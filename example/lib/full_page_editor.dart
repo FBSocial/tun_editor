@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:tun_editor/iconfont.dart';
 import 'package:tun_editor/models/documents/document.dart';
 import 'package:tun_editor/tun_editor.dart';
 import 'package:tun_editor/tun_editor_toolbar.dart';
@@ -23,13 +24,20 @@ class FullPageEditorState extends State<FullPageEditor> {
   bool isLoading = true;
   late TunEditorController _controller;
 
-  FocusNode focusNode = FocusNode();
+  FocusNode _titleFocusNode = FocusNode();
+  FocusNode _editorFocusNode = FocusNode();
 
   @override
   void initState() {
     super.initState();
   
     _loadDocument();
+    // _editorFocusNode.addListener(() {
+    //   if (_editorFocusNode.hasFocus) {
+    //     _titleFocusNode.unfocus();
+    //     _editorFocusNode.requestFocus();
+    //   }
+    // });
   }
 
   @override
@@ -39,12 +47,11 @@ class FullPageEditorState extends State<FullPageEditor> {
     }
 
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
         title: GestureDetector(
           child: Text("Editor"),
           onTap: () {
-            _controller.insertMention('1', 'Jeffrey Wu');
+            // _controller.insertMention('1', 'Jeffrey Wu');
             // if (focusNode.hasFocus) {
             //   focusNode.unfocus();
             // } else {
@@ -65,6 +72,10 @@ class FullPageEditorState extends State<FullPageEditor> {
           alignment: Alignment.center,
           child: Column(
             children: [
+              TextField(
+                focusNode: _titleFocusNode,
+                textInputAction: TextInputAction.next,
+              ),
               Expanded(
                 child: TunEditor(
                   controller: _controller,
@@ -73,7 +84,7 @@ class FullPageEditorState extends State<FullPageEditor> {
                     horizontal: 15,
                   ),
                   placeholder: "Hello World!",
-                  focusNode: focusNode,
+                  focusNode: _editorFocusNode,
                   autoFocus: false,
                   readOnly: false,
 
@@ -82,6 +93,12 @@ class FullPageEditorState extends State<FullPageEditor> {
                   },
                   onLinkClick: (String url) {
                     debugPrint('link click $url');
+                  },
+                  onFocusChange: (bool hasFocus) {
+                    // if (hasFocus) {
+                    //   _titleFocusNode.nextFocus();
+                    // }
+                    // _titleFocusNode.unfocus();
                   },
                 ),
               ),
@@ -115,13 +132,27 @@ class FullPageEditorState extends State<FullPageEditor> {
 
                 //   ToolbarMenu.link,
                 // ],
-                // children: [
-                //   IconButton(
-                //     icon: Icon(Icons.add),
-                //     onPressed: () {
-                //     },
-                //   ),
-                // ],
+               children: [
+                 Spacer(),
+
+                 // Send button.
+                 GestureDetector(
+                   onTap: () {},
+                   child: Container(
+                     width: 48,
+                     height: 36,
+                     decoration: BoxDecoration(
+                       color: Color(0x268F959E),
+                       borderRadius: BorderRadius.circular(18),
+                     ),
+                     child: Icon(
+                       IconFont.send,
+                       size: 24,
+                       color: Color(0xA6363940),
+                     ),
+                   ),
+                 ),
+               ],
               ),
             ],
           ),
@@ -146,15 +177,12 @@ class FullPageEditorState extends State<FullPageEditor> {
         selection: TextSelection.collapsed(offset: 0),
     );
     _controller.document.changes.listen((event) {
-      final delta1 = json.encode(event.item1.toJson());
+      // final delta1 = json.encode(event.item1.toJson());
       final delta2 = json.encode(event.item2.toJson());
-      debugPrint('event: $delta1 - $delta2');
+      debugPrint('event:  $delta2');
 
       final doc = json.encode(_controller.document.toDelta().toJson());
       debugPrint('document: $doc');
-    });
-    focusNode.addListener(() {
-      debugPrint('focus node listener: ${focusNode.hasFocus}');
     });
     setState(() {
       isLoading = false;

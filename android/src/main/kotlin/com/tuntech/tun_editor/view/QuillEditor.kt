@@ -49,6 +49,7 @@ class QuillEditor: WebView {
     private var onSelectionChangeListener: ((Int, Int, String) -> Unit)? = null
     private var onMentionClickListener: ((String, String) -> Unit)? = null
     private var onLinkClickListener: ((String) -> Unit)? = null
+    private var onFocusChangeListener: ((Boolean) -> Unit)? = null
 
     init {
         isVerticalScrollBarEnabled = false
@@ -90,6 +91,11 @@ class QuillEditor: WebView {
             onLinkClickListener = { url ->
                 (context as Activity).runOnUiThread {
                     onLinkClickListener?.invoke(url)
+                }
+            },
+            onFocusChangeListener = { hasFocus ->
+                (context as Activity).runOnUiThread {
+                    onFocusChangeListener?.invoke(hasFocus)
                 }
             }
         ), "tun")
@@ -170,6 +176,10 @@ class QuillEditor: WebView {
         this.onLinkClickListener = onLinkClick
     }
 
+    fun setOnFocusChangeListener(onFocusChangeListener: ((Boolean) -> Unit)?) {
+        this.onFocusChangeListener = onFocusChangeListener
+    }
+
     private fun setPlaceholder(placeholder: String) {
         exec("javascript:setPlaceholder(\"$placeholder\")")
     }
@@ -207,7 +217,8 @@ class QuillEditor: WebView {
         private val onTextChangeListener: ((String, String) -> Unit),
         private val onSelectionChangeListener: (Int, Int, String) -> Unit,
         private val onMentionClickListener: ((String, String) -> Unit),
-        private val onLinkClickListener: ((String) -> Unit)
+        private val onLinkClickListener: ((String) -> Unit),
+        private val onFocusChangeListener: ((Boolean) -> Unit)
     ) {
         @JavascriptInterface
         fun onSelectionChange(index: Int, length: Int, format: String) {
@@ -227,6 +238,11 @@ class QuillEditor: WebView {
         @JavascriptInterface
         fun onLinkClick(url: String) {
             onLinkClickListener(url)
+        }
+
+        @JavascriptInterface
+        fun onFocusChange(hasFocus: Boolean) {
+            onFocusChangeListener.invoke(hasFocus)
         }
     }
 

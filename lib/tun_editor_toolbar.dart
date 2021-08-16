@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:tun_editor/iconfont.dart';
 import 'package:tun_editor/controller.dart';
 import 'package:tun_editor/link_format_dialog.dart';
@@ -77,8 +78,19 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
 
   @override
   Widget build(BuildContext context) {
+    ScreenUtil.init(
+      BoxConstraints(
+          maxWidth: MediaQuery.of(context).size.width,
+          maxHeight: MediaQuery.of(context).size.height),
+      designSize: Size(375, 812),
+      orientation: Orientation.portrait,
+    );
+
     return Container(
       width: double.infinity,
+      decoration: BoxDecoration(
+        color: Colors.transparent,
+      ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -86,7 +98,7 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
           buildSubToolbar(),
           showingSubToolbar == SubToolbar.textType
             || showingSubToolbar == SubToolbar.textStyle ? SizedBox(height: 4) : SizedBox.shrink(),
-          Divider(height: 1, thickness: 1, color: Color(0x148F959E)),
+          Divider(height: 0.5.w, color: Color(0x148F959E)),
           buildMainToolbar(),
         ],
       ),
@@ -110,7 +122,7 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
           () => toggleSubToolbar(SubToolbar.at),
           false,
         ),
-        SizedBox(width: 8),
+        SizedBox(width: 8.w),
       ]);
     }
     if (menu.contains(ToolbarMenu.image)) {
@@ -120,7 +132,7 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
           () => toggleSubToolbar(SubToolbar.image),
           false,
         ),
-        SizedBox(width: 8),
+        SizedBox(width: 8.w),
       ]);
     }
     if (menu.contains(ToolbarMenu.emoji)) {
@@ -130,7 +142,7 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
           () => toggleSubToolbar(SubToolbar.emoji),
           false,
         ),
-        SizedBox(width: 8),
+        SizedBox(width: 8.w),
       ]);
     }
     if (menu.contains(ToolbarMenu.textType)) {
@@ -140,7 +152,7 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
           () => toggleSubToolbar(SubToolbar.textType),
           showingSubToolbar == SubToolbar.textType,
         ),
-        SizedBox(width: 8),
+        SizedBox(width: 8.w),
       ]);
     }
     if (menu.contains(ToolbarMenu.textStyle)) {
@@ -150,7 +162,7 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
           () => toggleSubToolbar(SubToolbar.textStyle),
           showingSubToolbar == SubToolbar.textStyle,
         ),
-        SizedBox(width: 8),
+        SizedBox(width: 8.w),
       ]);
     }
     if (menu.contains(ToolbarMenu.link)) {
@@ -160,7 +172,7 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
           () => onLinkFormatClick(),
           currentTextStyleList.contains(Attribute.link.uniqueKey),
         ),
-        SizedBox(width: 8),
+        SizedBox(width: 8.w),
       ]);
     }
     if (menuList.isNotEmpty) {
@@ -174,32 +186,15 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
     }
     return Container(
       width: double.infinity,
-      height: 48,
+      height: 48.w,
       padding: EdgeInsets.symmetric(
-        horizontal: 12,
+        horizontal: 12.w,
+      ),
+      decoration: BoxDecoration(
+        color: Colors.white,
       ),
       child: Row(
-        children: [
-          ...menuList,
-
-          // Send button.
-          GestureDetector(
-            onTap: onSendClick,
-            child: Container(
-              width: 48,
-              height: 36,
-              decoration: BoxDecoration(
-                color: Color(0x268F959E),
-                borderRadius: BorderRadius.circular(18),
-              ),
-              child: Icon(
-                IconFont.send,
-                size: 24,
-                color: isCanSend ? Color(0xFF5562F2) : Color(0xA6363940),
-              ),
-            ),
-          ),
-        ],
+        children: menuList,
       ),
     );
   }
@@ -226,7 +221,7 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
           () => toggleTextType(Attribute.h1.uniqueKey),
           currentTextType == Attribute.h1.uniqueKey,
         ),
-        SizedBox(width: 8),
+        SizedBox(width: 8.w),
       ]);
     }
     if (menu.contains(ToolbarMenu.textTypeHeadline2)) {
@@ -236,7 +231,7 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
           () => toggleTextType(Attribute.h2.uniqueKey),
           currentTextType == Attribute.h2.uniqueKey,
         ),
-        SizedBox(width: 8),
+        SizedBox(width: 8.w),
       ]);
     }
     if (menu.contains(ToolbarMenu.textTypeHeadline3)) {
@@ -246,7 +241,7 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
           () => toggleTextType(Attribute.h3.uniqueKey),
           currentTextType == Attribute.h3.uniqueKey,
         ),
-        SizedBox(width: 8),
+        SizedBox(width: 8.w),
       ]);
     }
     if (menu.contains(ToolbarMenu.textTypeListBullet)) {
@@ -256,7 +251,7 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
           () => toggleTextType(Attribute.ul.uniqueKey),
           currentTextType == Attribute.ul.uniqueKey,
         ),
-        SizedBox(width: 8),
+        SizedBox(width: 8.w),
       ]);
     }
     if (menu.contains(ToolbarMenu.textTypeListOrdered)) {
@@ -266,7 +261,7 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
           () => toggleTextType(Attribute.ol.uniqueKey),
           currentTextType == Attribute.ol.uniqueKey,
         ),
-        SizedBox(width: 8),
+        SizedBox(width: 8.w),
       ]);
     }
     if (menu.contains(ToolbarMenu.textTypeDivider)) {
@@ -276,7 +271,7 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
           onDividerClick,
           false,
         ),
-        SizedBox(width: 8),
+        SizedBox(width: 8.w),
       ]);
     }
     if (menu.contains(ToolbarMenu.textTypeQuote)) {
@@ -286,7 +281,7 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
           () => toggleTextType(Attribute.blockQuote.uniqueKey),
           currentTextType == Attribute.blockQuote.uniqueKey,
         ),
-        SizedBox(width: 8),
+        SizedBox(width: 8.w),
       ]);
     }
     if (menu.contains(ToolbarMenu.textTypeCodeBlock)) {
@@ -296,7 +291,7 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
           () => toggleTextType(Attribute.codeBlock.uniqueKey),
           currentTextType == Attribute.codeBlock.uniqueKey,
         ),
-        SizedBox(width: 8),
+        SizedBox(width: 8.w),
       ]);
     }
     if (textTypeMenuList.isNotEmpty) {
@@ -304,20 +299,21 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
     }
     return Padding(
       padding: EdgeInsets.symmetric(
-        horizontal: 4,
+        horizontal: 4.w,
       ),
       child: Container(
-        height: 44,
+        height: 44.w,
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(4),
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(4.w),
           border: Border.all(
-            width: 1,
+            width: 1.w,
             color: Color(0x198F959E),
           ),
           boxShadow: [
             BoxShadow(
-              offset: Offset(0, 5),
-              blurRadius: 20,
+              offset: Offset(0, 5.w),
+              blurRadius: 20.w,
               color: Color(0x0C646A73),
             ),
           ],
@@ -325,9 +321,9 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            SizedBox(width: 10),
+            SizedBox(width: 10.w),
             ...textTypeMenuList,
-            SizedBox(width: 10),
+            SizedBox(width: 10.w),
           ],
         ),
       ),
@@ -344,7 +340,7 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
           () => toggleTextStyle(Attribute.bold.uniqueKey),
           currentTextStyleList.contains(Attribute.bold.uniqueKey),
         ),
-        SizedBox(width: 8),
+        SizedBox(width: 8.w),
       ]);
     }
     if (menu.contains(ToolbarMenu.textStyleItalic)) {
@@ -354,7 +350,7 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
           () => toggleTextStyle(Attribute.italic.uniqueKey),
           currentTextStyleList.contains(Attribute.italic.uniqueKey),
         ),
-        SizedBox(width: 8),
+        SizedBox(width: 8.w),
       ]);
     }
     if (menu.contains(ToolbarMenu.textStyleUnderline)) {
@@ -364,7 +360,7 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
           () => toggleTextStyle(Attribute.underline.uniqueKey),
           currentTextStyleList.contains(Attribute.underline.uniqueKey),
         ),
-        SizedBox(width: 8),
+        SizedBox(width: 8.w),
       ]);
     }
     if (menu.contains(ToolbarMenu.textStyleStrikeThrough)) {
@@ -374,7 +370,7 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
           () => toggleTextStyle(Attribute.strikeThrough.uniqueKey),
           currentTextStyleList.contains(Attribute.strikeThrough.uniqueKey),
         ),
-        SizedBox(width: 8),
+        SizedBox(width: 8.w),
       ]);
     }
     if (textStyleMenuList.isNotEmpty) {
@@ -382,20 +378,21 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
     }
     return Padding(
       padding: EdgeInsets.symmetric(
-        horizontal: 4,
+        horizontal: 4.w,
       ),
       child: Container(
-        height: 44,
+        height: 44.w,
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(4),
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(4.w),
           border: Border.all(
-            width: 1,
+            width: 1.w,
             color: Color(0x198F959E),
           ),
           boxShadow: [
             BoxShadow(
-              offset: Offset(0, 5),
-              blurRadius: 20,
+              offset: Offset(0, 5.w),
+              blurRadius: 20.w,
               color: Color(0x0C646A73),
             ),
           ],
@@ -403,9 +400,9 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            SizedBox(width: 10),
+            SizedBox(width: 10.w),
             ...textStyleMenuList,
-            SizedBox(width: 10),
+            SizedBox(width: 10.w),
           ],
         ),
       ),
@@ -416,13 +413,13 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
     return GestureDetector(
       onTap: onPressed,
       child: Container(
-        width: 36,
-        height: 36,
+        width: 36.w,
+        height: 36.w,
         decoration: BoxDecoration(
           color: isActive ? Color(0x268F959E) : Colors.transparent,
-          borderRadius: isActive ? BorderRadius.circular(3) : BorderRadius.zero,
+          borderRadius: isActive ? BorderRadius.circular(3.w) : BorderRadius.zero,
         ),
-        child: Icon(iconData, size: 24, color: Color(0xFF363940)),
+        child: Icon(iconData, size: 24.w, color: Color(0xFF363940)),
       ),
     );
   }
@@ -431,11 +428,11 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
     return GestureDetector(
       onTap: onPressed,
       child: Container(
-        width: 36,
-        height: 36,
+        width: 36.w,
+        height: 36.w,
         child: Icon(
           iconData,
-          size: 24,
+          size: 24.w,
           color: isActive ? Color(0xFF5562F2) : Color(0xFF363940),
         ),
       ),

@@ -27,6 +27,8 @@ class TunEditor extends StatefulWidget {
   final MentionClickCallback? onMentionClick;
   final LinkClickCallback? onLinkClick;
 
+  final ValueChanged<bool>? onFocusChange;
+
   const TunEditor({
     Key? key,
     required this.controller,
@@ -40,6 +42,7 @@ class TunEditor extends StatefulWidget {
     this.focusNode,
     this.onMentionClick,
     this.onLinkClick,
+    this.onFocusChange,
   }) : super(key: key);
 
   @override
@@ -62,7 +65,8 @@ class TunEditorState extends State<TunEditor> with TunEditorHandler {
   FocusNode? get focusNode => widget.focusNode;
   MentionClickCallback? get mentionClickCallback => widget.onMentionClick;
   LinkClickCallback? get linkClickCallback => widget.onLinkClick;
-  
+  ValueChanged<bool>? get onFocusChangeCallback => widget.onFocusChange;
+
   @override
   void initState() {
     super.initState();
@@ -89,41 +93,46 @@ class TunEditorState extends State<TunEditor> with TunEditorHandler {
 
     if (Platform.isAndroid) {
       // Android platform.
-      return Focus(
-        focusNode: focusNode,
-        canRequestFocus: true,
-        onFocusChange: (bool hasFocus) {
-          debugPrint('on focus changed: $hasFocus');
-          if (hasFocus) {
-            controller.focus();
-          } else {
-            controller.blur();
-          }
+      return GestureDetector(
+        behavior: HitTestBehavior.translucent,
+        onTap: () {
+          debugPrint('on editor tap');
         },
-        child: PlatformViewLink(
-          viewType: VIEW_TYPE_TUN_EDITOR,
-          surfaceFactory: (BuildContext context, PlatformViewController controller) {
-            return AndroidViewSurface(
-              controller: controller as AndroidViewController,
-              gestureRecognizers: {},
-              hitTestBehavior: PlatformViewHitTestBehavior.opaque,
-            );
+        child: Focus(
+          focusNode: focusNode,
+          canRequestFocus: true,
+          onFocusChange: (bool hasFocus) {
+            if (hasFocus) {
+              _tunEditorApi.focus();
+            } else {
+              _tunEditorApi.blur();
+            }
           },
-          onCreatePlatformView: (PlatformViewCreationParams params) {
-            return PlatformViewsService.initSurfaceAndroidView(
-              id: params.id,
-              viewType: VIEW_TYPE_TUN_EDITOR,
-              layoutDirection: TextDirection.ltr,
-              creationParams: creationParams,
-              creationParamsCodec: StandardMessageCodec(),
-            )
-              ..addOnPlatformViewCreatedListener(params.onPlatformViewCreated)
-              ..addOnPlatformViewCreatedListener((int id) {
-                _tunEditorApi = TunEditorApi(id, this);
-                controller.setTunEditorApi(_tunEditorApi);
-              })
-              ..create();
-          },
+          child: PlatformViewLink(
+            viewType: VIEW_TYPE_TUN_EDITOR,
+            surfaceFactory: (BuildContext context, PlatformViewController controller) {
+              return AndroidViewSurface(
+                controller: controller as AndroidViewController,
+                gestureRecognizers: {},
+                hitTestBehavior: PlatformViewHitTestBehavior.translucent,
+              );
+            },
+            onCreatePlatformView: (PlatformViewCreationParams params) {
+              return PlatformViewsService.initSurfaceAndroidView(
+                id: params.id,
+                viewType: VIEW_TYPE_TUN_EDITOR,
+                layoutDirection: TextDirection.ltr,
+                creationParams: creationParams,
+                creationParamsCodec: StandardMessageCodec(),
+              )
+                ..addOnPlatformViewCreatedListener(params.onPlatformViewCreated)
+                ..addOnPlatformViewCreatedListener((int id) {
+                  _tunEditorApi = TunEditorApi(id, this);
+                  controller.setTunEditorApi(_tunEditorApi);
+                })
+                ..create();
+            },
+          ),
         ),
       );
 
@@ -176,6 +185,16 @@ class TunEditorState extends State<TunEditor> with TunEditorHandler {
   @override
   void onLinkClick(String url) {
     linkClickCallback?.call(url);
+  }
+
+  @override
+  void onFocusChange(bool hasFocus) {
+    onFocusChangeCallback?.call(hasFocus);
+    // if (hasFocus) {
+    //   focusNode?.requestFocus();
+    // } else {
+    //   focusNode?.unfocus();
+    // }
   }
 
 }

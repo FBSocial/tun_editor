@@ -11,7 +11,7 @@ dependencies:
   flutter:
     sdk: flutter
   tuple: ^2.0.0
-  ios_platform_images: ^0.2.0
+  flutter_screenutil: ^5.0.0+2
 
 dev_dependencies:
   flutter_test:
