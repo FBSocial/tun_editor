@@ -94,6 +94,10 @@ class TunEditorController {
   /// Insert divider to current [selection].
   void insertDivider() {
     _tunEditorApi?.insertDivider();
+    // compose(new Delta()
+    //     ..retain(selection.extentOffset)
+    //     ..insert('\n')
+    //     ..insert({ 'divider': true }), null, ChangeSource.LOCAL);
   }
 
   /// Insert [text] with [link] format to current [selection].
@@ -176,7 +180,6 @@ class TunEditorController {
   }
 
   void composeDocument(Delta delta) {
-    debugPrint('compose new delta: ${delta.toJson()}');
     document.compose(delta, ChangeSource.LOCAL);
   }
 

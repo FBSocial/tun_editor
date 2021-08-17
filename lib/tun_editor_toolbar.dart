@@ -5,6 +5,8 @@ import 'package:tun_editor/iconfont.dart';
 import 'package:tun_editor/controller.dart';
 import 'package:tun_editor/link_format_dialog.dart';
 import 'package:tun_editor/models/documents/attribute.dart';
+import 'package:tun_editor/models/documents/document.dart';
+import 'package:tun_editor/models/quill_delta.dart';
 
 class TunEditorToolbar extends StatefulWidget {
 
@@ -445,11 +447,40 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
   }
 
   void onDividerClick() {
-    // Disable insert divider if in code block.
-    if (currentTextType == Attribute.codeBlock.uniqueKey) {
+    final child = controller.document.queryChild(controller.selection.extentOffset);
+    if (child.node == null) {
       return;
     }
-    controller.insertDivider();
+
+    debugPrint('child: ${child.node!.style.attributes}');
+    final delta = new Delta();
+    final lineEndOffset = child.node!.documentOffset + child.node!.length - 1;
+    delta.retain(lineEndOffset);
+
+    if (child.node!.style.attributes.containsKey(Attribute.header.key)) {
+      delta.insert('\n', child.node!.style.attributes[Attribute.header.key]!.toJson());
+      delta.retain(1, Attribute.header.toJson());
+    } else if (child.node!.style.attributes.containsKey(Attribute.list.key)) {
+      delta.insert('\n', child.node!.style.attributes[Attribute.list.key]!.toJson());
+      delta.retain(1, Attribute.list.toJson());
+    } else if (child.node!.style.attributes.containsKey(Attribute.codeBlock.key)) {
+      delta.insert('\n', child.node!.style.attributes[Attribute.codeBlock.key]!.toJson());
+      delta.retain(1, Attribute.codeBlock.toJson());
+    } else if (child.node!.style.attributes.containsKey(Attribute.blockQuote.key)) {
+      delta.insert('\n', child.node!.style.attributes[Attribute.blockQuote.key]!.toJson());
+      delta.retain(1, Attribute.blockQuote.toJson());
+    } else {
+      delta.insert('\n');
+    }
+    controller.compose(delta, null, ChangeSource.LOCAL);
+
+    final dividerDelta = new Delta()
+        ..retain(lineEndOffset + 1)
+        ..insert({ 'divider': 'hr' });
+    controller.compose(dividerDelta, null, ChangeSource.LOCAL);
+
+    controller.updateSelection(TextSelection.collapsed(
+      offset: lineEndOffset + 2), ChangeSource.LOCAL);
   }
 
   void toggleTextType(String textType) {
