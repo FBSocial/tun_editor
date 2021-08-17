@@ -420,9 +420,19 @@
         setContents = function(delta) {
           quill.setContents(delta, Quill.sources.SILENT);
         }
-        replaceText = function(index, length, data) {
-          var delta = new Delta().retain(index).delete(length).insert(data)
-          quill.updateContents(delta);
+        replaceText = function(index, length, data, attributes, newLineAfterImage, isEmbeddable) {
+          if (isEmbeddable) {
+            var delta = new Delta().retain(index).delete(length).insert(data, attributes)
+            if (Object.keys(data).length > 0
+                    && Object.keys(data)[0] === 'image'
+                    && newLineAfterImage) {
+              delta = delta.insert('\n');
+            }
+            quill.updateContents(delta);
+          } else {
+            let delta = new Delta().retain(index).delete(length).insert(data, attributes)
+            quill.updateContents(delta);
+          }
         }
         updateContents = function(delta, source) {
           quill.updateContents(delta, source);

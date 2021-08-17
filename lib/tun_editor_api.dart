@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:tun_editor/models/documents/attribute.dart';
 import 'package:tun_editor/models/documents/document.dart';
+import 'package:tun_editor/models/documents/nodes/embed.dart';
 import 'package:tun_editor/models/quill_delta.dart';
 
 class TunEditorApi {
@@ -66,11 +67,20 @@ class TunEditorApi {
   }
 
   // Content related.
-  void replaceText(int index, int len, Object? data) {
+  void replaceText(int index, int len, Object? data, {
+    List<Attribute> attributes = const [],
+    bool autoAppendNewlineAfterImage = true,
+  }) {
+    final Map<String, dynamic> attrMap = {};
+    for (final attr in attributes) {
+      attrMap[attr.key] = attr.value;
+    }
     _channel.invokeMethod('replaceText', {
       'index': index,
       'len': len,
-      'data': data,
+      'data': data is Embeddable ? data.toJson() : data,
+      'attributes': attrMap,
+      'newLineAfterImage': autoAppendNewlineAfterImage,
     });
   }
   void updateContents(Delta delta, ChangeSource source) {

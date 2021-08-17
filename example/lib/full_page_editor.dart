@@ -5,7 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:tun_editor/iconfont.dart';
 import 'package:tun_editor/models/documents/attribute.dart';
 import 'package:tun_editor/models/documents/document.dart';
-import 'package:tun_editor/models/quill_delta.dart';
+import 'package:tun_editor/models/documents/nodes/embed.dart';
 import 'package:tun_editor/tun_editor.dart';
 import 'package:tun_editor/tun_editor_toolbar.dart';
 import 'package:tun_editor/controller.dart';
@@ -32,9 +32,8 @@ class FullPageEditorState extends State<FullPageEditor> {
   @override
   void initState() {
     super.initState();
-  
+
     _loadDocument();
-    // _controller.document.isEmpty();
     // _editorFocusNode.addListener(() {
     //   if (_editorFocusNode.hasFocus) {
     //     _titleFocusNode.unfocus();
@@ -52,8 +51,21 @@ class FullPageEditorState extends State<FullPageEditor> {
     return Scaffold(
       appBar: AppBar(
         title: GestureDetector(
-          child: Text("Editor"),
+          child: Text('Editor'),
           onTap: () {
+            // _controller.updateSelection(TextSelection.collapsed(offset: 10), ChangeSource.LOCAL);
+
+            final imageBlock = BlockEmbed.image(
+              'https://user-images.githubusercontent.com/122956/72955931-ccc07900-3d52-11ea-89b1-d468a6e2aa2b.png',
+            );
+            _controller.replaceText(0, 0, imageBlock, null,
+              ignoreFocus: true,
+              autoAppendNewlineAfterImage: false,
+              attributes: [
+                WidthAttribute('300'),
+              ],
+            );
+
             // _controller.compose(new Delta()
             //     ..retain(1)
             //     ..insert('Hello World', Attribute.bold.toJson()),
@@ -67,7 +79,7 @@ class FullPageEditorState extends State<FullPageEditor> {
             // _controller.insertImage('https://avatars0.githubusercontent.com/u/1758864?s=460&v=4');
             // _controller.formatText(0, 2, Attribute.h1);
             // _controller.insert(2, 'Bye Bye');
-            //   _controller.insert(_controller.selection.baseOffset, "🛹");
+            //   _controller.insert(_controller.selection.baseOffset, '🛹');
             // _controller.replaceText(6, 5, 'Jeffrey Wu', null);
           },
         ),
@@ -92,11 +104,11 @@ class FullPageEditorState extends State<FullPageEditor> {
                         vertical: 12,
                         horizontal: 15,
                       ),
-                      placeholder: "Hello World!",
+                      placeholder: 'Hello World!',
                       focusNode: _editorFocusNode,
                       autoFocus: false,
                       readOnly: false,
-
+                      scrollable: true,
                       onMentionClick: (String id, String text) {
                         debugPrint('metion click $id, $text');
                       },

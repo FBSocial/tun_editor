@@ -116,12 +116,15 @@ class TunEditorView: NSObject, FlutterPlatformView {
         case "replaceText":
             if let args = call.arguments as? [String: Any] {
                 let index = args["index"] as? Int
-                let length = args["length"] as? Int
+                let length = args["len"] as? Int
                 let data = args["data"]
-                if index == nil || length == nil || data == nil {
+                let attributes = args["attributes"] as? [String: Any]
+                let newLineAfterImage = args["newLineAfterImage"] as? Bool
+                if index == nil || length == nil || data == nil || newLineAfterImage == nil || attributes == nil {
+                    print("invalid params \(index) \(length) \(data) \(newLineAfterImage) \(attributes)")
                     return
                 }
-                _editor.replaceText(index: index!, length: length!, data: data!)
+                _editor.replaceText(index: index!, length: length!, data: data!, attributes: attributes!, newLineAfterImage: newLineAfterImage!)
             }
         case "updateContents":
             if let args = call.arguments as? [String: Any] {

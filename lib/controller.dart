@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:tun_editor/models/documents/attribute.dart';
 import 'package:tun_editor/models/documents/document.dart';
+import 'package:tun_editor/models/documents/nodes/embed.dart';
 import 'package:tun_editor/models/quill_delta.dart';
 import 'package:tun_editor/tun_editor_api.dart';
 
@@ -37,8 +38,17 @@ class TunEditorController {
   /// Insert [data] at the given [index].
   /// And delete some words with [len] size.
   /// It will update selection, if [textSelection] is not null.
-  void replaceText(int index, int len, Object? data, TextSelection? textSelection) {
-    _tunEditorApi?.replaceText(index, len, data);
+  void replaceText(int index, int len, Object? data, TextSelection? textSelection, {
+    bool ignoreFocus = false,
+    bool autoAppendNewlineAfterImage = true,
+    List<Attribute> attributes = const [],
+  }) {
+    assert(data is String || data is Embeddable);
+    _tunEditorApi?.replaceText(
+      index, len, data,
+      autoAppendNewlineAfterImage: autoAppendNewlineAfterImage,
+      attributes: attributes,
+    );
 
     if (textSelection == null) {
       updateSelection(
@@ -47,6 +57,9 @@ class TunEditorController {
       );
     } else {
       updateSelection(textSelection, ChangeSource.LOCAL);
+    }
+    if (!ignoreFocus) {
+      focus();
     }
   }
 

@@ -6,15 +6,18 @@ import android.content.Context
 import android.os.Build
 import android.util.AttributeSet
 import android.util.Log
+import android.view.MotionEvent
 import android.view.inputmethod.InputMethodManager
 import android.webkit.JavascriptInterface
 import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import org.json.JSONArray
+import org.json.JSONObject
+import org.json.JSONTokener
 
 
-@SuppressLint("SetJavaScriptEnabled", "AddJavascriptInterface")
+@SuppressLint("SetJavaScriptEnabled", "AddJavascriptInterface", "ClickableViewAccessibility")
 class QuillEditor: WebView {
 
     companion object {
@@ -30,9 +33,10 @@ class QuillEditor: WebView {
     constructor(context: Context, attr: AttributeSet, defStyle: Int): super (context, attr, defStyle)
 
     constructor(context: Context, placeholder: String, padding: List<Int>, readOnly: Boolean,
-                autoFocus: Boolean, delta: List<*>): this(context) {
+                scrollable: Boolean, autoFocus: Boolean, delta: List<*>): this(context) {
         this.placeholder = placeholder
         this.readOnly = readOnly
+        this.scrollable = scrollable
         this.autoFocus = autoFocus
         this.padding = padding
         this.delta = delta
@@ -41,6 +45,7 @@ class QuillEditor: WebView {
 
     private var placeholder: String = ""
     private var readOnly: Boolean = false
+    private var scrollable: Boolean = false
     private var autoFocus: Boolean = false
     private var padding: List<Int> = listOf(12, 15, 12, 15)
     private var delta: List<*> = listOf<Map<String, Any>>()
@@ -63,6 +68,7 @@ class QuillEditor: WebView {
                 setPadding(padding)
                 setReadOnly(readOnly)
                 setContents(delta)
+                setScrollable(scrollable)
 
                 if (autoFocus) {
                     focus()
@@ -103,11 +109,24 @@ class QuillEditor: WebView {
         loadUrl(URL)
     }
 
-    fun replaceText(index: Int, length: Int, data: Any) {
-        if (data is String) {
-            exec("javascript:replaceText($index, $length, \"$data\")")
+    fun replaceText(index: Int, length: Int, data: Any,
+                    attributes: Map<*, *>, newLineAfterImage: Boolean) {
+        val attrJsonObject = JSONObject()
+        for ((k, v) in attributes) {
+            if (k is String) {
+                attrJsonObject.put(k, v)
+            }
+        }
+        if (data is Map<*, *>) {
+            val dataJsonObject = JSONObject()
+            for ((k, v) in data) {
+                if (k is String) {
+                    dataJsonObject.put(k, v)
+                }
+            }
+            exec("javascript:replaceText($index, $length, $dataJsonObject, $attrJsonObject, $newLineAfterImage, true)")
         } else {
-            exec("javascript:replaceText($index, $length, $data)")
+            exec("javascript:replaceText($index, $length, \"$data\", $attrJsonObject, $newLineAfterImage, false)")
         }
     }
 
@@ -204,6 +223,14 @@ class QuillEditor: WebView {
         exec("javascript:setContents(${JSONArray(delta)})")
     }
 
+    private fun setScrollable(scrollable: Boolean) {
+        if (scrollable) {
+            setOnTouchListener(null)
+        } else {
+            setOnTouchListener { _, event -> event.action == MotionEvent.ACTION_MOVE }
+        }
+    }
+
     private fun exec(command: String) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             evaluateJavascript(command, null)
@@ -211,11 +238,6 @@ class QuillEditor: WebView {
             loadUrl(command)
         }
     }
-
-    data class Selection(
-        val index: Int,
-        val length: Int
-    )
 
     class JSInterface(
         private val onTextChangeListener: ((String, String) -> Unit),

@@ -70,6 +70,7 @@ internal class TunEditorView(
         var padding: List<Int> = listOf(12, 15, 12, 15)
         var autoFocus = false
         var readOnly = false
+        var scrollable = false
         var delta: List<*> = listOf<Map<String, Any>>()
         if (creationParams?.containsKey("placeholder") == true) {
             placeholder = (creationParams["placeholder"] as? String) ?: ""
@@ -85,11 +86,14 @@ internal class TunEditorView(
         if (creationParams?.containsKey("readOnly") == true) {
             readOnly = (creationParams["readOnly"] as? Boolean) ?: false
         }
+        if (creationParams?.containsKey("scrollable") == true)  {
+            scrollable = (creationParams["scrollable"] as? Boolean) ?: true
+        }
         if (creationParams?.containsKey("delta") == true) {
             delta = (creationParams["delta"] as? List<*>) ?: listOf<Map<String, Any>>()
         }
 
-        quillEditor = QuillEditor(context, placeholder, padding, readOnly, autoFocus, delta)
+        quillEditor = QuillEditor(context, placeholder, padding, readOnly, scrollable, autoFocus, delta)
         quillEditor.setOnTextChangeListener { changeDelta, oldDelta ->
             val text = HashMap<String, String>()
             text["delta"] = changeDelta
@@ -126,7 +130,9 @@ internal class TunEditorView(
                 val index = args["index"] as? Int ?: return
                 val len = args["len"] as? Int ?: return
                 val data = args["data"] ?: return
-                quillEditor.replaceText(index, len, data)
+                val attributes = args["attributes"] as? Map<*, *> ?: return
+                val newLineAfterImage = args["newLineAfterImage"] as? Boolean ?: return
+                quillEditor.replaceText(index, len, data, attributes, newLineAfterImage)
                 result.success(null)
             }
             HANDLE_METHOD_UPDATE_CONTENTS -> {

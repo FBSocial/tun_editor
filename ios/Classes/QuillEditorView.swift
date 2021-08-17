@@ -109,11 +109,29 @@ class QuillEditorView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler {
         }
     }
     
-    func replaceText(index: Int, length: Int, data: Any) {
-        if data is String {
-            exec("replaceText(\(index), \(length), \"\(data)\")")
-        } else {
-            exec("replaceText(\(index), \(length), \(data))")
+    func replaceText(index: Int, length: Int, data: Any, attributes: [String: Any], newLineAfterImage: Bool) {
+        do {
+            let attributesJson = try JSONSerialization.data(withJSONObject: attributes, options: JSONSerialization.WritingOptions(rawValue: 0))
+            let attributesJsonStr = String(data: attributesJson, encoding: .utf8)
+            if attributesJsonStr == nil {
+                print("attributes json str is nil")
+                return
+            }
+         
+            if data is String {
+                exec("replaceText(\(index), \(length), \"\(data)\", \(attributesJsonStr!), \(newLineAfterImage), false)")
+            } else {
+                let dataJson = try JSONSerialization.data(withJSONObject: data, options: JSONSerialization.WritingOptions(rawValue: 0))
+                let dataJsonStr = String(data: dataJson, encoding: .utf8)
+                if dataJsonStr == nil {
+                    print("data json str is nil")
+                    return
+                }
+                print("replaceText(\(index), \(length), \(dataJsonStr!), \(attributesJsonStr!), \(newLineAfterImage), true)")
+                exec("replaceText(\(index), \(length), \(dataJsonStr!), \(attributesJsonStr!), \(newLineAfterImage), true)")
+            }
+        } catch {
+            print("replace text failed: \(error)")
         }
     }
     
@@ -161,7 +179,7 @@ class QuillEditorView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler {
     }
     
     func setSelection(index: Int, length: Int) {
-        exec("setSelection(\(index), \(length)")
+        exec("setSelection(\(index), \(length))")
     }
     
     func focus() {

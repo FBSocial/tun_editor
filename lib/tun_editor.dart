@@ -18,6 +18,7 @@ class TunEditor extends StatefulWidget {
   final String placeholder;
 
   final bool readOnly;
+  final bool scrollable;
 
   final EdgeInsets padding;
 
@@ -34,6 +35,7 @@ class TunEditor extends StatefulWidget {
     required this.controller,
     this.placeholder = '',
     this.readOnly = false,
+    this.scrollable = true,
     this.padding = const EdgeInsets.symmetric(
       vertical: 15,
       horizontal: 12,
@@ -60,6 +62,7 @@ class TunEditorState extends State<TunEditor> with TunEditorHandler {
   TunEditorController get controller => widget.controller;
   String get placeholder => widget.placeholder;
   bool get readOnly => widget.readOnly;
+  bool get scrollable => widget.scrollable;
   EdgeInsets get padding => widget.padding;
   bool get autoFocus => widget.autoFocus;
   FocusNode? get focusNode => widget.focusNode;
@@ -81,6 +84,7 @@ class TunEditorState extends State<TunEditor> with TunEditorHandler {
     Map<String, dynamic> creationParams = {
       'placeholder': placeholder,
       'readOnly': readOnly,
+      'scrollable': scrollable,
       'padding': [
         padding.top.toInt(),
         padding.right.toInt(),
