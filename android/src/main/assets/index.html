@@ -327,6 +327,7 @@
           if (source === Quill.sources.SILENT) {
             return;
           }
+          console.log('on text change', JSON.stringify(delta));
           bridge.onTextChange(JSON.stringify(delta), JSON.stringify(oldDelta), source);
 
           setTimeout(function() {

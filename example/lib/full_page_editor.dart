@@ -55,16 +55,16 @@ class FullPageEditorState extends State<FullPageEditor> {
           onTap: () {
             // _controller.updateSelection(TextSelection.collapsed(offset: 10), ChangeSource.LOCAL);
 
-            final imageBlock = BlockEmbed.image(
-              'https://user-images.githubusercontent.com/122956/72955931-ccc07900-3d52-11ea-89b1-d468a6e2aa2b.png',
-            );
-            _controller.replaceText(0, 0, imageBlock, null,
-              ignoreFocus: true,
-              autoAppendNewlineAfterImage: false,
-              attributes: [
-                WidthAttribute('300'),
-              ],
-            );
+            // final imageBlock = BlockEmbed.image(
+            //   'https://user-images.githubusercontent.com/122956/72955931-ccc07900-3d52-11ea-89b1-d468a6e2aa2b.png',
+            // );
+            // _controller.replaceText(0, 0, imageBlock, null,
+            //   ignoreFocus: false,
+            //   autoAppendNewlineAfterImage: true,
+            //   attributes: [
+            //     WidthAttribute('300'),
+            //   ],
+            // );
 
             // _controller.compose(new Delta()
             //     ..retain(1)
@@ -200,7 +200,8 @@ class FullPageEditorState extends State<FullPageEditor> {
 
   Future<void> _loadDocument() async {
     final result = await rootBundle.loadString('assets/sample_data.json');
-    final doc = Document.fromJson(jsonDecode(result));
+    // final doc = Document.fromJson(jsonDecode(result));
+    final doc = Document();
 
     _controller = TunEditorController(
         document: doc,

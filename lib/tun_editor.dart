@@ -97,46 +97,40 @@ class TunEditorState extends State<TunEditor> with TunEditorHandler {
 
     if (Platform.isAndroid) {
       // Android platform.
-      return GestureDetector(
-        behavior: HitTestBehavior.translucent,
-        onTap: () {
-          debugPrint('on editor tap');
+      return Focus(
+        focusNode: focusNode,
+        canRequestFocus: true,
+        onFocusChange: (bool hasFocus) {
+          if (hasFocus) {
+            _tunEditorApi.focus();
+          } else {
+            _tunEditorApi.blur();
+          }
         },
-        child: Focus(
-          focusNode: focusNode,
-          canRequestFocus: true,
-          onFocusChange: (bool hasFocus) {
-            if (hasFocus) {
-              _tunEditorApi.focus();
-            } else {
-              _tunEditorApi.blur();
-            }
+        child: PlatformViewLink(
+          viewType: VIEW_TYPE_TUN_EDITOR,
+          surfaceFactory: (BuildContext context, PlatformViewController controller) {
+            return AndroidViewSurface(
+              controller: controller as AndroidViewController,
+              gestureRecognizers: {},
+              hitTestBehavior: PlatformViewHitTestBehavior.translucent,
+            );
           },
-          child: PlatformViewLink(
-            viewType: VIEW_TYPE_TUN_EDITOR,
-            surfaceFactory: (BuildContext context, PlatformViewController controller) {
-              return AndroidViewSurface(
-                controller: controller as AndroidViewController,
-                gestureRecognizers: {},
-                hitTestBehavior: PlatformViewHitTestBehavior.translucent,
-              );
-            },
-            onCreatePlatformView: (PlatformViewCreationParams params) {
-              return PlatformViewsService.initSurfaceAndroidView(
-                id: params.id,
-                viewType: VIEW_TYPE_TUN_EDITOR,
-                layoutDirection: TextDirection.ltr,
-                creationParams: creationParams,
-                creationParamsCodec: StandardMessageCodec(),
-              )
-                ..addOnPlatformViewCreatedListener(params.onPlatformViewCreated)
-                ..addOnPlatformViewCreatedListener((int id) {
-                  _tunEditorApi = TunEditorApi(id, this);
-                  controller.setTunEditorApi(_tunEditorApi);
-                })
-                ..create();
-            },
-          ),
+          onCreatePlatformView: (PlatformViewCreationParams params) {
+            return PlatformViewsService.initSurfaceAndroidView(
+              id: params.id,
+              viewType: VIEW_TYPE_TUN_EDITOR,
+              layoutDirection: TextDirection.ltr,
+              creationParams: creationParams,
+              creationParamsCodec: StandardMessageCodec(),
+            )
+              ..addOnPlatformViewCreatedListener(params.onPlatformViewCreated)
+              ..addOnPlatformViewCreatedListener((int id) {
+                _tunEditorApi = TunEditorApi(id, this);
+                controller.setTunEditorApi(_tunEditorApi);
+              })
+              ..create();
+          },
         ),
       );
 

@@ -454,7 +454,18 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
 
   void toggleTextType(String textType) {
     if (currentTextType == textType) {
+      final lastTextType = currentTextType;
       currentTextType = FORMAT_TEXT_TYPE_NORMAL;
+
+      setState(() {});
+      if (lastTextType.startsWith(Attribute.header.key)) {
+        controller.format(Attribute.header.key, false);
+      } else if (lastTextType.startsWith(Attribute.list.key)) {
+        controller.format(Attribute.list.key, false);
+      } {
+        controller.format(lastTextType, false);
+      }
+      return;
     } else {
       currentTextType = textType;
     }

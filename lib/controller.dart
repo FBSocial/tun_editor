@@ -52,7 +52,7 @@ class TunEditorController {
 
     if (textSelection == null) {
       updateSelection(
-          TextSelection.collapsed(offset: index + (data is String ? data.length : 0)),
+          TextSelection.collapsed(offset: index + (data is String ? data.length : 1)),
           ChangeSource.LOCAL,
       );
     } else {

@@ -40,7 +40,6 @@ class QuillEditor: WebView {
         this.autoFocus = autoFocus
         this.padding = padding
         this.delta = delta
-        Log.d(TAG, "delta: $delta")
     }
 
     private var placeholder: String = ""
