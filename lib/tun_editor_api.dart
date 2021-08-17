@@ -2,6 +2,8 @@ import 'dart:convert';
 
 import 'package:flutter/services.dart';
 import 'package:tun_editor/models/documents/attribute.dart';
+import 'package:tun_editor/models/documents/document.dart';
+import 'package:tun_editor/models/quill_delta.dart';
 
 class TunEditorApi {
 
@@ -69,6 +71,12 @@ class TunEditorApi {
       'index': index,
       'len': len,
       'data': data,
+    });
+  }
+  void updateContents(Delta delta, ChangeSource source) {
+    _channel.invokeMethod('updateContents', {
+      'delta': delta.toJson(),
+      'source': source == ChangeSource.LOCAL ? 'user' : 'api',
     });
   }
   void insertMention(String id, String text) {

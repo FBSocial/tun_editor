@@ -111,6 +111,10 @@ class QuillEditor: WebView {
         }
     }
 
+    fun updateContents(delta: List<*>, source: String) {
+        exec("javascript:updateContents(${JSONArray(delta)}, \"$source\")")
+    }
+
     fun insertMention(id: String, text: String) {
         exec("javascript:insertMention(\"$id\", \"$text\")")
     }

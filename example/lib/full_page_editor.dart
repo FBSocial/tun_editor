@@ -3,7 +3,9 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:tun_editor/iconfont.dart';
+import 'package:tun_editor/models/documents/attribute.dart';
 import 'package:tun_editor/models/documents/document.dart';
+import 'package:tun_editor/models/quill_delta.dart';
 import 'package:tun_editor/tun_editor.dart';
 import 'package:tun_editor/tun_editor_toolbar.dart';
 import 'package:tun_editor/controller.dart';
@@ -24,7 +26,7 @@ class FullPageEditorState extends State<FullPageEditor> {
   bool isLoading = true;
   late TunEditorController _controller;
 
-  FocusNode _titleFocusNode = FocusNode();
+  // FocusNode _titleFocusNode = FocusNode();
   FocusNode _editorFocusNode = FocusNode();
 
   @override
@@ -32,6 +34,7 @@ class FullPageEditorState extends State<FullPageEditor> {
     super.initState();
   
     _loadDocument();
+    // _controller.document.isEmpty();
     // _editorFocusNode.addListener(() {
     //   if (_editorFocusNode.hasFocus) {
     //     _titleFocusNode.unfocus();
@@ -51,7 +54,11 @@ class FullPageEditorState extends State<FullPageEditor> {
         title: GestureDetector(
           child: Text("Editor"),
           onTap: () {
-            _controller.insertMention('1', 'Jeffrey Wu');
+            // _controller.compose(new Delta()
+            //     ..retain(1)
+            //     ..insert('Hello World', Attribute.bold.toJson()),
+            //     TextSelection.collapsed(offset: 2), ChangeSource.LOCAL);
+            // _controller.insertMention('1', 'Jeffrey Wu');
             // if (focusNode.hasFocus) {
             //   focusNode.unfocus();
             // } else {
@@ -70,89 +77,100 @@ class FullPageEditorState extends State<FullPageEditor> {
           width: double.infinity,
           height: double.infinity,
           alignment: Alignment.center,
-          child: Column(
+          child: Stack(
             children: [
-              TextField(
-                focusNode: _titleFocusNode,
-                textInputAction: TextInputAction.next,
-              ),
-              Expanded(
-                child: TunEditor(
-                  controller: _controller,
-                  padding: EdgeInsets.symmetric(
-                    vertical: 12,
-                    horizontal: 15,
+              Column(
+                children: [
+                  // TextField(
+                  //   focusNode: _titleFocusNode,
+                  //   textInputAction: TextInputAction.next,
+                  // ),
+                  Expanded(
+                    child: TunEditor(
+                      controller: _controller,
+                      padding: EdgeInsets.symmetric(
+                        vertical: 12,
+                        horizontal: 15,
+                      ),
+                      placeholder: "Hello World!",
+                      focusNode: _editorFocusNode,
+                      autoFocus: false,
+                      readOnly: false,
+
+                      onMentionClick: (String id, String text) {
+                        debugPrint('metion click $id, $text');
+                      },
+                      onLinkClick: (String url) {
+                        debugPrint('link click $url');
+                      },
+                      onFocusChange: (bool hasFocus) {
+                        // if (hasFocus) {
+                        //   _titleFocusNode.nextFocus();
+                        // }
+                        // _titleFocusNode.unfocus();
+                      },
+                    ),
                   ),
-                  placeholder: "Hello World!",
-                  focusNode: _editorFocusNode,
-                  autoFocus: false,
-                  readOnly: false,
-
-                  onMentionClick: (String id, String text) {
-                    debugPrint('metion click $id, $text');
-                  },
-                  onLinkClick: (String url) {
-                    debugPrint('link click $url');
-                  },
-                  onFocusChange: (bool hasFocus) {
-                    // if (hasFocus) {
-                    //   _titleFocusNode.nextFocus();
-                    // }
-                    // _titleFocusNode.unfocus();
-                  },
-                ),
+                  SizedBox(height: 48),
+                ],
               ),
-              TunEditorToolbar(
-                controller: _controller,
-                showingAt: false,
-                showingImage: false,
-                showingEmoji: false,
-                onAtChange: (bool isShow) {
-                  debugPrint('show at subtoolbar change: $isShow');
-                },
-                onImageChange: (bool isShow) {
-                  debugPrint('show image subtoolbar change: $isShow');
-                },
-                onEmojiChange: (bool isShow) {
-                  debugPrint('show emoji sub toolbar change: $isShow');
-                },
-                onSend: () {
-                  debugPrint('send click');
-                },
 
-                // menu: [
-                //   ToolbarMenu.textType,
-                //   ToolbarMenu.textTypeHeadline1,
-                //   ToolbarMenu.textTypeHeadline2,
-                //   ToolbarMenu.textTypeHeadline3,
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: 0,
+                child: TunEditorToolbar(
+                  controller: _controller,
+                  showingAt: false,
+                  showingImage: false,
+                  showingEmoji: false,
+                  onAtChange: (bool isShow) {
+                    debugPrint('show at subtoolbar change: $isShow');
+                  },
+                  onImageChange: (bool isShow) {
+                    debugPrint('show image subtoolbar change: $isShow');
+                  },
+                  onEmojiChange: (bool isShow) {
+                    debugPrint('show emoji sub toolbar change: $isShow');
+                  },
+                  onSend: () {
+                    debugPrint('send click');
+                  },
 
-                //   ToolbarMenu.textStyle,
-                //   ToolbarMenu.textStyleBold,
-                //   ToolbarMenu.textStyleItalic,
+                  // menu: [
+                  //   ToolbarMenu.textType,
+                  //   ToolbarMenu.textTypeHeadline1,
+                  //   ToolbarMenu.textTypeHeadline2,
+                  //   ToolbarMenu.textTypeHeadline3,
 
-                //   ToolbarMenu.link,
-                // ],
-               children: [
-                 Spacer(),
+                  //   ToolbarMenu.textStyle,
+                  //   ToolbarMenu.textStyleBold,
+                  //   ToolbarMenu.textStyleItalic,
 
-                 // Send button.
-                 GestureDetector(
-                   onTap: () {},
-                   child: Container(
-                     width: 48,
-                     height: 36,
-                     decoration: BoxDecoration(
-                       color: Color(0x268F959E),
-                       borderRadius: BorderRadius.circular(18),
-                     ),
-                     child: Icon(
-                       IconFont.send,
-                       size: 24,
-                       color: Color(0xA6363940),
+                  //   ToolbarMenu.link,
+                  // ],
+                 children: [
+                   Spacer(),
+
+                   // Send button.
+                   GestureDetector(
+                     onTap: () {},
+                     child: Container(
+                       width: 48,
+                       height: 36,
+                       decoration: BoxDecoration(
+                         color: Color(0x268F959E),
+                         borderRadius: BorderRadius.circular(18),
+                       ),
+                       child: Icon(
+                         IconFont.send,
+                         size: 24,
+                         color: Color(0xA6363940),
+                       ),
                      ),
                    ),
-                 ),
-               ],
+                 ],
+                ),
               ),
             ],
           ),

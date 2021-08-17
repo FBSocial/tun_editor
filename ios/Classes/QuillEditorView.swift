@@ -117,6 +117,17 @@ class QuillEditorView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler {
         }
     }
     
+    func updateContents(delta: [Any], source: String) {
+        do {
+            let deltaJson = try JSONSerialization.data(withJSONObject: delta, options: JSONSerialization.WritingOptions(rawValue: 0))
+            if let deltaJsonStr = String(data: deltaJson, encoding: .utf8) {
+               exec("updateContents(\(deltaJsonStr), \"\(source)\")")
+            }
+        } catch {
+            print("update contents failed: \(error)")
+        }
+    }
+    
     func insertMention(id: String, text: String) {
         exec("insertMention(\"\(id)\", \"\(text)\")")
     }
@@ -148,7 +159,6 @@ class QuillEditorView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler {
             exec("formatText(\(index), \(length), \"\(name)\", \(value))")
         }
     }
-
     
     func setSelection(index: Int, length: Int) {
         exec("setSelection(\(index), \(length)")

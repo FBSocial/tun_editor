@@ -123,6 +123,15 @@ class TunEditorView: NSObject, FlutterPlatformView {
                 }
                 _editor.replaceText(index: index!, length: length!, data: data!)
             }
+        case "updateContents":
+            if let args = call.arguments as? [String: Any] {
+                let delta = args["delta"] as? [Any]
+                let source = args["source"] as? String
+                if delta == nil || source == nil {
+                    return
+                }
+                _editor.updateContents(delta: delta!, source: source!)
+            }
         case "insertMention":
             if let args = call.arguments as? [String: Any] {
                 let id = args["id"] as? String

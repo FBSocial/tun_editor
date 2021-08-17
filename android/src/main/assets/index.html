@@ -188,6 +188,7 @@
       var blur;
       var setContents;
       var replaceText;
+      var updateContents;
 
       document.addEventListener('DOMContentLoaded', () => {
         let Delta = Quill.import('delta');
@@ -422,6 +423,9 @@
         replaceText = function(index, length, data) {
           var delta = new Delta().retain(index).delete(length).insert(data)
           quill.updateContents(delta);
+        }
+        updateContents = function(delta, source) {
+          quill.updateContents(delta, source);
         }
       })
     </script>

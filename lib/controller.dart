@@ -50,6 +50,18 @@ class TunEditorController {
     }
   }
 
+  void compose(Delta delta, TextSelection? textSelection, ChangeSource source) {
+    _tunEditorApi?.updateContents(delta, source);
+    if (textSelection == null) {
+      updateSelection(selection.copyWith(
+        baseOffset: delta.transformPosition(selection.baseOffset, force: false),
+        extentOffset: delta.transformPosition(selection.extentOffset, force: false)
+      ), source);
+    } else {
+      updateSelection(textSelection, source);
+    }
+  }
+
   /// Insert mention with [id] and [text], [id] should be unqiue, will be used on click event.
   void insertMention(String id, String text) {
     _tunEditorApi?.insertMention(id, text);
