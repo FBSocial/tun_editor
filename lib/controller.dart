@@ -93,11 +93,39 @@ class TunEditorController {
 
   /// Insert divider to current [selection].
   void insertDivider() {
-    _tunEditorApi?.insertDivider();
-    // compose(new Delta()
-    //     ..retain(selection.extentOffset)
-    //     ..insert('\n')
-    //     ..insert({ 'divider': true }), null, ChangeSource.LOCAL);
+    final child = document.queryChild(selection.extentOffset);
+    if (child.node == null) {
+      return;
+    }
+
+    final delta = new Delta();
+    final lineEndOffset = child.node!.documentOffset + child.node!.length - 1;
+    delta.retain(lineEndOffset);
+
+    if (child.node!.style.attributes.containsKey(Attribute.header.key)) {
+      delta.insert('\n', child.node!.style.attributes[Attribute.header.key]!.toJson());
+      delta.retain(1, Attribute.header.toJson());
+    } else if (child.node!.style.attributes.containsKey(Attribute.list.key)) {
+      delta.insert('\n', child.node!.style.attributes[Attribute.list.key]!.toJson());
+      delta.retain(1, Attribute.list.toJson());
+    } else if (child.node!.style.attributes.containsKey(Attribute.codeBlock.key)) {
+      delta.insert('\n', child.node!.style.attributes[Attribute.codeBlock.key]!.toJson());
+      delta.retain(1, Attribute(Attribute.codeBlock.key, AttributeScope.BLOCK, null).toJson());
+    } else if (child.node!.style.attributes.containsKey(Attribute.blockQuote.key)) {
+      delta.insert('\n', child.node!.style.attributes[Attribute.blockQuote.key]!.toJson());
+      delta.retain(1, Attribute(Attribute.blockQuote.key, AttributeScope.BLOCK, null).toJson());
+    } else {
+      delta.insert('\n');
+    }
+    compose(delta, null, ChangeSource.LOCAL);
+
+    final dividerDelta = new Delta()
+        ..retain(lineEndOffset + 1)
+        ..insert({ 'divider': 'hr' });
+    compose(dividerDelta, null, ChangeSource.LOCAL);
+
+    updateSelection(TextSelection.collapsed(
+      offset: lineEndOffset + 2), ChangeSource.LOCAL);
   }
 
   /// Insert [text] with [link] format to current [selection].

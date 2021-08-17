@@ -164,8 +164,12 @@ class TunEditorState extends State<TunEditor> with TunEditorHandler {
   ) async {
     final deltaMap = json.decode(delta) as Map;
     if (deltaMap['ops'] is List<dynamic>) {
-      final deltaObj = deltaMap['ops'] as List<dynamic>;
-      controller.composeDocument(Delta.fromJson(deltaObj));
+      final deltaList = deltaMap['ops'] as List<dynamic>;
+      final deltaObj = Delta.fromJson(deltaList);
+      if (deltaObj.isNotEmpty) {
+        debugPrint('delta list: ${deltaObj.length}');
+        controller.composeDocument(deltaObj);
+      }
     }
   }
 
