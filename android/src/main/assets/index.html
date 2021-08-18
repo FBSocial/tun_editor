@@ -247,15 +247,32 @@
             key: 'Enter',
             collapsed: true,
             format: ['code-block'],
-            prefix: /\n$/,
-            suffix: /^\s+$/,
-            handler: function(range) {
+            prefix: /^$/,
+            suffix: /^\s*$/,
+            handler: function(range, context) {
               const [line, offset] = this.quill.getLine(range.index);
-              const delta = new Delta()
-                .retain(range.index + line.length() - offset - 1)
-                .retain(1, { 'code-block': null })
-                .delete(1);
-              this.quill.updateContents(delta, Quill.sources.USER);
+              let numLines = 1;
+              let cur = line;
+              while (
+                cur != null &&
+                cur.length() <= 1 &&
+                cur.formats()['code-block'] &&
+                (cur.next === null || !cur.next.formats()['code-block'])
+              ) {
+                cur = cur.prev;
+                numLines -= 1;
+                // Requisite prev lines are empty
+                if (numLines <= 0) {
+                  const delta = new Delta()
+                    .retain(range.index + line.length() - offset - 1)
+                    .retain(1, { 'code-block': null })
+                    .delete(1);
+                  this.quill.updateContents(delta, Quill.sources.USER);
+                  this.quill.setSelection(range.index, Quill.sources.SILENT);
+                  return false;
+                }
+              }
+              return true;
             }
           },
           'code delete': {
@@ -263,7 +280,7 @@
             collapsed: true,
             format: ['code-block'],
             prefix: /^$/,
-            suffix: /^\s+$/,
+            suffix: /^\s*$/,
             handler: function(range) {
               this.quill.format('code-block', false, Quill.sources.USER);
             }
