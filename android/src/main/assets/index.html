@@ -10,7 +10,7 @@
     <script src="highlight.min.js" charset="utf-8"></script>
     <script src="highlightjs-line-numbers.min.js" charset="utf-8"></script>
     <script src="markdown.js" charset="utf-8"></script>
-    <script src="quill.min.js" charset="utf-8"></script>
+    <script src="quill2.min.js" charset="utf-8"></script>
     <script src="quill.mention.min.js" charset="utf-8"></script>
     <style>
       .ql-container {
@@ -70,6 +70,7 @@
         padding-left: 12px;
         color: #646A73;
       }
+      .ql-editor .ql-code-block-container,
       .ql-snow .ql-editor pre.ql-syntax {
         font-size: 14px;
         color: #646A73;
@@ -79,20 +80,15 @@
         margin: 5px 0;
         padding: 16px 24px;
         box-sizing: border-box;
-      }
-      .ql-snow .ql-editor pre {
-        color: #646A73;
-        background-color: #F5F5F8;
-        border-radius: 4px;
-        border: 1px solid rgba(143, 149, 158, 0.2);
         counter-reset: line-numbering;
       }
       .ql-snow a {
         color: #5562F2;
       }
+      .ql-editor .ql-code-block::before,
       pre .hljs-line::before {
         display: inline-block;
-        content: counter(line-numbering);
+        content: counter(line-numbering) '.';
         counter-increment: line-numbering;
         width: 30px;
         text-align: right;
@@ -194,6 +190,11 @@
         let Delta = Quill.import('delta');
         let Keyboard = Quill.import('modules/keyboard');
         let BlockEmbed = Quill.import('blots/block/embed');
+        let Container = Quill.import('blots/container');
+        let Block = Quill.import('blots/block');
+        let TextBlot = Quill.import('blots/text');
+        let Break = Quill.import('blots/break');
+        let Cursor = Quill.import('blots/cursor');
 
         class DividerBlot extends BlockEmbed {
 
@@ -212,9 +213,38 @@
         DividerBlot.tagName = 'hr';
         Quill.register(DividerBlot);
 
+        class CodeBlockContainer extends Container {
+          static create(value) {
+            const domNode = super.create(value);
+            domNode.setAttribute('spellcheck', false);
+            return domNode;
+          }
+        }
+
+        class CodeBlock extends Block {
+          static register() {
+            Quill.register(CodeBlockContainer);
+          }
+        }
+
+        CodeBlock.blotName = 'code-block';
+        CodeBlock.className = 'ql-code-block';
+        CodeBlock.tagName = 'DIV';
+        CodeBlockContainer.blotName = 'code-block-container';
+        CodeBlockContainer.className = 'ql-code-block-container';
+        CodeBlockContainer.tagName = 'DIV';
+
+        CodeBlockContainer.allowedChildren = [CodeBlock];
+
+        CodeBlock.allowedChildren = [TextBlot, Break, Cursor];
+        CodeBlock.requiredContainer = CodeBlockContainer;
+        CodeBlock.TAB = '  ';
+        // Quill.register(CodeBlockContainer);
+        // Quill.register(CodeBlock);
+
         let bindings = {
           'code exit': {
-            key: Keyboard.keys.ENTER,
+            key: 'Enter',
             collapsed: true,
             format: ['code-block'],
             prefix: /\n$/,
@@ -229,7 +259,7 @@
             }
           },
           'code delete': {
-            key: Keyboard.keys.BACKSPACE,
+            key: 'Backspace',
             collapsed: true,
             format: ['code-block'],
             prefix: /^$/,
@@ -239,7 +269,7 @@
             }
           },
           'blockquote delete': {
-            key: Keyboard.keys.BACKSPACE,
+            key: 'Backspace',
             collapsed: true,
             format: ['blockquote'],
             prefix: /^$/,
@@ -249,7 +279,7 @@
             }
           },
           'header delete': {
-            key: Keyboard.keys.BACKSPACE,
+            key: 'Backspace',
             collapsed: true,
             format: ['header'],
             prefix: /^$/,
@@ -263,26 +293,27 @@
           readOnly: false,
           theme: 'snow',
           modules: {
-            syntax: {
-              highlight: (function() {
-                if (window.hljs == null) return null;
-                return function(text) {
-                  let lines = text.split('\n');
-                  let spanLines = lines.map(function(line, index) {
-                    if (index == lines.length - 1) {
-                      return '';
-                    }
-                    if (line === '') {
-                      return '<span class="hljs-line">&ZeroWidthSpace;</span>'
-                    }
-                    return '<span class="hljs-line">' + line + '</span>';
-                  });
-                  let res = spanLines.join('\n');
-                  return text;
-                };
-              })(),
-              interval: 0,
-            },
+            syntax: false,
+            // syntax: {
+            //   highlight: (function() {
+            //     if (window.hljs == null) return null;
+            //     return function(text) {
+            //       let lines = text.split('\n');
+            //       let spanLines = lines.map(function(line, index) {
+            //         if (index == lines.length - 1) {
+            //           return '';
+            //         }
+            //         if (line === '') {
+            //           return '<span class="hljs-line">&ZeroWidthSpace;</span>'
+            //         }
+            //         return '<span class="hljs-line">' + line + '</span>';
+            //       });
+            //       let res = spanLines.join('\n');
+            //       return text;
+            //     };
+            //   })(),
+            //   interval: 0,
+            // },
             toolbar: false,
             keyboard: {
               bindings: bindings
@@ -290,9 +321,6 @@
             mention: {
               mentionDenotationChars: ["@"],
               source: async function(searchTerm, renderList) {
-              },
-              onSelect(item, insertItem) {
-                console.log(item);
               },
             },
           }

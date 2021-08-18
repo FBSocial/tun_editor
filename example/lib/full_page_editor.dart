@@ -3,9 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:tun_editor/iconfont.dart';
-import 'package:tun_editor/models/documents/attribute.dart';
 import 'package:tun_editor/models/documents/document.dart';
-import 'package:tun_editor/models/documents/nodes/embed.dart';
 import 'package:tun_editor/tun_editor.dart';
 import 'package:tun_editor/tun_editor_toolbar.dart';
 import 'package:tun_editor/controller.dart';
@@ -62,7 +60,7 @@ class FullPageEditorState extends State<FullPageEditor> {
             //   ignoreFocus: false,
             //   autoAppendNewlineAfterImage: true,
             //   attributes: [
-            //     WidthAttribute('300'),
+            //     WidthAttribute('100'),
             //   ],
             // );
 
@@ -70,16 +68,19 @@ class FullPageEditorState extends State<FullPageEditor> {
             //     ..retain(1)
             //     ..insert('Hello World', Attribute.bold.toJson()),
             //     TextSelection.collapsed(offset: 2), ChangeSource.LOCAL);
+
             // _controller.insertMention('1', 'Jeffrey Wu');
-            // if (focusNode.hasFocus) {
-            //   focusNode.unfocus();
+
+            // if (_editorFocusNode.hasFocus) {
+            //   _editorFocusNode.unfocus();
             // } else {
-            //   focusNode.requestFocus();
+            //   _editorFocusNode.requestFocus();
             // }
+
             // _controller.insertImage('https://avatars0.githubusercontent.com/u/1758864?s=460&v=4');
-            // _controller.formatText(0, 2, Attribute.h1);
+            // _controller.formatText(0, 2, Attribute.bold);
             // _controller.insert(2, 'Bye Bye');
-            //   _controller.insert(_controller.selection.baseOffset, '🛹');
+            // _controller.insert(_controller.selection.baseOffset, '🛹');
             // _controller.replaceText(6, 5, 'Jeffrey Wu', null);
           },
         ),
@@ -200,8 +201,8 @@ class FullPageEditorState extends State<FullPageEditor> {
 
   Future<void> _loadDocument() async {
     final result = await rootBundle.loadString('assets/sample_data.json');
-    // final doc = Document.fromJson(jsonDecode(result));
-    final doc = Document();
+    final doc = Document.fromJson(jsonDecode(result));
+    // final doc = Document();
 
     _controller = TunEditorController(
         document: doc,

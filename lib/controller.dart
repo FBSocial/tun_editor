@@ -83,7 +83,7 @@ class TunEditorController {
   /// Insert [data] at the given [index].
   /// This is a shortcut of [replaceText].
   void insert(int index, Object? data) {
-    replaceText(index, 0, data, TextSelection.collapsed(offset: selection.baseOffset));
+    replaceText(index, 0, data, null);
   }
 
   /// Insert image with given [url] to current [selection].
