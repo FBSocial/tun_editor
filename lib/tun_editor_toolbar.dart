@@ -5,22 +5,14 @@ import 'package:tun_editor/iconfont.dart';
 import 'package:tun_editor/controller.dart';
 import 'package:tun_editor/link_format_dialog.dart';
 import 'package:tun_editor/models/documents/attribute.dart';
-import 'package:tun_editor/models/documents/document.dart';
-import 'package:tun_editor/models/quill_delta.dart';
 
 class TunEditorToolbar extends StatefulWidget {
 
   final TunEditorController controller;
 
   // Sub toolbar panel showing status.
-  final bool showingAt;
-  final bool showingImage;
-  final bool showingEmoji;
-  final ValueChanged<bool>? onAtChange;
-  final ValueChanged<bool>? onImageChange;
-  final ValueChanged<bool>? onEmojiChange;
-
-  final VoidCallback? onSend;
+  final SubToolbar showingSubToolbar;
+  final ValueChanged<SubToolbar>? onSubToolbarChange;
 
   // Menu decides which tool should be showed in toolbar.
   final List<ToolbarMenu> menu;
@@ -31,13 +23,8 @@ class TunEditorToolbar extends StatefulWidget {
   const TunEditorToolbar({
     Key? key,
     required this.controller,
-    this.showingAt = false,
-    this.showingImage = false,
-    this.showingEmoji = false,
-    this.onAtChange,
-    this.onImageChange,
-    this.onEmojiChange,
-    this.onSend,
+    this.showingSubToolbar = SubToolbar.none,
+    this.onSubToolbarChange,
     this.menu = ToolbarMenu.values,
     this.children,
   }) : super(key: key);
@@ -52,18 +39,11 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
   static const String FORMAT_TEXT_TYPE_NORMAL = "normal";
 
   TunEditorController get controller => widget.controller;
-  bool get showingAt => widget.showingAt;
-  bool get showingImage => widget.showingImage;
-  bool get showingEmoji => widget.showingEmoji;
-  ValueChanged<bool>? get onAtChange => widget.onAtChange;
-  ValueChanged<bool>? get onImageChange => widget.onImageChange;
-  ValueChanged<bool>? get onEmojiChange => widget.onEmojiChange;
-  VoidCallback? get onSend => widget.onSend;
+  SubToolbar get showingSubToolbar => widget.showingSubToolbar;
+  ValueChanged<SubToolbar>? get onSubToolbarChange => widget.onSubToolbarChange;
+
   List<ToolbarMenu> get menu => widget.menu;
   List<Widget>? get children => widget.children;
-
-  // Sub toolbar.
-  SubToolbar showingSubToolbar = SubToolbar.none;
 
   // Text type and style.
   String currentTextType = FORMAT_TEXT_TYPE_NORMAL;
@@ -441,11 +421,6 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
     );
   }
 
-  void onSendClick() {
-    widget.onSend?.call();
-    setState(() {});
-  }
-
   void onDividerClick() {
     controller.insertDivider();
   }
@@ -483,24 +458,9 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
 
   void toggleSubToolbar(SubToolbar subToolbar) {
     if (showingSubToolbar == subToolbar) {
-      showingSubToolbar = SubToolbar.none;
+      onSubToolbarChange?.call(SubToolbar.none);
     } else {
-      showingSubToolbar = subToolbar;
-    }
-    setState(() {});
-
-    // Check if the value of at, image and emoji have changed.
-    final showingAtNew = showingSubToolbar == SubToolbar.at;
-    final showingImageNew = showingSubToolbar == SubToolbar.image;
-    final showingEmojiNew = showingSubToolbar == SubToolbar.emoji;
-    if (showingAtNew != showingAt) {
-      onAtChange?.call(showingAtNew);
-    }
-    if (showingImageNew != showingImage) {
-      onImageChange?.call(showingImageNew);
-    }
-    if (showingEmojiNew != showingEmoji) {
-      onEmojiChange?.call(showingEmojiNew);
+      onSubToolbarChange?.call(subToolbar);
     }
   }
 

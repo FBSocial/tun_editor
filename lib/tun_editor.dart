@@ -94,6 +94,7 @@ class TunEditorState extends State<TunEditor> with TunEditorHandler {
       'autoFocus': autoFocus,
       'delta': controller.document.toDelta().toJson(),
     };
+    debugPrint('build editor');
 
     if (Platform.isAndroid) {
       // Android platform.
@@ -117,6 +118,7 @@ class TunEditorState extends State<TunEditor> with TunEditorHandler {
             );
           },
           onCreatePlatformView: (PlatformViewCreationParams params) {
+            debugPrint('on create platform view');
             return PlatformViewsService.initSurfaceAndroidView(
               id: params.id,
               viewType: VIEW_TYPE_TUN_EDITOR,

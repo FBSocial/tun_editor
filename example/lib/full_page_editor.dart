@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:tun_editor/iconfont.dart';
+import 'package:tun_editor/models/documents/attribute.dart';
 import 'package:tun_editor/models/documents/document.dart';
 import 'package:tun_editor/tun_editor.dart';
 import 'package:tun_editor/tun_editor_toolbar.dart';
@@ -21,11 +22,28 @@ class FullPageEditor extends StatefulWidget {
 
 class FullPageEditorState extends State<FullPageEditor> {
 
-  bool isLoading = true;
+  bool _isLoading = true;
   late TunEditorController _controller;
 
   // FocusNode _titleFocusNode = FocusNode();
   FocusNode _editorFocusNode = FocusNode();
+
+  bool _readOnly = false;
+
+  SubToolbar _showingSubToolbar = SubToolbar.none;
+
+  final _emojiList = [
+    '😃', '😄', '😁', '😆', '😅', '😂', '🤣', '🥲', '☺️', '😊', '😇', '🙂',
+    '🙃', '😉', '😌', '😍', '🥰', '😘', '😗', '😙', '😚', '😋', '😛', '😝',
+    '😜', '🤪', '🤨', '🧐', '🤓', '😎', '🥸', '🤩', '🥳', '😏', '😒', '😞',
+    '😔', '😟', '😕', '🙁', '☹️', '😣', '😖', '😫', '😩', '🥺', '😢', '😭',
+    '😤', '😠', '😡', '🤬', '🤯', '😳', '🥵', '🥶', '😱', '😨', '😰', '😥',
+    '😓', '🤗', '🤔', '🤭', '🤫', '🤥', '😶', '😐', '😑', '😬', '🙄', '😯',
+    '😦', '😧', '😮', '😲', '🥱', '😴', '🤤', '😪', '😵', '🤐', '🥴', '🤢',
+    '🤮', '🤧', '😷', '🤒', '🤕', '🤑', '🤠', '😈', '👿', '👹', '👺', '🤡',
+    '💩', '👻', '💀', '☠️', '👽', '👾', '🤖', '🎃', '😺', '😸', '😹', '😻',
+    '😼', '😽', '🙀', '😿', '😾',
+  ];
 
   @override
   void initState() {
@@ -42,7 +60,7 @@ class FullPageEditorState extends State<FullPageEditor> {
 
   @override
   Widget build(BuildContext context) {
-    if (isLoading) {
+    if (_isLoading) {
       return const Scaffold(body: Center(child: Text('Loading...')));
     }
 
@@ -51,6 +69,12 @@ class FullPageEditorState extends State<FullPageEditor> {
         title: GestureDetector(
           child: Text('Editor'),
           onTap: () {
+            // _controller.insertVideo(
+            //   'https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_20mb.mp4',
+            //   [
+            //     WidthAttribute('300'),
+            //   ]
+            // );
             // _controller.updateSelection(TextSelection.collapsed(offset: 10), ChangeSource.LOCAL);
 
             // final imageBlock = BlockEmbed.image(
@@ -77,7 +101,6 @@ class FullPageEditorState extends State<FullPageEditor> {
             //   _editorFocusNode.requestFocus();
             // }
 
-            // _controller.insertImage('https://avatars0.githubusercontent.com/u/1758864?s=460&v=4');
             // _controller.formatText(0, 2, Attribute.bold);
             // _controller.insert(2, 'Bye Bye');
             // _controller.insert(_controller.selection.baseOffset, '🛹');
@@ -108,7 +131,7 @@ class FullPageEditorState extends State<FullPageEditor> {
                       placeholder: 'Hello World!',
                       focusNode: _editorFocusNode,
                       autoFocus: false,
-                      readOnly: false,
+                      readOnly: _readOnly,
                       scrollable: true,
                       onMentionClick: (String id, String text) {
                         debugPrint('metion click $id, $text');
@@ -117,10 +140,13 @@ class FullPageEditorState extends State<FullPageEditor> {
                         debugPrint('link click $url');
                       },
                       onFocusChange: (bool hasFocus) {
-                        // if (hasFocus) {
-                        //   _titleFocusNode.nextFocus();
-                        // }
-                        // _titleFocusNode.unfocus();
+                        if (hasFocus) {
+                          if (_showingSubToolbar != SubToolbar.none) {
+                            setState(() {
+                              _showingSubToolbar = SubToolbar.none;
+                            });
+                          }
+                        }
                       },
                     ),
                   ),
@@ -132,57 +158,70 @@ class FullPageEditorState extends State<FullPageEditor> {
                 left: 0,
                 right: 0,
                 bottom: 0,
-                child: TunEditorToolbar(
-                  controller: _controller,
-                  showingAt: false,
-                  showingImage: false,
-                  showingEmoji: false,
-                  onAtChange: (bool isShow) {
-                    debugPrint('show at subtoolbar change: $isShow');
-                  },
-                  onImageChange: (bool isShow) {
-                    debugPrint('show image subtoolbar change: $isShow');
-                  },
-                  onEmojiChange: (bool isShow) {
-                    debugPrint('show emoji sub toolbar change: $isShow');
-                  },
-                  onSend: () {
-                    debugPrint('send click');
-                  },
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TunEditorToolbar(
+                      controller: _controller,
 
-                  // menu: [
-                  //   ToolbarMenu.textType,
-                  //   ToolbarMenu.textTypeHeadline1,
-                  //   ToolbarMenu.textTypeHeadline2,
-                  //   ToolbarMenu.textTypeHeadline3,
+                      // Sub toolbar control.
+                      showingSubToolbar: _showingSubToolbar,
+                      onSubToolbarChange: (SubToolbar subToolbar) {
+                        // Hide keyboard on panel showing.
+                        if (subToolbar != SubToolbar.none) {
+                          // TODO Hide keyboard only.
+                          debugPrint('make editor unfocus');
+                          _controller.blur();
+                        }
+                        setState(() {
+                          _showingSubToolbar = subToolbar;
+                          _readOnly = _showingSubToolbar == SubToolbar.emoji;
+                        });
+                      },
 
-                  //   ToolbarMenu.textStyle,
-                  //   ToolbarMenu.textStyleBold,
-                  //   ToolbarMenu.textStyleItalic,
+                      // menu: [
+                      //   ToolbarMenu.textType,
+                      //   ToolbarMenu.textTypeHeadline1,
+                      //   ToolbarMenu.textTypeHeadline2,
+                      //   ToolbarMenu.textTypeHeadline3,
 
-                  //   ToolbarMenu.link,
-                  // ],
-                 children: [
-                   Spacer(),
+                      //   ToolbarMenu.textStyle,
+                      //   ToolbarMenu.textStyleBold,
+                      //   ToolbarMenu.textStyleItalic,
 
-                   // Send button.
-                   GestureDetector(
-                     onTap: () {},
-                     child: Container(
-                       width: 48,
-                       height: 36,
-                       decoration: BoxDecoration(
-                         color: Color(0x268F959E),
-                         borderRadius: BorderRadius.circular(18),
-                       ),
-                       child: Icon(
-                         IconFont.send,
-                         size: 24,
-                         color: Color(0xA6363940),
-                       ),
-                     ),
-                   ),
-                 ],
+                      //   ToolbarMenu.link,
+                      // ],
+                      children: [
+                        Spacer(),
+
+                        // Send button.
+                        GestureDetector(
+                          onTap: () {},
+                          child: Container(
+                            width: 48,
+                            height: 36,
+                            decoration: BoxDecoration(
+                              color: Color(0x268F959E),
+                              borderRadius: BorderRadius.circular(18),
+                            ),
+                            child: Icon(
+                              IconFont.send,
+                              size: 24,
+                              color: Color(0xA6363940),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    _showingSubToolbar == SubToolbar.at
+                        ? _buildAtPicker() : SizedBox.shrink(),
+                    _showingSubToolbar == SubToolbar.image
+                        ? _buildImagePicker() : SizedBox.shrink(),
+                    _showingSubToolbar == SubToolbar.emoji
+                        ? _buildbEmojiPicker() : SizedBox.shrink(),
+
+                  ],
                 ),
               ),
             ],
@@ -197,6 +236,88 @@ class FullPageEditorState extends State<FullPageEditor> {
     _controller.dispose();
   
     super.dispose();
+  }
+
+  Widget _buildAtPicker() {
+    return Container(
+      width: double.infinity,
+      height: 300,
+      decoration: BoxDecoration(
+        color: Colors.white,
+      ),
+      child: ListView.builder(
+        itemCount: 10,
+        itemBuilder: (BuildContext context, int index) {
+          return ListTile(
+            title: Text('People $index'),
+            onTap: () {
+              _controller.insertMention('$index', 'People $index');
+            },
+          );
+        }
+      ),
+    );
+  }
+
+  Widget _buildImagePicker() {
+    return Container(
+      width: double.infinity,
+      height: 300,
+      decoration: BoxDecoration(
+        color: Colors.white,
+      ),
+      child: IconButton(
+        onPressed: () {
+          _controller.insertImage(
+            'https://user-images.githubusercontent.com/122956/72955931-ccc07900-3d52-11ea-89b1-d468a6e2aa2b.png',
+            [
+              WidthAttribute('100'),
+            ],
+          );
+        },
+        icon: Icon(
+          Icons.image,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildbEmojiPicker() {
+    return Container(
+      width: double.infinity,
+      height: 300,
+      decoration: BoxDecoration(
+        color: Colors.white,
+      ),
+      child: GridView.builder(
+        itemCount: _emojiList.length,
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 10,
+          mainAxisSpacing: 10,
+        ),
+        itemBuilder: (BuildContext context, int index) {
+          return GestureDetector(
+            behavior: HitTestBehavior.translucent,
+            onTap: () {
+              _controller.insert(
+                _controller.selection.extentOffset,
+                _emojiList[index],
+                ignoreFocus: true,
+              );
+            },
+            child: Align(
+              alignment: Alignment.center,
+              child: Text(
+                _emojiList[index],
+                style: TextStyle(
+                  fontSize: 18,
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
   }
 
   Future<void> _loadDocument() async {
@@ -217,7 +338,7 @@ class FullPageEditorState extends State<FullPageEditor> {
       debugPrint('document: $doc');
     });
     setState(() {
-      isLoading = false;
+      _isLoading = false;
     });
   }
 

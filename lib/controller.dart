@@ -82,13 +82,45 @@ class TunEditorController {
 
   /// Insert [data] at the given [index].
   /// This is a shortcut of [replaceText].
-  void insert(int index, Object? data) {
-    replaceText(index, 0, data, null);
+  void insert(int index, Object? data, {
+    bool ignoreFocus = false,
+  }) {
+    replaceText(index, 0, data, null, ignoreFocus: ignoreFocus);
   }
 
   /// Insert image with given [url] to current [selection].
-  void insertImage(String url) {
-    _tunEditorApi?.insertImage(url);
+  void insertImage(String url, [List<Attribute>? attributes]) {
+    final Map<String, dynamic> attrMap = {};
+    if (attributes != null) {
+      for (final attr in attributes) {
+        attrMap[attr.key] = attr.value;
+      }
+    }
+    final delta = new Delta()
+      ..retain(selection.extentOffset)
+      ..insert(BlockEmbed.image(url).toJson(), attrMap);
+    compose(delta, null, ChangeSource.LOCAL);
+    updateSelection(
+      TextSelection.collapsed(offset: selection.extentOffset),
+      ChangeSource.LOCAL,
+    );
+  }
+
+  void insertVideo(String url, [List<Attribute>? attributes]) {
+    final Map<String, dynamic> attrMap = {};
+    if (attributes != null) {
+      for (final attr in attributes) {
+        attrMap[attr.key] = attr.value;
+      }
+    }
+    final delta = new Delta()
+      ..retain(selection.extentOffset)
+      ..insert(BlockEmbed.video(url).toJson(), attrMap);
+    compose(delta, null, ChangeSource.LOCAL);
+    updateSelection(
+      TextSelection.collapsed(offset: selection.extentOffset + 1),
+      ChangeSource.LOCAL,
+    );
   }
 
   /// Insert divider to current [selection].
@@ -171,6 +203,10 @@ class TunEditorController {
   /// Request focus to editor.
   void focus() {
     _tunEditorApi?.focus();
+  }
+  /// Request unfocus to editor.
+  void blur() {
+    _tunEditorApi?.blur();
   }
 
   void scrollTo(int offset) {

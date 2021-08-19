@@ -171,6 +171,7 @@ class LinkFomratDialogState extends State<LinkFomratDialog> {
                     style: ButtonStyle(
                       foregroundColor: MaterialStateProperty.all(Color(0xFF1F2125)),
                       backgroundColor: MaterialStateProperty.all(Colors.white),
+                      padding: MaterialStateProperty.all(EdgeInsets.zero),
                       side: MaterialStateProperty.all(BorderSide(
                         width: 0.5.w,
                         color: Color(0xFFDEE0E3),
@@ -187,7 +188,12 @@ class LinkFomratDialogState extends State<LinkFomratDialog> {
                         ),
                       ),
                      ),
-                    child: Text('取消'),
+                    child: Text(
+                      '取消',
+                      style: TextStyle(
+                        fontSize: 16.w,
+                      ),
+                    ),
                   ),
                 ),
 
@@ -206,6 +212,7 @@ class LinkFomratDialogState extends State<LinkFomratDialog> {
                         }
                         return Color(0xFF6179F2);
                       }),
+                      padding: MaterialStateProperty.all(EdgeInsets.zero),
                       side: MaterialStateProperty.all(BorderSide.none),
                       shape: MaterialStateProperty.all(
                         RoundedRectangleBorder(
@@ -219,7 +226,12 @@ class LinkFomratDialogState extends State<LinkFomratDialog> {
                         ),
                       ),
                      ),
-                    child: Text("确定"),
+                    child: Text(
+                      "确定",
+                      style: TextStyle(
+                        fontSize: 16.w,
+                      ),
+                    ),
                   ),
                 ),
               ],

@@ -87,11 +87,21 @@
    },
    {
       "insert": {
-         "image": "https://user-images.githubusercontent.com/122956/72955931-ccc07900-3d52-11ea-89b1-d468a6e2aa2b.png"
+        "image": "https://user-images.githubusercontent.com/122956/72955931-ccc07900-3d52-11ea-89b1-d468a6e2aa2b.png"
       },
       "attributes":{
-         "width":"230",
-         "style":"display: block; margin: auto;"
+         "width":"230"
+      }
+   },
+   {
+      "insert": "\n"
+   },
+   {
+      "insert": {
+        "video": "https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_20mb.mp4"
+      },
+      "attributes":{
+         "width":"230"
       }
    },
    {
