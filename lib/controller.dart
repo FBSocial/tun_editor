@@ -77,7 +77,27 @@ class TunEditorController {
 
   /// Insert mention with [id] and [text], [id] should be unqiue, will be used on click event.
   void insertMention(String id, String text) {
-    _tunEditorApi?.insertMention(id, text);
+    // [{"retain":39},{"insert":{"mention":{"denotationChar":"@","id":"5","value":"People 5"}}}]
+    final mentionDelta = new Delta()
+        ..retain(selection.extentOffset)
+        ..insert({
+          'mention': { 
+            'denotationChar': '@',
+            'id': id,
+            'value': text,
+          },
+        });
+    compose(mentionDelta, null, ChangeSource.LOCAL);
+
+    final spaceDelta = new Delta()
+        ..retain(selection.extentOffset + 1)
+        ..insert(' ');
+    compose(spaceDelta, null, ChangeSource.LOCAL);
+
+    updateSelection(
+      TextSelection.collapsed(offset: selection.extentOffset + 2),
+      ChangeSource.LOCAL,
+    );
   }
 
   /// Insert [data] at the given [index].
@@ -89,7 +109,10 @@ class TunEditorController {
   }
 
   /// Insert image with given [url] to current [selection].
-  void insertImage(String url, [List<Attribute>? attributes]) {
+  void insertImage(String url, {
+    List<Attribute>? attributes,
+    bool appendNewLine = true,
+  }) {
     final Map<String, dynamic> attrMap = {};
     if (attributes != null) {
       for (final attr in attributes) {
@@ -98,10 +121,19 @@ class TunEditorController {
     }
     final delta = new Delta()
       ..retain(selection.extentOffset)
+      ..insert('\n')
       ..insert(BlockEmbed.image(url).toJson(), attrMap);
+    if (appendNewLine) {
+      delta.insert('\n');
+    }
     compose(delta, null, ChangeSource.LOCAL);
+
+    int newOffset = selection.extentOffset + 2;
+    if (appendNewLine) {
+      newOffset = newOffset + 1;
+    }
     updateSelection(
-      TextSelection.collapsed(offset: selection.extentOffset),
+      TextSelection.collapsed(offset: newOffset),
       ChangeSource.LOCAL,
     );
   }
@@ -134,6 +166,7 @@ class TunEditorController {
     final lineEndOffset = child.node!.documentOffset + child.node!.length - 1;
     delta.retain(lineEndOffset);
 
+    // Insert new line below current line.
     if (child.node!.style.attributes.containsKey(Attribute.header.key)) {
       delta.insert('\n', child.node!.style.attributes[Attribute.header.key]!.toJson());
       delta.retain(1, Attribute.header.toJson());
@@ -151,6 +184,7 @@ class TunEditorController {
     }
     compose(delta, null, ChangeSource.LOCAL);
 
+    // Insert divider.
     final dividerDelta = new Delta()
         ..retain(lineEndOffset + 1)
         ..insert({ 'divider': 'hr' });
@@ -162,7 +196,12 @@ class TunEditorController {
 
   /// Insert [text] with [link] format to current [selection].
   void insertLink(String text, String url) {
-    _tunEditorApi?.insertLink(text, url);
+    final delta = new Delta()
+        ..retain(selection.extentOffset)
+        ..insert(text, LinkAttribute(url).toJson());
+    compose(delta, null, ChangeSource.LOCAL);
+    updateSelection(TextSelection.collapsed(
+      offset: selection.extentOffset + text.length), ChangeSource.LOCAL);
   }
 
   /// Format current [selection] with text type.

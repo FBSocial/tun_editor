@@ -56,8 +56,6 @@ class TunEditorState extends State<TunEditor> with TunEditorHandler {
 
   static const String VIEW_TYPE_TUN_EDITOR = 'tun_editor';
 
-  late TunEditorApi _tunEditorApi;
-
   // Widget fields.
   TunEditorController get controller => widget.controller;
   String get placeholder => widget.placeholder;
@@ -70,6 +68,10 @@ class TunEditorState extends State<TunEditor> with TunEditorHandler {
   LinkClickCallback? get linkClickCallback => widget.onLinkClick;
   ValueChanged<bool>? get onFocusChangeCallback => widget.onFocusChange;
 
+  TunEditorApi? _tunEditorApi;
+
+  Map<String, dynamic> creationParams = {};
+
   @override
   void initState() {
     super.initState();
@@ -81,20 +83,43 @@ class TunEditorState extends State<TunEditor> with TunEditorHandler {
 
   @override
   Widget build(BuildContext context) {
-    Map<String, dynamic> creationParams = {
-      'placeholder': placeholder,
-      'readOnly': readOnly,
-      'scrollable': scrollable,
-      'padding': [
-        padding.top.toInt(),
-        padding.right.toInt(),
-        padding.bottom.toInt(),
-        padding.left.toInt(),
-      ],
-      'autoFocus': autoFocus,
-      'delta': controller.document.toDelta().toJson(),
-    };
-    debugPrint('build editor');
+    final paddingList = [
+      padding.top.toInt(),
+      padding.right.toInt(),
+      padding.bottom.toInt(),
+      padding.left.toInt(),
+    ];
+    if (_tunEditorApi != null) {
+      if (creationParams.containsKey('placeholder')
+          && creationParams['placeholder'] != placeholder) {
+        _tunEditorApi?.setPlaceholder(placeholder);
+        creationParams['placeholder'] = placeholder;
+      }
+      if (creationParams.containsKey('readOnly')
+          && creationParams['readOnly'] != readOnly) {
+        _tunEditorApi?.setReadOnly(readOnly);
+        creationParams['readOnly'] = readOnly;
+      }
+      if (creationParams.containsKey('scrollable')
+          && creationParams['scrollable'] != scrollable) {
+        _tunEditorApi?.setScrollable(scrollable);
+        creationParams['scrollable'] = scrollable;
+      }
+      if (creationParams.containsKey('padding')
+          && creationParams['padding'] != padding) {
+        _tunEditorApi?.setPadding(paddingList);
+        creationParams['padding'] = paddingList;
+      }
+    } else {
+      creationParams = {
+        'placeholder': placeholder,
+        'readOnly': readOnly,
+        'scrollable': scrollable,
+        'padding': paddingList,
+        'autoFocus': autoFocus,
+        'delta': controller.document.toDelta().toJson(),
+      };
+    }
 
     if (Platform.isAndroid) {
       // Android platform.
@@ -103,9 +128,9 @@ class TunEditorState extends State<TunEditor> with TunEditorHandler {
         canRequestFocus: true,
         onFocusChange: (bool hasFocus) {
           if (hasFocus) {
-            _tunEditorApi.focus();
+            _tunEditorApi?.focus();
           } else {
-            _tunEditorApi.blur();
+            _tunEditorApi?.blur();
           }
         },
         child: PlatformViewLink(

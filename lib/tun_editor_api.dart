@@ -89,24 +89,6 @@ class TunEditorApi {
       'source': source == ChangeSource.LOCAL ? 'user' : 'api',
     });
   }
-  void insertMention(String id, String text) {
-    _channel.invokeMethod('insertMention', {
-      'id': id,
-      'text': text,
-    });
-  }
-  void insertDivider() {
-    _channel.invokeMethod('insertDivider');
-  }
-  void insertImage(String url) {
-    _channel.invokeMethod('insertImage', url);
-  }
-  void insertLink(String text, String url) {
-    _channel.invokeMethod('insertLink', {
-      'text': text,
-      'url': url,
-    });
-  }
 
   // Format related.
   void setTextType(String textType) {
@@ -153,6 +135,18 @@ class TunEditorApi {
   }
   void scrollToBottom() {
     _channel.invokeMethod('scrollToBottom');
+  }
+  void setPlaceholder(String placeholder) {
+    _channel.invokeMethod('setPlaceholder', placeholder);
+  }
+  void setReadOnly(bool readOnly) {
+    _channel.invokeMethod('setReadOnly', readOnly);
+  }
+  void setScrollable(bool scrollable) {
+    _channel.invokeMethod('setScrollable', scrollable);
+  }
+  void setPadding(List<int> padding) {
+    _channel.invokeMethod('setPadding', padding);
   }
 
 }

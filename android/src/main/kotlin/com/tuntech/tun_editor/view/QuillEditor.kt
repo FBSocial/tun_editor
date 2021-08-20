@@ -133,22 +133,6 @@ class QuillEditor: WebView {
         exec("javascript:updateContents(${JSONArray(delta)}, \"$source\")")
     }
 
-    fun insertMention(id: String, text: String) {
-        exec("javascript:insertMention(\"$id\", \"$text\")")
-    }
-
-    fun insertDivider() {
-        exec("javascript:insertDivider()")
-    }
-
-    fun insertImage(url: String) {
-        exec("javascript:insertImage(\"$url\")")
-    }
-
-    fun insertLink(text: String, url: String) {
-        exec("javascript:insertLink(\"$text\", \"$url\")")
-    }
-
     fun format(name: String, value: Any) {
         if (value is String) {
             exec("javascript:format(\"$name\", \"$value\")")
@@ -182,6 +166,30 @@ class QuillEditor: WebView {
         exec("javascript:blur()");
     }
 
+    fun setPlaceholder(placeholder: String) {
+        exec("javascript:setPlaceholder(\"$placeholder\")")
+    }
+
+    fun setReadOnly(readOnly: Boolean) {
+        exec("javascript:setReadOnly($readOnly)")
+    }
+
+    fun setScrollable(scrollable: Boolean) {
+        if (scrollable) {
+            setOnTouchListener(null)
+        } else {
+            setOnTouchListener { _, event -> event.action == MotionEvent.ACTION_MOVE }
+        }
+    }
+
+    fun setPadding(padding: List<Int>) {
+        if (padding.size < 4) {
+            Log.w(TAG, "set editor padding failed: padding size is less then 4")
+            return
+        }
+        exec("javascript:setPadding(${padding[0]}, ${padding[1]}, ${padding[2]}, ${padding[3]})")
+    }
+
     fun setOnTextChangeListener(onTextChangeListener: ((String, String) -> Unit)?) {
         this.onTextChangeListener = onTextChangeListener
     }
@@ -202,33 +210,10 @@ class QuillEditor: WebView {
         this.onFocusChangeListener = onFocusChangeListener
     }
 
-    private fun setPlaceholder(placeholder: String) {
-        exec("javascript:setPlaceholder(\"$placeholder\")")
-    }
-
-    private fun setPadding(padding: List<Int>) {
-        if (padding.size < 4) {
-            Log.w(TAG, "set editor padding failed: padding size is less then 4")
-            return
-        }
-        exec("javascript:setPadding(${padding[0]}, ${padding[1]}, ${padding[2]}, ${padding[3]})")
-    }
-
-    private fun setReadOnly(readOnly: Boolean) {
-        exec("javascript:setReadOnly($readOnly)")
-    }
-
     private fun setContents(delta: List<*>) {
         exec("javascript:setContents(${JSONArray(delta)})")
     }
 
-    private fun setScrollable(scrollable: Boolean) {
-        if (scrollable) {
-            setOnTouchListener(null)
-        } else {
-            setOnTouchListener { _, event -> event.action == MotionEvent.ACTION_MOVE }
-        }
-    }
 
     private fun exec(command: String) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {

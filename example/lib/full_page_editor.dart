@@ -63,7 +63,6 @@ class FullPageEditorState extends State<FullPageEditor> {
     if (_isLoading) {
       return const Scaffold(body: Center(child: Text('Loading...')));
     }
-
     return Scaffold(
       appBar: AppBar(
         title: GestureDetector(
@@ -168,9 +167,9 @@ class FullPageEditorState extends State<FullPageEditor> {
                       showingSubToolbar: _showingSubToolbar,
                       onSubToolbarChange: (SubToolbar subToolbar) {
                         // Hide keyboard on panel showing.
-                        if (subToolbar != SubToolbar.none) {
+                        if (subToolbar == SubToolbar.at || subToolbar == SubToolbar.image
+                            || subToolbar == SubToolbar.emoji) {
                           // TODO Hide keyboard only.
-                          debugPrint('make editor unfocus');
                           _controller.blur();
                         }
                         setState(() {
@@ -270,7 +269,7 @@ class FullPageEditorState extends State<FullPageEditor> {
         onPressed: () {
           _controller.insertImage(
             'https://user-images.githubusercontent.com/122956/72955931-ccc07900-3d52-11ea-89b1-d468a6e2aa2b.png',
-            [
+            attributes: [
               WidthAttribute('100'),
             ],
           );

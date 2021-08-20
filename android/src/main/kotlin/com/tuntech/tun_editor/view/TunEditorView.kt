@@ -27,10 +27,6 @@ internal class TunEditorView(
         // Content related.
         const val HANDLE_METHOD_REPLACE_TEXT = "replaceText"
         const val HANDLE_METHOD_UPDATE_CONTENTS = "updateContents"
-        const val HANDLE_METHOD_INSERT_MENTION = "insertMention"
-        const val HANDLE_METHOD_INSERT_DIVIDER = "insertDivider"
-        const val HANDLE_METHOD_INSERT_IMAGE = "insertImage"
-        const val HANDLE_METHOD_INSERT_LINK = "insertLink"
         // Format related.
         const val HANDLE_METHOD_SET_TEXT_TYPE = "setTextType"
         const val HANDLE_METHOD_SET_TEXT_STYLE = "setTextStyle"
@@ -44,10 +40,14 @@ internal class TunEditorView(
         const val HANDLE_SCROLL_TO = "scrollTo"
         const val HANDLE_SCROLL_TO_TOP = "scrollToTop"
         const val HANDLE_SCROLL_TO_BOTTOM = "scrollToBottom"
+        const val HANDLE_SET_PLACEHOLDER = "setPlaceholder"
+        const val HANDLE_SET_READ_ONLY = "setReadOnly"
+        const val HANDLE_SET_SCROLLABLE = "setScrollable"
+        const val HANDLE_SET_PADDING = "setPadding"
     }
 
     // View.
-    private lateinit var quillEditor: QuillEditor
+    private var quillEditor: QuillEditor
 
     // Method channel.
     private val methodChannel: MethodChannel = MethodChannel(messenger, "tun/editor/${id}")
@@ -141,25 +141,6 @@ internal class TunEditorView(
                 val source = args["source"] as? String ?: return
                 quillEditor.updateContents(delta, source)
             }
-            HANDLE_METHOD_INSERT_MENTION -> {
-                val args = call.arguments as? Map<*, *> ?: return
-                val id = args["id"] as? String ?: return
-                val text = args["text"] as? String ?: return
-                quillEditor.insertMention(id, text)
-            }
-            HANDLE_METHOD_INSERT_DIVIDER -> {
-                quillEditor.insertDivider()
-            }
-            HANDLE_METHOD_INSERT_IMAGE -> {
-                val url = call.arguments as? String ?: return
-                quillEditor.insertImage(url)
-            }
-            HANDLE_METHOD_INSERT_LINK -> {
-                val args = call.arguments as? Map<*, *> ?: return
-                val text = args["text"] as? String ?: return
-                val url = args["url"] as? String ?: return
-                quillEditor.insertLink(text, url)
-            }
             // Format related.
             HANDLE_METHOD_SET_TEXT_TYPE -> {
                 when (call.arguments as? String ?: TextCons.TEXT_TYPE_NORMAL) {
@@ -242,6 +223,25 @@ internal class TunEditorView(
             HANDLE_SCROLL_TO_BOTTOM -> {
                 quillEditor.pageDown(true)
                 result.success(null)
+            }
+            HANDLE_SET_PLACEHOLDER -> {
+                val placeholder = call.arguments as? String ?: return
+                quillEditor.setPlaceholder(placeholder)
+            }
+            HANDLE_SET_READ_ONLY -> {
+                val readOnly = call.arguments as? Boolean ?: return
+                println("set read only $readOnly")
+                quillEditor.setReadOnly(readOnly)
+            }
+            HANDLE_SET_SCROLLABLE -> {
+                val scrollable = call.arguments as? Boolean ?: return
+                quillEditor.setScrollable(scrollable)
+            }
+            HANDLE_SET_PADDING -> {
+                val padding = (call.arguments as? List<*>)?.map {
+                    return@map it as? Int ?: 0
+                } ?: return
+                quillEditor.setPadding(padding)
             }
 
             else -> {
