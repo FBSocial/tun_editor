@@ -132,7 +132,6 @@ class TunEditorController {
     // Insert image.
     final delta = new Delta()
       ..retain(selection.extentOffset)
-      ..insert('\n')
       ..insert({ 'image': imageBlot });
     if (appendNewLine) {
       delta.insert('\n');
@@ -318,6 +317,7 @@ class TunEditorController {
   }
 
   void composeDocument(Delta delta) {
+    debugPrint('compose delta ${delta.toJson()}');
     document.compose(delta, ChangeSource.LOCAL);
   }
 

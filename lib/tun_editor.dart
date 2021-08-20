@@ -143,7 +143,6 @@ class TunEditorState extends State<TunEditor> with TunEditorHandler {
             );
           },
           onCreatePlatformView: (PlatformViewCreationParams params) {
-            debugPrint('on create platform view');
             return PlatformViewsService.initSurfaceAndroidView(
               id: params.id,
               viewType: VIEW_TYPE_TUN_EDITOR,
@@ -194,7 +193,6 @@ class TunEditorState extends State<TunEditor> with TunEditorHandler {
       final deltaList = deltaMap['ops'] as List<dynamic>;
       final deltaObj = Delta.fromJson(deltaList);
       if (deltaObj.isNotEmpty) {
-        debugPrint('delta list: ${deltaObj.length}');
         controller.composeDocument(deltaObj);
       }
     }
@@ -217,7 +215,6 @@ class TunEditorState extends State<TunEditor> with TunEditorHandler {
 
   @override
   void onFocusChange(bool hasFocus) {
-    debugPrint('on focus chagne $hasFocus');
     onFocusChangeCallback?.call(hasFocus);
     // if (hasFocus) {
     //   focusNode?.requestFocus();

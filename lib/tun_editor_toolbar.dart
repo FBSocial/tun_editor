@@ -539,7 +539,7 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
 
   // Sync toolbar' status with format.
   void syncFormat(Map<String, dynamic> format) {
-    debugPrint('sync format: ${controller.selection.baseOffset} - ${controller.selection.extentOffset} - $format');
+    // debugPrint('sync format: ${controller.selection.baseOffset} - ${controller.selection.extentOffset} - $format');
     // Check text type.
     if (format.containsKey(Attribute.header.key)) {
       final level = format[Attribute.header.key] as int?;
