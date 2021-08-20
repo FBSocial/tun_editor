@@ -1,5 +1,7 @@
 PODS:
   - Flutter (1.0.0)
+  - image_picker (0.0.1):
+    - Flutter
   - RichEditorView (5.0.0)
   - tun_editor (0.0.1):
     - Flutter
@@ -7,6 +9,7 @@ PODS:
 
 DEPENDENCIES:
   - Flutter (from `Flutter`)
+  - image_picker (from `.symlinks/plugins/image_picker/ios`)
   - tun_editor (from `.symlinks/plugins/tun_editor/ios`)
 
 SPEC REPOS:
@@ -16,11 +19,14 @@ SPEC REPOS:
 EXTERNAL SOURCES:
   Flutter:
     :path: Flutter
+  image_picker:
+    :path: ".symlinks/plugins/image_picker/ios"
   tun_editor:
     :path: ".symlinks/plugins/tun_editor/ios"
 
 SPEC CHECKSUMS:
   Flutter: 434fef37c0980e73bb6479ef766c45957d4b510c
+  image_picker: e06f7a68f000bd36f552c1847e33cda96ed31f1f
   RichEditorView: 1bbb07b87ca2d479ac29a6877014b38b8df233ef
   tun_editor: a21324e4825cc6f4892792e682fb0b38435ade25
 
