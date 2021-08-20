@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:tun_editor/iconfont.dart';
 import 'package:tun_editor/models/documents/document.dart';
 import 'package:tun_editor/tun_editor.dart';
@@ -267,10 +268,7 @@ class FullPageEditorState extends State<FullPageEditor> {
       ),
       child: IconButton(
         onPressed: () {
-          _controller.insertImage(
-            source: 'https://user-images.githubusercontent.com/122956/72955931-ccc07900-3d52-11ea-89b1-d468a6e2aa2b.png',
-            width: 230,
-          );
+          _pickImage();
         },
         icon: Icon(
           Icons.image,
@@ -337,6 +335,24 @@ class FullPageEditorState extends State<FullPageEditor> {
     setState(() {
       _isLoading = false;
     });
+  }
+
+  Future<void> _pickImage() async {
+    // final picker = ImagePicker();
+    // final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+    // if (image != null) {
+    //   debugPrint('file path ${image.path}');
+    //   final imageBytes = await image.readAsBytes();
+    //   _controller.insertImage(
+    //     source: 'data:image/png;base64,${base64Encode(imageBytes)}',
+    //     width: 230,
+    //   );
+    // }
+    _controller.insertImage(
+      source: 'https://user-images.githubusercontent.com/122956/72955931-ccc07900-3d52-11ea-89b1-d468a6e2aa2b.png',
+      width: 230,
+      appendNewLine: false,
+    );
   }
 
 }

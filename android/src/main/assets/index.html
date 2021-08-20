@@ -235,12 +235,13 @@
         DividerBlot.tagName = 'hr';
         Quill.register(DividerBlot, true);
 
-        class ImageExtend extends BlockEmbed {
+        class ImageExtend extends Embed {
           static create(value) {
 
             const node = super.create(value);
             node.setAttribute('src', this.sanitize(value.source));
             node.onerror = function() {
+              console.log('image error', node.getAttribute('src'));
               node.setAttribute('src', 'common_lost.svg');
             }
             if (value.width) {
@@ -270,7 +271,7 @@
           }
 
           static sanitize(url) {
-            let protocols = ['http', 'https', 'mailto', 'tel'];
+            let protocols = ['http', 'https', 'mailto', 'tel', 'file'];
             const anchor = document.createElement('a');
             anchor.href = url;
             const protocol = anchor.href.slice(0, anchor.href.indexOf(':'));

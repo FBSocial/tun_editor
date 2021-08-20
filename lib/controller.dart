@@ -129,16 +129,22 @@ class TunEditorController {
       imageBlot['checkPath'] = checkPath;
     }
 
+    // Insert new line.
+    final newLineOffset = _insertNewLine();
+    if (newLineOffset == null) {
+      return;
+    }
+
     // Insert image.
     final delta = new Delta()
-      ..retain(selection.extentOffset)
+      ..retain(newLineOffset)
       ..insert({ 'image': imageBlot });
     if (appendNewLine) {
       delta.insert('\n');
     }
     compose(delta, null, ChangeSource.LOCAL);
 
-    int newOffset = selection.extentOffset + 2;
+    int newOffset = newLineOffset + 1;
     if (appendNewLine) {
       newOffset = newOffset + 1;
     }
@@ -191,41 +197,19 @@ class TunEditorController {
 
   /// Insert divider to current [selection].
   void insertDivider() {
-    final child = document.queryChild(selection.extentOffset);
-    if (child.node == null) {
+    final newLineOffset = _insertNewLine();
+    if (newLineOffset == null) {
       return;
     }
 
-    final delta = new Delta();
-    final lineEndOffset = child.node!.documentOffset + child.node!.length - 1;
-    delta.retain(lineEndOffset);
-
-    // Insert new line below current line.
-    if (child.node!.style.attributes.containsKey(Attribute.header.key)) {
-      delta.insert('\n', child.node!.style.attributes[Attribute.header.key]!.toJson());
-      delta.retain(1, Attribute.header.toJson());
-    } else if (child.node!.style.attributes.containsKey(Attribute.list.key)) {
-      delta.insert('\n', child.node!.style.attributes[Attribute.list.key]!.toJson());
-      delta.retain(1, Attribute.list.toJson());
-    } else if (child.node!.style.attributes.containsKey(Attribute.codeBlock.key)) {
-      delta.insert('\n', child.node!.style.attributes[Attribute.codeBlock.key]!.toJson());
-      delta.retain(1, Attribute(Attribute.codeBlock.key, AttributeScope.BLOCK, null).toJson());
-    } else if (child.node!.style.attributes.containsKey(Attribute.blockQuote.key)) {
-      delta.insert('\n', child.node!.style.attributes[Attribute.blockQuote.key]!.toJson());
-      delta.retain(1, Attribute(Attribute.blockQuote.key, AttributeScope.BLOCK, null).toJson());
-    } else {
-      delta.insert('\n');
-    }
-    compose(delta, null, ChangeSource.LOCAL);
-
     // Insert divider.
     final dividerDelta = new Delta()
-        ..retain(lineEndOffset + 1)
+        ..retain(newLineOffset)
         ..insert({ 'divider': 'hr' });
     compose(dividerDelta, null, ChangeSource.LOCAL);
 
     updateSelection(TextSelection.collapsed(
-      offset: lineEndOffset + 2), ChangeSource.LOCAL);
+      offset: newLineOffset + 1), ChangeSource.LOCAL);
   }
 
   /// Insert [text] with [link] format to current [selection].
@@ -319,6 +303,37 @@ class TunEditorController {
   void composeDocument(Delta delta) {
     debugPrint('compose delta ${delta.toJson()}');
     document.compose(delta, ChangeSource.LOCAL);
+  }
+
+  // Insert new line and return new line's offset.
+  int? _insertNewLine() {
+    final child = document.queryChild(selection.extentOffset);
+    if (child.node == null) {
+      return null;
+    }
+
+    final delta = new Delta();
+    final lineEndOffset = child.node!.documentOffset + child.node!.length - 1;
+    delta.retain(lineEndOffset);
+
+    // Insert new line below current line.
+    if (child.node!.style.attributes.containsKey(Attribute.header.key)) {
+      delta.insert('\n', child.node!.style.attributes[Attribute.header.key]!.toJson());
+      delta.retain(1, Attribute.header.toJson());
+    } else if (child.node!.style.attributes.containsKey(Attribute.list.key)) {
+      delta.insert('\n', child.node!.style.attributes[Attribute.list.key]!.toJson());
+      delta.retain(1, Attribute.list.toJson());
+    } else if (child.node!.style.attributes.containsKey(Attribute.codeBlock.key)) {
+      delta.insert('\n', child.node!.style.attributes[Attribute.codeBlock.key]!.toJson());
+      delta.retain(1, Attribute(Attribute.codeBlock.key, AttributeScope.BLOCK, null).toJson());
+    } else if (child.node!.style.attributes.containsKey(Attribute.blockQuote.key)) {
+      delta.insert('\n', child.node!.style.attributes[Attribute.blockQuote.key]!.toJson());
+      delta.retain(1, Attribute(Attribute.blockQuote.key, AttributeScope.BLOCK, null).toJson());
+    } else {
+      delta.insert('\n');
+    }
+    compose(delta, null, ChangeSource.LOCAL);
+    return lineEndOffset + 1;
   }
 
 }
