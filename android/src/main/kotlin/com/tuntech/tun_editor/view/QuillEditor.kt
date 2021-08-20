@@ -45,8 +45,8 @@ class QuillEditor: WebView {
     private var placeholder: String = ""
     private var readOnly: Boolean = false
     private var scrollable: Boolean = false
-    private var autoFocus: Boolean = false
     private var padding: List<Int> = listOf(12, 15, 12, 15)
+    private var autoFocus: Boolean = false
     private var delta: List<*> = listOf<Map<String, Any>>()
 
     private var onTextChangeListener: ((String, String) -> Unit)? = null

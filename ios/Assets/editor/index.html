@@ -10,7 +10,7 @@
     <script src="highlight.min.js" charset="utf-8"></script>
     <script src="highlightjs-line-numbers.min.js" charset="utf-8"></script>
     <script src="markdown.js" charset="utf-8"></script>
-    <script src="quill.min.js" charset="utf-8"></script>
+    <script src="quill2.min.js" charset="utf-8"></script>
     <script src="quill.mention.min.js" charset="utf-8"></script>
     <style>
       .ql-container {
@@ -70,6 +70,7 @@
         padding-left: 12px;
         color: #646A73;
       }
+      .ql-editor .ql-code-block-container,
       .ql-snow .ql-editor pre.ql-syntax {
         font-size: 14px;
         color: #646A73;
@@ -79,20 +80,15 @@
         margin: 5px 0;
         padding: 16px 24px;
         box-sizing: border-box;
-      }
-      .ql-snow .ql-editor pre {
-        color: #646A73;
-        background-color: #F5F5F8;
-        border-radius: 4px;
-        border: 1px solid rgba(143, 149, 158, 0.2);
         counter-reset: line-numbering;
       }
       .ql-snow a {
         color: #5562F2;
       }
+      .ql-editor .ql-code-block::before,
       pre .hljs-line::before {
         display: inline-block;
-        content: counter(line-numbering);
+        content: counter(line-numbering) '.';
         counter-increment: line-numbering;
         width: 30px;
         text-align: right;
@@ -107,6 +103,31 @@
       }
       .ql-snow .ql-editor blockquote {
         margin: 0;
+      }
+      .ql-editor .ql-video {
+        display: flex;
+        position: relative;
+        margin: 0;
+        padding: 0;
+      }
+      .ql-editor .ql-video video {
+        max-width: 100%;
+      }
+      .ql-editor .ql-video .video-duration-mask {
+        position: absolute;
+        bottom: 4px;
+        right: 4px;
+        background: #0000008C;
+        color: #FFFFFF;
+        padding: 2px;
+        width: 60px;
+        height: 24px;
+        font-size: 13px;
+        text-align: center;
+        border-radius: 12px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
       }
     </style>
   </head>
@@ -172,29 +193,24 @@
         },
       }
 
-      var insertMention;
-      var insertDivider;
-      var insertImage;
-      var insertLink;
+      var replaceText;
+      var setContents;
+      var updateContents;
       var format;
       var formatText;
-      var removeFormat;
-      var removeCurrentFormat;
       var setSelection;
-      var setPlaceholder;
-      var setPadding;
-      var setReadOnly;
       var focus;
       var blur;
-      var setContents;
-      var replaceText;
-      var updateContents;
+      var setPlaceholder;
+      var setReadOnly;
+      var setPadding;
 
       document.addEventListener('DOMContentLoaded', () => {
         let Delta = Quill.import('delta');
         let Keyboard = Quill.import('modules/keyboard');
         let BlockEmbed = Quill.import('blots/block/embed');
-        let CodeBlock = Quill.import('formats/code-block');
+        let Container = Quill.import('blots/container');
+        let Image = Quill.import('formats/image');
 
         class DividerBlot extends BlockEmbed {
 
@@ -211,37 +227,142 @@
         }
         DividerBlot.blotName = 'divider';
         DividerBlot.tagName = 'hr';
-        Quill.register(DividerBlot);
+        Quill.register(DividerBlot, true);
+
+        class ImageExtend extends Image {
+          static create(value) {
+            let node = super.create(value);
+            if (typeof value === 'string') {
+              node.setAttribute('src', this.sanitize(value));
+              node.setAttribute('data-src', this.sanitize(value));
+            }
+            node.onerror = function() {
+              node.setAttribute('src', 'common_lost.svg');
+            }
+            return node;
+          }
+          static value(domNode) {
+            return domNode.getAttribute('data-src');
+          }
+        }
+        Quill.register(ImageExtend, true);
+
+        class VideoBlot extends BlockEmbed {
+
+          static create(value) {
+            const node = super.create(value);
+            node.setAttribute('src', this.sanitize(value));
+
+            const video = document.createElement("video");
+            video.innerHTML = node.duration;
+            video.setAttribute('src', this.sanitize(value));
+            video.controls = false;
+            video.ontimeupdate = function() {
+              const durationSpan = document.createElement("div");
+              durationSpan.className = 'video-duration-mask';
+              if (video.duration) {
+                let minute = parseInt(video.duration / 60);
+                let second = parseInt(video.duration % 60);
+                durationSpan.innerHTML = `<svg t="1629367052116" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="9336" xmlns:xlink="http://www.w3.org/1999/xlink" width="15" height="15"><defs><style type="text/css">@font-face { font-family: element-icons; src: url("chrome-extension://moombeodfomdpjnpocobemoiaemednkg/fonts/element-icons.woff") format("woff"), url("chrome-extension://moombeodfomdpjnpocobemoiaemednkg/fonts/element-icons.ttf ") format("truetype"); }
+</style></defs><path d="M896 305.066667a72.533333 72.533333 0 0 0-78.933333 12.8l-91.733334 85.333333V341.333333a128 128 0 0 0-128-128H213.333333a128 128 0 0 0-128 128v341.333334a128 128 0 0 0 128 128h384a128 128 0 0 0 128-128v-61.866667l92.16 85.333333a74.24 74.24 0 0 0 49.493334 19.2 71.68 71.68 0 0 0 29.44-6.4 68.266667 68.266667 0 0 0 42.666666-63.146666V368.213333A68.266667 68.266667 0 0 0 896 305.066667z" fill="#FFFFFF" p-id="9337"></path></svg> ${minute}:${second}`;
+              } else {
+                durationSpan.innerHTML = '00:00';
+              }
+              durationSpan.setAttribute('contenteditable', false);
+              node.appendChild(durationSpan);
+            }
+            node.appendChild(video);
+            return node;
+          }
+
+          static formats(domNode) {
+            return ['width', 'height'].reduce((formats, attribute) => {
+              if (domNode.hasAttribute(attribute)) {
+                formats[attribute] = domNode.getAttribute(attribute);
+              }
+              return formats;
+            }, {});
+          }
+
+          static sanitize(url) {
+            let protocols = ['http', 'https', 'mailto', 'tel'];
+            const anchor = document.createElement('a');
+            anchor.href = url;
+            const protocol = anchor.href.slice(0, anchor.href.indexOf(':'));
+            let isValid = protocols.indexOf(protocol) > -1;
+            return isValid ? `${url}#t=0.1` : 'about:blank';
+          }
+
+          static value(domNode) {
+            return domNode.getAttribute('src');
+          }
+
+          format(name, value) {
+            let videoNode = this.domNode.querySelector('video');
+            if (name === 'width' || name === 'height' && videoNode) {
+              if (value) {
+                this.domNode.style[name] = `${value}px`;
+                videoNode.setAttribute(name, value);
+              } else {
+                this.domNode.style[name] = null;
+                videoNode.removeAttribute(name);
+              }
+            } else {
+              super.format(name, value);
+            }
+          }
+
+        }
+        VideoBlot.blotName = 'video';
+        VideoBlot.className = 'ql-video';
+        VideoBlot.tagName = 'DIV';
+        Quill.register(VideoBlot, true);
 
         let bindings = {
           'code exit': {
-            key: Keyboard.keys.ENTER,
-            collapsed: true,
-            format: ['code-block'],
-            prefix: /\n$/,
-            suffix: /^\s+$/,
-            handler: function(range) {
-              const [line, offset] = this.quill.getLine(range.index);
-              const delta = new Delta()
-                .retain(range.index + line.length() - offset - 1)
-                .retain(1, { 'code-block': null })
-                .delete(1);
-              this.quill.updateContents(delta, Quill.sources.USER);
-            }
-          },
-          'code delete': {
-            key: Keyboard.keys.BACKSPACE,
+            key: 'Enter',
             collapsed: true,
             format: ['code-block'],
             prefix: /^$/,
-            suffix: /^\s+$/,
+            suffix: /^\s*$/,
+            handler: function(range, context) {
+              const [line, offset] = this.quill.getLine(range.index);
+              let numLines = 1;
+              let cur = line;
+              while (
+                cur != null &&
+                cur.length() <= 1 &&
+                cur.formats()['code-block'] &&
+                (cur.next === null || !cur.next.formats()['code-block'])
+              ) {
+                cur = cur.prev;
+                numLines -= 1;
+                // Requisite prev lines are empty
+                if (numLines <= 0) {
+                  const delta = new Delta()
+                    .retain(range.index + line.length() - offset - 1)
+                    .retain(1, { 'code-block': null })
+                    .delete(1);
+                  this.quill.updateContents(delta, Quill.sources.USER);
+                  this.quill.setSelection(range.index, Quill.sources.SILENT);
+                  return false;
+                }
+              }
+              return true;
+            }
+          },
+          'code delete': {
+            key: 'Backspace',
+            collapsed: true,
+            format: ['code-block'],
+            prefix: /^$/,
+            suffix: /^\s*$/,
             handler: function(range) {
-              console.log('code delete');
               this.quill.format('code-block', false, Quill.sources.USER);
             }
           },
           'blockquote delete': {
-            key: Keyboard.keys.BACKSPACE,
+            key: 'Backspace',
             collapsed: true,
             format: ['blockquote'],
             prefix: /^$/,
@@ -251,7 +372,7 @@
             }
           },
           'header delete': {
-            key: Keyboard.keys.BACKSPACE,
+            key: 'Backspace',
             collapsed: true,
             format: ['header'],
             prefix: /^$/,
@@ -265,26 +386,7 @@
           readOnly: false,
           theme: 'snow',
           modules: {
-            syntax: {
-              highlight: (function() {
-                if (window.hljs == null) return null;
-                return function(text) {
-                  let lines = text.split('\n');
-                  let spanLines = lines.map(function(line, index) {
-                    if (index == lines.length - 1) {
-                      return '';
-                    }
-                    if (line === '') {
-                      return '<span class="hljs-line">&ZeroWidthSpace;</span>'
-                    }
-                    return '<span class="hljs-line">' + line + '</span>';
-                  });
-                  let res = spanLines.join('\n');
-                  return text;
-                };
-              })(),
-              interval: 0,
-            },
+            syntax: false,
             toolbar: false,
             keyboard: {
               bindings: bindings
@@ -292,9 +394,6 @@
             mention: {
               mentionDenotationChars: ["@"],
               source: async function(searchTerm, renderList) {
-              },
-              onSelect(item, insertItem) {
-                console.log(item);
               },
             },
           }
@@ -355,71 +454,6 @@
         };
         new QuillMarkdown(quill, markdownOptions);
 
-        // Insert divider.
-        insertMention = function(id, name) {
-          quill.getModule('mention').insertItem({
-            denotationChar: "@",
-            id: id,
-            value: name,
-          }, true);
-        }
-        insertDivider = function() {
-          let range = quill.getSelection(true);
-          quill.insertText(range.index, '\n', Quill.sources.USER);
-          quill.insertEmbed(range.index + 1, 'divider', 'hr', Quill.sources.USER);
-          quill.setSelection(range.index + 2, Quill.sources.SILENT);
-        }
-        insertImage = function(url) {
-          let range = quill.getSelection(true);
-          quill.insertText(range.index, '\n', Quill.sources.USER);
-          quill.insertEmbed(range.index + 1, 'image', url, Quill.sources.USER);
-          quill.setSelection(range.index + 2, Quill.sources.SILENT);
-        }
-        insertLink = function(text, url) {
-          let range = quill.getSelection(true);
-          quill.insertText(range.index, text, 'link', url, Quill.sources.USER);
-          quill.setSelection(range.index + text.length, Quill.sources.SILENT)
-        }
-        format = function(name, value) {
-          quill.format(name, value, 'user');
-        }
-        formatText = function(index, length, format, value) {
-          quill.formatText(index, length, format, value, Quill.sources.USER);
-        }
-        removeFormat = function(index, length) {
-          quill.removeFormat(index, length, 'user');
-        }
-        removeCurrentFormat = function() {
-          var range = quill.getSelection();
-          if (range.length === 0) {
-            let leaf, offset = quill.getLeaf(range.index);
-            quill.removeFormat(range.index - offset, range.index + leaf.domNode.length);
-          } else {
-             quill.removeFormat(range.index, range.length);
-          }
-        }
-        setSelection = function(index, length) {
-          quill.setSelection(index, length, Quill.sources.API)
-        }
-        setPlaceholder = function(placeholder) {
-          quill.root.dataset.placeholder = placeholder;
-        }
-        setPadding = function(top, right, bottom, left) {
-          var editor = document.querySelector('.ql-editor');
-          editor.style.padding = `${top}px ${right}px ${bottom}px ${left}px`;
-        }
-        setReadOnly = function(readOnly) {
-          quill.enable(!readOnly);
-        }
-        focus = function() {
-          quill.focus();
-        }
-        blur = function() {
-          quill.blur();
-        }
-        setContents = function(delta) {
-          quill.setContents(delta, Quill.sources.SILENT);
-        }
         replaceText = function(index, length, data, attributes, newLineAfterImage, isEmbeddable) {
           if (isEmbeddable) {
             var delta = new Delta().retain(index).delete(length).insert(data, attributes)
@@ -434,8 +468,36 @@
             quill.updateContents(delta);
           }
         }
+        setContents = function(delta) {
+          quill.setContents(delta, Quill.sources.SILENT);
+        }
         updateContents = function(delta, source) {
           quill.updateContents(delta, source);
+        }
+        format = function(name, value) {
+          quill.format(name, value, 'user');
+        }
+        formatText = function(index, length, format, value) {
+          quill.formatText(index, length, format, value, Quill.sources.USER);
+        }
+        setSelection = function(index, length) {
+          quill.setSelection(index, length, Quill.sources.API)
+        }
+        focus = function() {
+          quill.focus();
+        }
+        blur = function() {
+          quill.blur();
+        }
+        setPlaceholder = function(placeholder) {
+          quill.root.dataset.placeholder = placeholder;
+        }
+        setReadOnly = function(readOnly) {
+          quill.enable(!readOnly);
+        }
+        setPadding = function(top, right, bottom, left) {
+          var editor = document.querySelector('.ql-editor');
+          editor.style.padding = `${top}px ${right}px ${bottom}px ${left}px`;
         }
       })
     </script>

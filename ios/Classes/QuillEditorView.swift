@@ -13,8 +13,9 @@ class QuillEditorView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler {
     weak var scriptDelegate: WKScriptMessageHandler?
     
     var placeholder: String = ""
-    var padding: [Int] = [12, 15, 12, 15]
     var readOnly: Bool = false
+    var scrollable: Bool = true
+    var padding: [Int] = [12, 15, 12, 15]
     var autoFocus: Bool = false
     var delta: [Any] = []
     
@@ -38,14 +39,16 @@ class QuillEditorView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler {
         frame: CGRect,
         configuration: WKWebViewConfiguration,
         placeholder: String,
-        padding: [Int],
         readOnly: Bool,
+        scrollable: Bool,
+        padding: [Int],
         autoFocus: Bool,
         delta: [Any]
     ) {
         self.placeholder = placeholder
-        self.padding = padding
         self.readOnly = readOnly
+        self.scrollable = scrollable
+        self.padding = padding
         self.autoFocus = autoFocus
         self.delta = delta
         
@@ -63,8 +66,9 @@ class QuillEditorView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler {
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         setPlaceholder(placeholder)
-        setPadding(padding)
         setReadOnly(readOnly)
+        setScrollable(scrollable)
+        setPadding(padding)
         setContents(delta)
 
         if (autoFocus) {
@@ -146,22 +150,6 @@ class QuillEditorView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler {
         }
     }
     
-    func insertMention(id: String, text: String) {
-        exec("insertMention(\"\(id)\", \"\(text)\")")
-    }
-    
-    func insertDivider() {
-        exec("insertDivider()")
-    }
-    
-    func insertImage(_ url: String) {
-        exec("insertImage(\"\(url)\")")
-    }
-    
-    func insertLink(_ text: String, _ url: String) {
-        exec("insertLink(\"\(text)\", \"\(url)\")")
-    }
-    
     func format(name: String, value: Any) {
         if (value is String) {
             exec("format(\"\(name)\", \"\(value)\")")
@@ -190,6 +178,26 @@ class QuillEditorView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler {
         exec("blur()")
     }
     
+    func setPlaceholder(_ placeholder: String) {
+        exec("setPlaceholder(\"\(placeholder)\")")
+    }
+    
+    func setReadOnly(_ readOnly: Bool) {
+        exec("setReadOnly(\(readOnly))")
+    }
+    
+    func setScrollable(_ scrollable: Bool) {
+        self.scrollView.isScrollEnabled = scrollable
+    }
+    
+    func setPadding(_ padding: [Int]) {
+        if padding.count < 4 {
+            return
+        } else {
+            exec("setPadding(\(padding[0]), \(padding[1]), \(padding[2]), \(padding[3]))")
+        }
+    }
+    
     func setOnTextChangeListener(_ handler: @escaping (([String: AnyObject]) -> Void)) {
         self.onTextChangeHandler = handler
     }
@@ -208,22 +216,6 @@ class QuillEditorView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler {
     
     func setOnFocusChangeListener(_ handler: @escaping (([String: AnyObject]) -> Void)) {
         self.onFocusChangeHandler = handler
-    }
-    
-    private func setPlaceholder(_ placeholder: String) {
-        exec("setPlaceholder(\"\(placeholder)\")")
-    }
-    
-    private func setPadding(_ padding: [Int]) {
-        if padding.count < 4 {
-            return
-        } else {
-            exec("setPadding(\(padding[0]), \(padding[1]), \(padding[2]), \(padding[3]))")
-        }
-    }
-    
-    private func setReadOnly(_ readOnly: Bool) {
-        exec("setReadOnly(\(readOnly))")
     }
     
     private func setContents(_ delta: [Any]) {

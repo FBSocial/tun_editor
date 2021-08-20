@@ -45,8 +45,9 @@ class TunEditorView: NSObject, FlutterPlatformView {
         let configuration = WKWebViewConfiguration()
         
         var placeholder: String = ""
-        var padding: [Int] = [12, 15, 12, 15]
         var readOnly: Bool = false
+        var scrollable: Bool = true
+        var padding: [Int] = [12, 15, 12, 15]
         var autoFocus: Bool = false
         var delta: [Any] = []
         
@@ -54,11 +55,14 @@ class TunEditorView: NSObject, FlutterPlatformView {
             if let optPlaceholder = argsMap["placeholder"] as? String {
                 placeholder = optPlaceholder
             }
-            if let optPadding = argsMap["padding"] as? [Int] {
-                padding = optPadding
-            }
             if let optReadOnly = argsMap["readOnly"] as? Bool {
                 readOnly = optReadOnly
+            }
+            if let optScrollable = argsMap["scrollable"] as? Bool {
+                scrollable = optScrollable
+            }
+            if let optPadding = argsMap["padding"] as? [Int] {
+                padding = optPadding
             }
             if let optAutoFocus = argsMap["autoFocus"] as? Bool {
                 autoFocus = optAutoFocus
@@ -71,8 +75,9 @@ class TunEditorView: NSObject, FlutterPlatformView {
             frame: frame,
             configuration: configuration,
             placeholder: placeholder,
-            padding: padding,
             readOnly: readOnly,
+            scrollable: scrollable,
+            padding: padding,
             autoFocus: autoFocus,
             delta: delta
         )
@@ -87,17 +92,14 @@ class TunEditorView: NSObject, FlutterPlatformView {
             self.methodChannel.invokeMethod("onSelectionChange", arguments: args)
         }
         _editor.setOnMentionClickListener { args in
-            print("on mention click \(args)")
             self.methodChannel.invokeMethod("onMentionClick", arguments: args)
         }
         _editor.setOnLinkClickListener { args in
-            print("on link click \(args)")
             if let url = args["url"] as? String {
                 self.methodChannel.invokeMethod("onLinkClick", arguments: url)
             }
         }
         _editor.setOnFocusChangeListener { args in
-            print("on focus change \(args)")
             if let hasFocus = args["hasFocus"] as? Bool {
                 self.methodChannel.invokeMethod("onFocusChange", arguments: hasFocus)
             }
@@ -121,7 +123,6 @@ class TunEditorView: NSObject, FlutterPlatformView {
                 let attributes = args["attributes"] as? [String: Any]
                 let newLineAfterImage = args["newLineAfterImage"] as? Bool
                 if index == nil || length == nil || data == nil || newLineAfterImage == nil || attributes == nil {
-                    print("invalid params \(index) \(length) \(data) \(newLineAfterImage) \(attributes)")
                     return
                 }
                 _editor.replaceText(index: index!, length: length!, data: data!, attributes: attributes!, newLineAfterImage: newLineAfterImage!)
@@ -134,30 +135,6 @@ class TunEditorView: NSObject, FlutterPlatformView {
                     return
                 }
                 _editor.updateContents(delta: delta!, source: source!)
-            }
-        case "insertMention":
-            if let args = call.arguments as? [String: Any] {
-                let id = args["id"] as? String
-                let text = args["text"] as? String
-                if id == nil || text == nil {
-                    return
-                }
-                _editor.insertMention(id: id!, text: text!)
-            }
-        case "insertDivider":
-            _editor.insertDivider()
-        case "insertImage":
-            if let url = call.arguments as? String {
-                _editor.insertImage(url)
-            }
-        case "insertLink":
-            if let args = call.arguments as? [String: Any] {
-                let text = args["text"] as? String
-                let url = args["url"] as? String
-                if text == nil || url == nil {
-                    return
-                }
-                _editor.insertLink(text!, url!)
             }
 
         // Format related.
@@ -245,6 +222,22 @@ class TunEditorView: NSObject, FlutterPlatformView {
         case "scrollToBottom":
             let offset = CGPoint(x: 0, y: _editor.scrollView.contentSize.height - _editor.frame.size.height)
             _editor.scrollView.setContentOffset(offset, animated: true)
+        case "setPlaceholder":
+            if let placeholder = call.arguments as? String {
+                _editor.setPlaceholder(placeholder)
+            }
+        case "setReadOnly":
+            if let readOnly = call.arguments as? Bool {
+                _editor.setReadOnly(readOnly)
+            }
+        case "setScrollable":
+            if let scrollable = call.arguments as? Bool {
+                _editor.setScrollable(scrollable)
+            }
+        case "setPadding":
+            if let padding = call.arguments as? [Int] {
+                _editor.setPadding(padding)
+            }
             
         default:
             print("missing tun editor method")
