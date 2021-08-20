@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:tun_editor/iconfont.dart';
-import 'package:tun_editor/models/documents/attribute.dart';
 import 'package:tun_editor/models/documents/document.dart';
 import 'package:tun_editor/tun_editor.dart';
 import 'package:tun_editor/tun_editor_toolbar.dart';
@@ -68,12 +67,13 @@ class FullPageEditorState extends State<FullPageEditor> {
         title: GestureDetector(
           child: Text('Editor'),
           onTap: () {
-            // _controller.insertVideo(
-            //   'https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_20mb.mp4',
-            //   [
-            //     WidthAttribute('300'),
-            //   ]
-            // );
+            _controller.insertVideo(
+              source: 'https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_20mb.mp4',
+              width: 230,
+              height: 460,
+              duration: 7,
+              thumbUrl: 'https://fb-cdn.fanbook.mobi/fanbook/app/files/chatroom/image/43789ea4452106628661d9014d45c873.jpg',
+            );
             // _controller.updateSelection(TextSelection.collapsed(offset: 10), ChangeSource.LOCAL);
 
             // final imageBlock = BlockEmbed.image(
@@ -268,10 +268,8 @@ class FullPageEditorState extends State<FullPageEditor> {
       child: IconButton(
         onPressed: () {
           _controller.insertImage(
-            'https://user-images.githubusercontent.com/122956/72955931-ccc07900-3d52-11ea-89b1-d468a6e2aa2b.png',
-            attributes: [
-              WidthAttribute('100'),
-            ],
+            source: 'https://user-images.githubusercontent.com/122956/72955931-ccc07900-3d52-11ea-89b1-d468a6e2aa2b.png',
+            width: 230,
           );
         },
         icon: Icon(

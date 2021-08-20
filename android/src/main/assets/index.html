@@ -105,13 +105,19 @@
         margin: 0;
       }
       .ql-editor .ql-video {
-        display: flex;
         position: relative;
         margin: 0;
         padding: 0;
+        overflow: hidden;
+        max-width: 100%;
+        width: auto;
+        height: auto;
       }
       .ql-editor .ql-video video {
-        max-width: 100%;
+        width: 100%;
+        height: 100%;
+        display: block;
+        object-fit: cover;
       }
       .ql-editor .ql-video .video-duration-mask {
         position: absolute;
@@ -136,10 +142,10 @@
 
     <script>
       let u = navigator.userAgent;
-      // let isAndroid = u.indexOf('Android') > -1 || u.indexOf('Adr') > -1;
-      // let isIOS = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/);
-      let isAndroid = false;
-      let isIOS = false;
+      let isAndroid = u.indexOf('Android') > -1 || u.indexOf('Adr') > -1;
+      let isIOS = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/);
+      // let isAndroid = false;
+      // let isIOS = false;
       let bridge = {
         onTextChange: function(delta, oldDelta, source) {
           if (isAndroid) {
@@ -210,7 +216,7 @@
         let Keyboard = Quill.import('modules/keyboard');
         let BlockEmbed = Quill.import('blots/block/embed');
         let Container = Quill.import('blots/container');
-        let Image = Quill.import('formats/image');
+        let Embed = Quill.import('blots/embed');
 
         class DividerBlot extends BlockEmbed {
 
@@ -229,59 +235,38 @@
         DividerBlot.tagName = 'hr';
         Quill.register(DividerBlot, true);
 
-        class ImageExtend extends Image {
+        class ImageExtend extends Embed {
           static create(value) {
-            let node = super.create(value);
-            if (typeof value === 'string') {
-              node.setAttribute('src', this.sanitize(value));
-              node.setAttribute('data-src', this.sanitize(value));
-            }
+
+            const node = super.create(value);
+            node.setAttribute('src', this.sanitize(value.source));
             node.onerror = function() {
               node.setAttribute('src', 'common_lost.svg');
             }
-            return node;
-          }
-          static value(domNode) {
-            return domNode.getAttribute('data-src');
-          }
-        }
-        Quill.register(ImageExtend, true);
-
-        class VideoBlot extends BlockEmbed {
-
-          static create(value) {
-            const node = super.create(value);
-            node.setAttribute('src', this.sanitize(value));
-
-            const video = document.createElement("video");
-            video.innerHTML = node.duration;
-            video.setAttribute('src', this.sanitize(value));
-            video.controls = false;
-            video.ontimeupdate = function() {
-              const durationSpan = document.createElement("div");
-              durationSpan.className = 'video-duration-mask';
-              if (video.duration) {
-                let minute = parseInt(video.duration / 60);
-                let second = parseInt(video.duration % 60);
-                durationSpan.innerHTML = `<svg t="1629367052116" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="9336" xmlns:xlink="http://www.w3.org/1999/xlink" width="15" height="15"><defs><style type="text/css">@font-face { font-family: element-icons; src: url("chrome-extension://moombeodfomdpjnpocobemoiaemednkg/fonts/element-icons.woff") format("woff"), url("chrome-extension://moombeodfomdpjnpocobemoiaemednkg/fonts/element-icons.ttf ") format("truetype"); }
-</style></defs><path d="M896 305.066667a72.533333 72.533333 0 0 0-78.933333 12.8l-91.733334 85.333333V341.333333a128 128 0 0 0-128-128H213.333333a128 128 0 0 0-128 128v341.333334a128 128 0 0 0 128 128h384a128 128 0 0 0 128-128v-61.866667l92.16 85.333333a74.24 74.24 0 0 0 49.493334 19.2 71.68 71.68 0 0 0 29.44-6.4 68.266667 68.266667 0 0 0 42.666666-63.146666V368.213333A68.266667 68.266667 0 0 0 896 305.066667z" fill="#FFFFFF" p-id="9337"></path></svg> ${minute}:${second}`;
-              } else {
-                durationSpan.innerHTML = '00:00';
-              }
-              durationSpan.setAttribute('contenteditable', false);
-              node.appendChild(durationSpan);
+            if (value.width) {
+              node.setAttribute('width', value.width);
             }
-            node.appendChild(video);
+            if (value.height) {
+              node.setAttribute('height', value.height);
+            }
+
+            Object.keys(value).forEach(function(key) {
+              node.dataset[key] = value[key];
+            });
             return node;
           }
 
-          static formats(domNode) {
-            return ['width', 'height'].reduce((formats, attribute) => {
-              if (domNode.hasAttribute(attribute)) {
-                formats[attribute] = domNode.getAttribute(attribute);
-              }
-              return formats;
-            }, {});
+          static match(url) {
+            return /\.(jpe?g|gif|png)$/.test(url) || /^data:image\/.+;base64/.test(url);
+          }
+
+          static register() {
+            if (/Firefox/i.test(navigator.userAgent)) {
+              setTimeout(() => {
+                // Disable image resizing in Firefox
+                document.execCommand('enableObjectResizing', false, false);
+              }, 1);
+            }
           }
 
           static sanitize(url) {
@@ -290,26 +275,66 @@
             anchor.href = url;
             const protocol = anchor.href.slice(0, anchor.href.indexOf(':'));
             let isValid = protocols.indexOf(protocol) > -1;
-            return isValid ? `${url}#t=0.1` : 'about:blank';
+            return isValid ? url: '//:0';
           }
 
           static value(domNode) {
-            return domNode.getAttribute('src');
+            return domNode.dataset;
+          }
+        }
+        ImageExtend.blotName = 'image';
+        ImageExtend.tagName = 'IMG';
+        Quill.register(ImageExtend, true);
+
+        class VideoBlot extends BlockEmbed {
+
+          static create(value) {
+            const node = super.create(value);
+
+            node.setAttribute('src', this.sanitize(value));
+            node.setAttribute('width', value.width);
+            node.setAttribute('height', value.height);
+            node.style.width = `${value.width}px`;
+            node.style.height = `${value.height}px`;
+
+            const video = document.createElement("video");
+            video.innerHTML = node.duration;
+            video.setAttribute('src', this.sanitize(value.source));
+            video.controls = false;
+            video.poster = value.thumbUrl;
+
+            const durationSpan = document.createElement("div");
+            durationSpan.className = 'video-duration-mask';
+            if (value.duration) {
+              let minute = parseInt(value.duration / 60);
+              let second = parseInt(value.duration % 60);
+              durationSpan.innerHTML = `<svg t="1629367052116" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="9336" xmlns:xlink="http://www.w3.org/1999/xlink" width="15" height="15"><defs><style type="text/css">@font-face { font-family: element-icons; src: url("chrome-extension://moombeodfomdpjnpocobemoiaemednkg/fonts/element-icons.woff") format("woff"), url("chrome-extension://moombeodfomdpjnpocobemoiaemednkg/fonts/element-icons.ttf ") format("truetype"); }
+</style></defs><path d="M896 305.066667a72.533333 72.533333 0 0 0-78.933333 12.8l-91.733334 85.333333V341.333333a128 128 0 0 0-128-128H213.333333a128 128 0 0 0-128 128v341.333334a128 128 0 0 0 128 128h384a128 128 0 0 0 128-128v-61.866667l92.16 85.333333a74.24 74.24 0 0 0 49.493334 19.2 71.68 71.68 0 0 0 29.44-6.4 68.266667 68.266667 0 0 0 42.666666-63.146666V368.213333A68.266667 68.266667 0 0 0 896 305.066667z" fill="#FFFFFF" p-id="9337"></path></svg> ${minute}:${second}`;
+            } else {
+              durationSpan.innerHTML = '00:00';
+            }
+            durationSpan.setAttribute('contenteditable', false);
+
+            node.appendChild(video);
+            node.appendChild(durationSpan);
+
+            Object.keys(value).forEach(function(key) {
+              node.dataset[key] = value[key];
+            });
+            return node;
           }
 
-          format(name, value) {
-            let videoNode = this.domNode.querySelector('video');
-            if (name === 'width' || name === 'height' && videoNode) {
-              if (value) {
-                this.domNode.style[name] = `${value}px`;
-                videoNode.setAttribute(name, value);
-              } else {
-                this.domNode.style[name] = null;
-                videoNode.removeAttribute(name);
-              }
-            } else {
-              super.format(name, value);
-            }
+          static sanitize(url) {
+            let protocols = ['http', 'https', 'mailto', 'tel'];
+            const anchor = document.createElement('a');
+            anchor.href = url;
+            const protocol = anchor.href.slice(0, anchor.href.indexOf(':'));
+            let isValid = protocols.indexOf(protocol) > -1;
+            return isValid ? url: 'about:blank';
+          }
+
+          static value(domNode) {
+            return domNode.dataset;
           }
 
         }

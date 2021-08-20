@@ -109,20 +109,31 @@ class TunEditorController {
   }
 
   /// Insert image with given [url] to current [selection].
-  void insertImage(String url, {
-    List<Attribute>? attributes,
+  void insertImage({
+    required String source,
+    double? width,
+    double? height,
+    String? checkPath,
     bool appendNewLine = true,
   }) {
-    final Map<String, dynamic> attrMap = {};
-    if (attributes != null) {
-      for (final attr in attributes) {
-        attrMap[attr.key] = attr.value;
-      }
+    final Map<String, dynamic> imageBlot = {
+      'source': source,
+    };
+    if (width != null) {
+      imageBlot['width'] = width;
     }
+    if (height != null) {
+      imageBlot['height'] = height;
+    }
+    if (checkPath != null) {
+      imageBlot['checkPath'] = checkPath;
+    }
+
+    // Insert image.
     final delta = new Delta()
       ..retain(selection.extentOffset)
       ..insert('\n')
-      ..insert(BlockEmbed.image(url).toJson(), attrMap);
+      ..insert({ 'image': imageBlot });
     if (appendNewLine) {
       delta.insert('\n');
     }
@@ -138,16 +149,40 @@ class TunEditorController {
     );
   }
 
-  void insertVideo(String url, [List<Attribute>? attributes]) {
-    final Map<String, dynamic> attrMap = {};
-    if (attributes != null) {
-      for (final attr in attributes) {
-        attrMap[attr.key] = attr.value;
-      }
+  void insertVideo({
+    required String source,
+    required double duration,
+    required String thumbUrl,
+    double? width,
+    double? height,
+    String? fillType,
+    String? videoType,
+    bool? inline,
+  }) {
+    final Map<String, dynamic> videoBlot = {
+      'source': source,
+      'duration': duration,
+      'thumbUrl': thumbUrl,
+    };
+    if (width != null) {
+      videoBlot['width'] = width;
     }
+    if (height != null) {
+      videoBlot['height'] = height;
+    }
+    if (fillType != null) {
+      videoBlot['fillType'] = fillType;
+    }
+    if (videoType != null) {
+      videoBlot['videoType'] = videoType;
+    }
+    if (inline != null) {
+      videoBlot['inline'] = inline;
+    }
+
     final delta = new Delta()
       ..retain(selection.extentOffset)
-      ..insert(BlockEmbed.video(url).toJson(), attrMap);
+      ..insert({ 'video': videoBlot });
     compose(delta, null, ChangeSource.LOCAL);
     updateSelection(
       TextSelection.collapsed(offset: selection.extentOffset + 1),
