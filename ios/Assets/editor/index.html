@@ -33,31 +33,31 @@
       .ql-snow .ql-editor h3 {
         font-size: 18px;
       }
-      .ql-editor ol li:before {
-        color: #5562F2;
-        font-size: 16px;
-      }
-      .ql-editor ul > li::before {
-        color: #5562F2;
-      }
       .ql-editor ol,
       .ql-editor ul {
         padding-left: 3px;
       }
-      .ql-editor ol li:not(.ql-direction-rtl),
-      .ql-editor ul li:not(.ql-direction-rtl) {
+      .ql-editor ol li:not(.ql-direction-rtl) {
         padding-left: 20px;
       }
-      .ql-editor ul > li::before {
-        width: 12px;
+      .ql-editor ol li[data-list=bullet] {
+        counter-reset: none;
+        counter-increment: none;
       }
       .ql-editor li:not(.ql-direction-rtl)::before {
+        width: auto;
         text-align: left;
         margin-left: -20px;
         margin-right: 8px;
       }
-      .ql-editor li::before {
-        width: auto;
+      .ql-editor ol li[data-list=bullet]::before {
+        color: #5562F2;
+        content: '\2022';
+        width: 12px;
+      }
+      .ql-editor ol li[data-list=ordered]:before {
+        color: #5562F2;
+        font-size: 16px;
       }
       hr {
         border: 0 none;
@@ -136,10 +136,10 @@
 
     <script>
       let u = navigator.userAgent;
-      let isAndroid = u.indexOf('Android') > -1 || u.indexOf('Adr') > -1;
-      let isIOS = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/);
-      // let isAndroid = false;
-      // let isIOS = false;
+      // let isAndroid = u.indexOf('Android') > -1 || u.indexOf('Adr') > -1;
+      // let isIOS = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/);
+      let isAndroid = false;
+      let isIOS = false;
       let bridge = {
         onTextChange: function(delta, oldDelta, source) {
           if (isAndroid) {
