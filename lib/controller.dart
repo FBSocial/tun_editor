@@ -115,7 +115,9 @@ class TunEditorController {
     double? height,
     String? checkPath,
     bool appendNewLine = true,
+    List<Attribute>? attributes = const [],
   }) {
+    // Wrap value.
     final Map<String, dynamic> imageBlot = {
       'source': source,
     };
@@ -129,6 +131,14 @@ class TunEditorController {
       imageBlot['checkPath'] = checkPath;
     }
 
+    // Wrap attributes
+    final Map<String, dynamic> attrMap = {};
+    if (attributes != null) {
+      for (final attr in attributes) {
+        attrMap[attr.key] = attr.value;
+      }
+    }
+
     // Insert new line.
     final newLineOffset = _insertNewLine();
     if (newLineOffset == null) {
@@ -138,7 +148,7 @@ class TunEditorController {
     // Insert image.
     final delta = new Delta()
       ..retain(newLineOffset)
-      ..insert({ 'image': imageBlot });
+      ..insert({ 'image': imageBlot }, attrMap);
     if (appendNewLine) {
       delta.insert('\n');
     }
@@ -163,7 +173,9 @@ class TunEditorController {
     String? fillType,
     String? videoType,
     bool? inline,
+    List<Attribute>? attributes = const [],
   }) {
+    // Wrap value.
     final Map<String, dynamic> videoBlot = {
       'source': source,
       'duration': duration,
@@ -185,9 +197,17 @@ class TunEditorController {
       videoBlot['inline'] = inline;
     }
 
+    // Wrap attributes
+    final Map<String, dynamic> attrMap = {};
+    if (attributes != null) {
+      for (final attr in attributes) {
+        attrMap[attr.key] = attr.value;
+      }
+    }
+
     final delta = new Delta()
       ..retain(selection.extentOffset)
-      ..insert({ 'video': videoBlot });
+      ..insert({ 'video': videoBlot }, attrMap);
     compose(delta, null, ChangeSource.LOCAL);
     updateSelection(
       TextSelection.collapsed(offset: selection.extentOffset + 1),

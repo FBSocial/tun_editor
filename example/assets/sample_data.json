@@ -89,10 +89,14 @@
       "insert": {
         "image": {
           "source": "https://user-images.githubusercontent.com/122956/72955931-ccc07900-3d52-11ea-89b1-d468a6e2aa2b.png",
-          "width": 230.0,
-          "height": 230.0,
+          "width": 330.0,
+          "height": 330.0,
           "checkPath": "https://user-images.githubusercontent.com/122956/72955931-ccc07900-3d52-11ea-89b1-d468a6e2aa2b.png"
         }
+      },
+      "attributes":{
+         "width": 230,
+         "height": 230
       }
    },
    {
@@ -102,14 +106,18 @@
       "insert": {
         "video": {
           "source": "https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_20mb.mp4",
-          "width": 230.0,
-          "height": 460.0,
+          "width": 360.0,
+          "height": 720.0,
           "fillType": "video",
           "duration": 7,
           "thumbUrl": "https://fb-cdn.fanbook.mobi/fanbook/app/files/chatroom/image/43789ea4452106628661d9014d45c873.jpg",
           "_type": "video",
           "_inline": false
         }
+      },
+      "attributes":{
+         "width": 230,
+         "height": 460
       }
    },
    {

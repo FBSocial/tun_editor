@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:tun_editor/iconfont.dart';
+import 'package:tun_editor/models/documents/attribute.dart';
 import 'package:tun_editor/models/documents/document.dart';
+import 'package:tun_editor/models/quill_delta.dart';
 import 'package:tun_editor/tun_editor.dart';
 import 'package:tun_editor/tun_editor_toolbar.dart';
 import 'package:tun_editor/controller.dart';
@@ -68,13 +70,13 @@ class FullPageEditorState extends State<FullPageEditor> {
         title: GestureDetector(
           child: Text('Editor'),
           onTap: () {
-            _controller.insertVideo(
-              source: 'https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_20mb.mp4',
-              width: 230,
-              height: 460,
-              duration: 7,
-              thumbUrl: 'https://fb-cdn.fanbook.mobi/fanbook/app/files/chatroom/image/43789ea4452106628661d9014d45c873.jpg',
-            );
+            // _controller.insertVideo(
+            //   source: 'https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_20mb.mp4',
+            //   width: 230,
+            //   height: 460,
+            //   duration: 7,
+            //   thumbUrl: 'https://fb-cdn.fanbook.mobi/fanbook/app/files/chatroom/image/43789ea4452106628661d9014d45c873.jpg',
+            // );
             // _controller.updateSelection(TextSelection.collapsed(offset: 10), ChangeSource.LOCAL);
 
             // final imageBlock = BlockEmbed.image(
@@ -88,10 +90,10 @@ class FullPageEditorState extends State<FullPageEditor> {
             //   ],
             // );
 
-            // _controller.compose(new Delta()
-            //     ..retain(1)
-            //     ..insert('Hello World', Attribute.bold.toJson()),
-            //     TextSelection.collapsed(offset: 2), ChangeSource.LOCAL);
+            _controller.compose(new Delta()
+                ..retain(1)
+                ..insert('Hello World', Attribute.bold.toJson()),
+                TextSelection.collapsed(offset: 2), ChangeSource.LOCAL);
 
             // _controller.insertMention('1', 'Jeffrey Wu');
 
@@ -344,13 +346,12 @@ class FullPageEditorState extends State<FullPageEditor> {
       _controller.insertImage(
         source: 'file://${image.path}',
         width: 230,
+        attributes: [
+          WidthAttribute("200"),
+          HeightAttribute("100"),
+        ]
       );
     }
-    // _controller.insertImage(
-    //   source: 'https://user-images.githubusercontent.com/122956/72955931-ccc07900-3d52-11ea-89b1-d468a6e2aa2b.png',
-    //   width: 230,
-    //   appendNewLine: false,
-    // );
   }
 
 }

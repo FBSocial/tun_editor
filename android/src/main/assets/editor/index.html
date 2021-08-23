@@ -132,12 +132,6 @@
             node.onerror = function() {
               node.setAttribute('src', 'common_lost.svg');
             }
-            if (value.width) {
-              node.setAttribute('width', value.width);
-            }
-            if (value.height) {
-              node.setAttribute('height', value.height);
-            }
 
             Object.keys(value).forEach(function(key) {
               node.dataset[key] = value[key];
@@ -170,6 +164,28 @@
           static value(domNode) {
             return domNode.dataset;
           }
+
+          static formats(domNode) {
+            return ['width', 'height'].reduce((formats, attribute) => {
+              if (domNode.hasAttribute(attribute)) {
+                formats[attribute] = domNode.getAttribute(attribute);
+              }
+              return formats;
+            }, {});
+          }
+
+          format(name, value) {
+            if (['width', 'height'].indexOf(name) > -1) {
+              if (value) {
+                this.domNode.setAttribute(name, value);
+              } else {
+                this.domNode.removeAttribute(name);
+              }
+            } else {
+              super.format(name, value);
+            }
+          }
+
         }
         ImageExtend.blotName = 'image';
         ImageExtend.tagName = 'IMG';
@@ -181,10 +197,6 @@
             const node = super.create(value);
 
             node.setAttribute('src', this.sanitize(value));
-            node.setAttribute('width', value.width);
-            node.setAttribute('height', value.height);
-            node.style.width = `${value.width}px`;
-            node.style.height = `${value.height}px`;
 
             const video = document.createElement("video");
             video.innerHTML = node.duration;
@@ -224,6 +236,28 @@
 
           static value(domNode) {
             return domNode.dataset;
+          }
+
+          static formats(domNode) {
+            return ['width', 'height'].reduce((formats, attribute) => {
+              if (domNode.style.hasOwnProperty(attribute)) {
+                formats[attribute] = domNode.style[attribute].replace('px', '');
+              }
+              return formats;
+            }, {});
+          }
+
+          format(name, value) {
+            if (['width', 'height'].indexOf(name) > -1) {
+              if (value) {
+                // this.domNode.setAttribute(name, value);
+                this.domNode.style[name] = `${value}px`;
+              } else {
+                this.domNode.removeAttribute(name);
+              }
+            } else {
+              super.format(name, value);
+            }
           }
 
         }
@@ -417,7 +451,6 @@
           let image = document.querySelector(`[data-source="${path}"]`);
           if (image) {
             image.setAttribute('src', data);
-            console.log('image data', data);
           } else {
             console.log('not found image element', path);
           }
