@@ -197,6 +197,15 @@
             });
           }
         },
+        loadImage: function(path) {
+          if (isAndroid) {
+            return tun.loadImage(path);
+          } else if (isIOS) {
+            return window.webkit.messageHandlers.loadImage.postMessage({
+               hasFocus: hasFocus,
+            });
+          }
+        },
       }
 
       var replaceText;
@@ -210,6 +219,7 @@
       var setPlaceholder;
       var setReadOnly;
       var setPadding;
+      var refreshImage;
 
       document.addEventListener('DOMContentLoaded', () => {
         let Delta = Quill.import('delta');
@@ -239,9 +249,13 @@
           static create(value) {
 
             const node = super.create(value);
-            node.setAttribute('src', this.sanitize(value.source));
+            let url = this.sanitize(value.source);
+            if (url.startsWith('file')) {
+              bridge.loadImage(url);
+            } else {
+              node.setAttribute('src', url);
+            }
             node.onerror = function() {
-              console.log('image error', node.getAttribute('src'));
               node.setAttribute('src', 'common_lost.svg');
             }
             if (value.width) {
@@ -525,6 +539,16 @@
           var editor = document.querySelector('.ql-editor');
           editor.style.padding = `${top}px ${right}px ${bottom}px ${left}px`;
         }
+        refreshImage = function(path, data) {
+          let image = document.querySelector(`[data-source="${path}"]`);
+          if (image) {
+            image.setAttribute('src', data);
+            console.log('image data', data);
+          } else {
+            console.log('not found image element', path);
+          }
+        }
+        replaceText(0, 0, { image: { source: 'https://user-images.githubusercontent.com/122956/72955931-ccc07900-3d52-11ea-89b1-d468a6e2aa2b.png' }}, {}, true, true);
       })
     </script>
   </body>

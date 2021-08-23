@@ -338,21 +338,19 @@ class FullPageEditorState extends State<FullPageEditor> {
   }
 
   Future<void> _pickImage() async {
-    // final picker = ImagePicker();
-    // final XFile? image = await picker.pickImage(source: ImageSource.gallery);
-    // if (image != null) {
-    //   debugPrint('file path ${image.path}');
-    //   final imageBytes = await image.readAsBytes();
-    //   _controller.insertImage(
-    //     source: 'data:image/png;base64,${base64Encode(imageBytes)}',
-    //     width: 230,
-    //   );
-    // }
-    _controller.insertImage(
-      source: 'https://user-images.githubusercontent.com/122956/72955931-ccc07900-3d52-11ea-89b1-d468a6e2aa2b.png',
-      width: 230,
-      appendNewLine: false,
-    );
+    final picker = ImagePicker();
+    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+    if (image != null) {
+      _controller.insertImage(
+        source: 'file://${image.path}',
+        width: 230,
+      );
+    }
+    // _controller.insertImage(
+    //   source: 'https://user-images.githubusercontent.com/122956/72955931-ccc07900-3d52-11ea-89b1-d468a6e2aa2b.png',
+    //   width: 230,
+    //   appendNewLine: false,
+    // );
   }
 
 }

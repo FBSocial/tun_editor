@@ -5,6 +5,7 @@ import android.app.Activity
 import android.content.Context
 import android.os.Build
 import android.util.AttributeSet
+import android.util.Base64
 import android.util.Log
 import android.view.MotionEvent
 import android.view.inputmethod.InputMethodManager
@@ -14,7 +15,8 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import org.json.JSONArray
 import org.json.JSONObject
-import org.json.JSONTokener
+import java.io.File
+import java.net.URLEncoder
 
 
 @SuppressLint("SetJavaScriptEnabled", "AddJavascriptInterface", "ClickableViewAccessibility")
@@ -101,6 +103,11 @@ class QuillEditor: WebView {
             onFocusChangeListener = { hasFocus ->
                 (context as Activity).runOnUiThread {
                     onFocusChangeListener?.invoke(hasFocus)
+                }
+            },
+            onLoadImageListener = { path ->
+                (context as Activity).runOnUiThread {
+                    refreshImage(path)
                 }
             }
         ), "tun")
@@ -214,6 +221,16 @@ class QuillEditor: WebView {
         exec("javascript:setContents(${JSONArray(delta)})")
     }
 
+    private fun refreshImage(path: String) {
+        val file = File(path.replace("file://", ""))
+        if (file.exists()) {
+            val imageData = Base64.encodeToString(file.readBytes(), Base64.DEFAULT)
+            val imageBase64 = URLEncoder.encode(imageData, "UTF-8")
+            exec("javascript:refreshImage(\"$path\", \"data:image/png;base64,$imageBase64\")")
+        } else {
+            Log.w(TAG, "image file not found: $path")
+        }
+    }
 
     private fun exec(command: String) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
@@ -224,11 +241,12 @@ class QuillEditor: WebView {
     }
 
     class JSInterface(
-        private val onTextChangeListener: ((String, String) -> Unit),
+        private val onTextChangeListener: (String, String) -> Unit,
         private val onSelectionChangeListener: (Int, Int, String) -> Unit,
-        private val onMentionClickListener: ((String, String) -> Unit),
-        private val onLinkClickListener: ((String) -> Unit),
-        private val onFocusChangeListener: ((Boolean) -> Unit)
+        private val onMentionClickListener: (String, String) -> Unit,
+        private val onLinkClickListener: (String) -> Unit,
+        private val onFocusChangeListener: (Boolean) -> Unit,
+        private val onLoadImageListener: (String) -> Unit
     ) {
         @JavascriptInterface
         fun onSelectionChange(index: Int, length: Int, format: String) {
@@ -253,6 +271,11 @@ class QuillEditor: WebView {
         @JavascriptInterface
         fun onFocusChange(hasFocus: Boolean) {
             onFocusChangeListener.invoke(hasFocus)
+        }
+
+        @JavascriptInterface
+        fun loadImage(path: String) {
+            onLoadImageListener.invoke(path)
         }
     }
 

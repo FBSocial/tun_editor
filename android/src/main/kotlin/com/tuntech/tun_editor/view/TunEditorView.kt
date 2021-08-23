@@ -230,7 +230,6 @@ internal class TunEditorView(
             }
             HANDLE_SET_READ_ONLY -> {
                 val readOnly = call.arguments as? Boolean ?: return
-                println("set read only $readOnly")
                 quillEditor.setReadOnly(readOnly)
             }
             HANDLE_SET_SCROLLABLE -> {
