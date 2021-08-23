@@ -6,136 +6,10 @@
     <title>Tun Editor</title>
     <link rel="stylesheet" href="normalize.css" type="text/css" charset="utf-8">
     <link rel="stylesheet" href="snow.css" type="text/css" charset="utf-8">
-    <link rel="stylesheet" href="highlight.min.css" type="text/css" charset="utf-8">
-    <script src="highlight.min.js" charset="utf-8"></script>
-    <script src="highlightjs-line-numbers.min.js" charset="utf-8"></script>
-    <script src="markdown.js" charset="utf-8"></script>
+    <link rel="stylesheet" href="quill.custom.css" type="text/css" charset="utf-8">
     <script src="quill2.min.js" charset="utf-8"></script>
     <script src="quill.mention.min.js" charset="utf-8"></script>
-    <style>
-      .ql-container {
-        font-size: 16px;
-        color: #363940;
-      }
-      .ql-container.ql-snow {
-         border: none !important;
-         height: 100vh;
-       }
-      .ql-editor {
-        line-height: 1.5;
-      }
-      .ql-snow .ql-editor h1 {
-        font-size: 22px;
-      }
-      .ql-snow .ql-editor h2 {
-        font-size: 20px;
-      }
-      .ql-snow .ql-editor h3 {
-        font-size: 18px;
-      }
-      .ql-editor ol,
-      .ql-editor ul {
-        padding-left: 3px;
-      }
-      .ql-editor ol li:not(.ql-direction-rtl) {
-        padding-left: 20px;
-      }
-      .ql-editor ol li[data-list=bullet] {
-        counter-reset: none;
-        counter-increment: none;
-      }
-      .ql-editor li:not(.ql-direction-rtl)::before {
-        width: auto;
-        text-align: left;
-        margin-left: -20px;
-        margin-right: 8px;
-      }
-      .ql-editor ol li[data-list=bullet]::before {
-        color: #5562F2;
-        content: '\2022';
-        width: 12px;
-      }
-      .ql-editor ol li[data-list=ordered]:before {
-        color: #5562F2;
-        font-size: 16px;
-      }
-      hr {
-        border: 0 none;
-        height: 1px;
-        color: #8f959e1e;
-        background-color: #8f959e1e;
-      }
-      .ql-snow .ql-editor blockquote {
-        border-left: 2px solid #5562F2;
-        padding-left: 12px;
-        color: #646A73;
-      }
-      .ql-editor .ql-code-block-container,
-      .ql-snow .ql-editor pre.ql-syntax {
-        font-size: 14px;
-        color: #646A73;
-        background-color: #F5F5F8;
-        border-radius: 4px;
-        border: 0.5px solid #8f959e14;
-        margin: 5px 0;
-        padding: 16px 24px;
-        box-sizing: border-box;
-        counter-reset: line-numbering;
-      }
-      .ql-snow a {
-        color: #5562F2;
-      }
-      .ql-editor .ql-code-block::before,
-      pre .hljs-line::before {
-        display: inline-block;
-        content: counter(line-numbering) '.';
-        counter-increment: line-numbering;
-        width: 30px;
-        text-align: right;
-        margin-left: -16px;
-        margin-right: 16px;
-      }
-      span.mention {
-        background-color: #5562F2;
-        padding: 2px 12px;
-        border-radius: 20px;
-        color: #FFFFFF;
-      }
-      .ql-snow .ql-editor blockquote {
-        margin: 0;
-      }
-      .ql-editor .ql-video {
-        position: relative;
-        margin: 0;
-        padding: 0;
-        overflow: hidden;
-        max-width: 100%;
-        width: auto;
-        height: auto;
-      }
-      .ql-editor .ql-video video {
-        width: 100%;
-        height: 100%;
-        display: block;
-        object-fit: cover;
-      }
-      .ql-editor .ql-video .video-duration-mask {
-        position: absolute;
-        bottom: 4px;
-        right: 4px;
-        background: #0000008C;
-        color: #FFFFFF;
-        padding: 2px;
-        width: 60px;
-        height: 24px;
-        font-size: 13px;
-        text-align: center;
-        border-radius: 12px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-      }
-    </style>
+    <script src="quill.markdown.min.js" charset="utf-8"></script>
   </head>
   <body>
     <div id="editor"></div>
@@ -197,6 +71,15 @@
             });
           }
         },
+        loadImage: function(path) {
+          if (isAndroid) {
+            return tun.loadImage(path);
+          } else if (isIOS) {
+            return window.webkit.messageHandlers.loadImage.postMessage({
+               hasFocus: hasFocus,
+            });
+          }
+        },
       }
 
       var replaceText;
@@ -210,6 +93,7 @@
       var setPlaceholder;
       var setReadOnly;
       var setPadding;
+      var refreshImage;
 
       document.addEventListener('DOMContentLoaded', () => {
         let Delta = Quill.import('delta');
@@ -239,9 +123,13 @@
           static create(value) {
 
             const node = super.create(value);
-            node.setAttribute('src', this.sanitize(value.source));
+            let url = this.sanitize(value.source);
+            if (isAndroid && url.startsWith('file')) {
+              bridge.loadImage(url);
+            } else {
+              node.setAttribute('src', url);
+            }
             node.onerror = function() {
-              console.log('image error', node.getAttribute('src'));
               node.setAttribute('src', 'common_lost.svg');
             }
             if (value.width) {
@@ -524,6 +412,15 @@
         setPadding = function(top, right, bottom, left) {
           var editor = document.querySelector('.ql-editor');
           editor.style.padding = `${top}px ${right}px ${bottom}px ${left}px`;
+        }
+        refreshImage = function(path, data) {
+          let image = document.querySelector(`[data-source="${path}"]`);
+          if (image) {
+            image.setAttribute('src', data);
+            console.log('image data', data);
+          } else {
+            console.log('not found image element', path);
+          }
         }
       })
     </script>

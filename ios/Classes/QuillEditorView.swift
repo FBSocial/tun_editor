@@ -108,6 +108,10 @@ class QuillEditorView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler {
             if let args = message.body as? [String: AnyObject] {
                 onFocusChangeHandler?(args)
             }
+        case "loadImage":
+            if let path = message.body as? String {
+                print("load image \(path)")
+            }
         default:
             debugPrint("missing message handler in quill editor \(message.name)")
         }

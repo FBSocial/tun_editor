@@ -25,7 +25,7 @@ class QuillEditor: WebView {
     companion object {
         val TAG: String = QuillEditor::class.java.name
 
-        const val URL = "file:///android_asset/index.html"
+        const val URL = "file:///android_asset/editor/index.html"
     }
 
     constructor(context: Context): super(context)
