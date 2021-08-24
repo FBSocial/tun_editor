@@ -17,6 +17,10 @@ class TunEditorToolbar extends StatefulWidget {
   // Menu decides which tool should be showed in toolbar.
   final List<ToolbarMenu> menu;
 
+  // Disabled menu.
+  final List<ToolbarMenu> disabledMenu;
+  final ValueChanged<List<ToolbarMenu>>? onDisabledMenuChange;
+
   // Children is the custom tool menu.
   final List<Widget>? children;
 
@@ -26,6 +30,8 @@ class TunEditorToolbar extends StatefulWidget {
     this.showingSubToolbar = SubToolbar.none,
     this.onSubToolbarChange,
     this.menu = ToolbarMenu.values,
+    this.disabledMenu = const [],
+    this.onDisabledMenuChange,
     this.children,
   }) : super(key: key);
 
@@ -43,6 +49,10 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
   ValueChanged<SubToolbar>? get onSubToolbarChange => widget.onSubToolbarChange;
 
   List<ToolbarMenu> get menu => widget.menu;
+
+  List<ToolbarMenu> get disabledMenu => widget.disabledMenu;
+  ValueChanged<List<ToolbarMenu>>? get onDisabledMenuChange => widget.onDisabledMenuChange;
+
   List<Widget>? get children => widget.children;
 
   // Text type and style.
@@ -102,6 +112,7 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
           IconFont.at,
           () => toggleSubToolbar(SubToolbar.at),
           false,
+          disabledMenu.contains(ToolbarMenu.at),
         ),
         SizedBox(width: 8.w),
       ]);
@@ -112,6 +123,7 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
           IconFont.image,
           () => toggleSubToolbar(SubToolbar.image),
           false,
+          disabledMenu.contains(ToolbarMenu.image),
         ),
         SizedBox(width: 8.w),
       ]);
@@ -122,6 +134,7 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
           IconFont.emoji,
           () => toggleSubToolbar(SubToolbar.emoji),
           false,
+          disabledMenu.contains(ToolbarMenu.emoji),
         ),
         SizedBox(width: 8.w),
       ]);
@@ -132,6 +145,7 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
           IconFont.textType,
           () => toggleSubToolbar(SubToolbar.textType),
           showingSubToolbar == SubToolbar.textType,
+          disabledMenu.contains(ToolbarMenu.textType),
         ),
         SizedBox(width: 8.w),
       ]);
@@ -142,6 +156,7 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
           IconFont.textStyle,
           () => toggleSubToolbar(SubToolbar.textStyle),
           showingSubToolbar == SubToolbar.textStyle,
+          disabledMenu.contains(ToolbarMenu.textStyle),
         ),
         SizedBox(width: 8.w),
       ]);
@@ -152,6 +167,7 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
           IconFont.link,
           () => onLinkFormatClick(),
           currentTextStyleList.contains(Attribute.link.uniqueKey),
+          disabledMenu.contains(ToolbarMenu.link),
         ),
         SizedBox(width: 8.w),
       ]);
@@ -201,6 +217,7 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
           IconFont.headline1,
           () => toggleTextType(Attribute.h1.uniqueKey),
           currentTextType == Attribute.h1.uniqueKey,
+          disabledMenu.contains(ToolbarMenu.textTypeHeadline1),
         ),
         SizedBox(width: 8.w),
       ]);
@@ -211,6 +228,7 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
           IconFont.headline2,
           () => toggleTextType(Attribute.h2.uniqueKey),
           currentTextType == Attribute.h2.uniqueKey,
+          disabledMenu.contains(ToolbarMenu.textTypeHeadline2),
         ),
         SizedBox(width: 8.w),
       ]);
@@ -221,6 +239,7 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
           IconFont.headline3,
           () => toggleTextType(Attribute.h3.uniqueKey),
           currentTextType == Attribute.h3.uniqueKey,
+          disabledMenu.contains(ToolbarMenu.textTypeHeadline3),
         ),
         SizedBox(width: 8.w),
       ]);
@@ -231,6 +250,7 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
           IconFont.listBullet,
           () => toggleTextType(Attribute.ul.uniqueKey),
           currentTextType == Attribute.ul.uniqueKey,
+          disabledMenu.contains(ToolbarMenu.textTypeListBullet),
         ),
         SizedBox(width: 8.w),
       ]);
@@ -241,6 +261,7 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
           IconFont.listOrdered,
           () => toggleTextType(Attribute.ol.uniqueKey),
           currentTextType == Attribute.ol.uniqueKey,
+          disabledMenu.contains(ToolbarMenu.textTypeListOrdered),
         ),
         SizedBox(width: 8.w),
       ]);
@@ -251,6 +272,7 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
           IconFont.divider,
           onDividerClick,
           false,
+          disabledMenu.contains(ToolbarMenu.textTypeDivider),
         ),
         SizedBox(width: 8.w),
       ]);
@@ -261,6 +283,7 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
           IconFont.quote,
           () => toggleTextType(Attribute.blockQuote.uniqueKey),
           currentTextType == Attribute.blockQuote.uniqueKey,
+          disabledMenu.contains(ToolbarMenu.textTypeQuote),
         ),
         SizedBox(width: 8.w),
       ]);
@@ -271,6 +294,7 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
           IconFont.codeBlock,
           () => toggleTextType(Attribute.codeBlock.uniqueKey),
           currentTextType == Attribute.codeBlock.uniqueKey,
+          disabledMenu.contains(ToolbarMenu.textTypeCodeBlock),
         ),
         SizedBox(width: 8.w),
       ]);
@@ -320,6 +344,7 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
           IconFont.bold,
           () => toggleTextStyle(Attribute.bold.uniqueKey),
           currentTextStyleList.contains(Attribute.bold.uniqueKey),
+          disabledMenu.contains(ToolbarMenu.textStyleBold),
         ),
         SizedBox(width: 8.w),
       ]);
@@ -330,6 +355,7 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
           IconFont.italic,
           () => toggleTextStyle(Attribute.italic.uniqueKey),
           currentTextStyleList.contains(Attribute.italic.uniqueKey),
+          disabledMenu.contains(ToolbarMenu.textStyleItalic),
         ),
         SizedBox(width: 8.w),
       ]);
@@ -340,6 +366,7 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
           IconFont.underline,
           () => toggleTextStyle(Attribute.underline.uniqueKey),
           currentTextStyleList.contains(Attribute.underline.uniqueKey),
+          disabledMenu.contains(ToolbarMenu.textStyleUnderline),
         ),
         SizedBox(width: 8.w),
       ]);
@@ -350,6 +377,7 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
           IconFont.strikeThrough,
           () => toggleTextStyle(Attribute.strikeThrough.uniqueKey),
           currentTextStyleList.contains(Attribute.strikeThrough.uniqueKey),
+          disabledMenu.contains(ToolbarMenu.textStyleStrikeThrough),
         ),
         SizedBox(width: 8.w),
       ]);
@@ -390,31 +418,41 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
     );
   }
 
-  Widget buildButton(IconData iconData, VoidCallback onPressed, bool isActive) {
+  Widget buildButton(IconData iconData, VoidCallback onPressed, bool isActive, bool isDisabled) {
     return GestureDetector(
-      onTap: onPressed,
+      onTap: isDisabled ? null : onPressed,
       child: Container(
         width: 36.w,
         height: 36.w,
         decoration: BoxDecoration(
-          color: isActive ? Color(0x268F959E) : Colors.transparent,
-          borderRadius: isActive ? BorderRadius.circular(3.w) : BorderRadius.zero,
+          color: !isDisabled && isActive ? Color(0x268F959E) : Colors.transparent,
+          borderRadius: !isDisabled && isActive ? BorderRadius.circular(3.w) : BorderRadius.zero,
         ),
-        child: Icon(iconData, size: 24.w, color: Color(0xFF363940)),
+        child: Icon(
+          iconData,
+          size: 24.w,
+          color: isDisabled ? Color(0x80363940) : Color(0xFF363940),
+        ),
       ),
     );
   }
 
-  Widget buildOutlineButton(IconData iconData, VoidCallback onPressed, bool isActive) {
+  Widget buildOutlineButton(IconData iconData, VoidCallback onPressed, bool isActive, bool isDisabled) {
+    Color color = Color(0xFF363940);
+    if (isDisabled) {
+      color = Color(0x80363940);
+    } else if (isActive) {
+      color = Color(0xFF5562F2);
+    }
     return GestureDetector(
-      onTap: onPressed,
+      onTap: isDisabled ? null : onPressed,
       child: Container(
         width: 36.w,
         height: 36.w,
         child: Icon(
           iconData,
           size: 24.w,
-          color: isActive ? Color(0xFF5562F2) : Color(0xFF363940),
+          color: color,
         ),
       ),
     );
@@ -539,7 +577,6 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
 
   // Sync toolbar' status with format.
   void syncFormat(Map<String, dynamic> format) {
-    // debugPrint('sync format: ${controller.selection.baseOffset} - ${controller.selection.extentOffset} - $format');
     // Check text type.
     if (format.containsKey(Attribute.header.key)) {
       final level = format[Attribute.header.key] as int?;
@@ -587,6 +624,19 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
     }
     if (format.containsKey(Attribute.link.key)) {
       currentTextStyleList.add(Attribute.link.uniqueKey);
+    }
+
+    // Disable text style.
+    disabledMenu.clear();
+    if (currentTextType == Attribute.codeBlock.uniqueKey) {
+      disabledMenu.addAll([
+        ToolbarMenu.at,
+        ToolbarMenu.textStyleBold,
+        ToolbarMenu.textStyleItalic,
+        ToolbarMenu.textStyleUnderline,
+        ToolbarMenu.textStyleStrikeThrough,
+        ToolbarMenu.link,
+      ]);
     }
     setState(() {});
   }

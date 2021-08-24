@@ -34,6 +34,8 @@ class FullPageEditorState extends State<FullPageEditor> {
 
   SubToolbar _showingSubToolbar = SubToolbar.none;
 
+  List<ToolbarMenu> _disabledMenu = [];
+
   final _emojiList = [
     '😃', '😄', '😁', '😆', '😅', '😂', '🤣', '🥲', '☺️', '😊', '😇', '🙂',
     '🙃', '😉', '😌', '😍', '🥰', '😘', '😗', '😙', '😚', '😋', '😛', '😝',
@@ -185,6 +187,14 @@ class FullPageEditorState extends State<FullPageEditor> {
 
                       //   ToolbarMenu.link,
                       // ],
+
+                      disabledMenu: _disabledMenu,
+                      onDisabledMenuChange: (disabledMenu) {
+                        setState(() {
+                          _disabledMenu = disabledMenu;
+                        });
+                      },
+
                       children: [
                         Spacer(),
 
