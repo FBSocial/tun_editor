@@ -28,9 +28,11 @@ class TunEditorController {
     );
   }
 
+  List<ValueChanged<TextSelection>> _selectionListeners = [];
   List<ValueChanged<Map<String, dynamic>>> _formatListeners = [];
 
   void dispose() {
+    _selectionListeners.clear();
     _formatListeners.clear();
     _tunEditorApi = null;
   }
@@ -295,6 +297,14 @@ class TunEditorController {
     _tunEditorApi?.scrollToBottom();
   }
 
+  void addSelectionListener(ValueChanged<TextSelection> listener) {
+    _selectionListeners.add(listener);
+  }
+
+  void removeSelectionListener(ValueChanged<TextSelection> listener) {
+    _selectionListeners.remove(listener);
+  }
+
   // ================== Below methods are internal ==================
 
   void setTunEditorApi(TunEditorApi? api) {
@@ -314,6 +324,9 @@ class TunEditorController {
 
     for (final listener in _formatListeners) {
       listener(format);
+    }
+    for (final listener in _selectionListeners) {
+      listener(_selection);
     }
   }
 

@@ -579,17 +579,19 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
   void syncFormat(Map<String, dynamic> format) {
     // Check text type.
     if (format.containsKey(Attribute.header.key)) {
-      final level = format[Attribute.header.key] as int?;
-      switch (level) {
-        case 1:
-          currentTextType = Attribute.h1.uniqueKey;
-          break;
-        case 2:
-          currentTextType = Attribute.h2.uniqueKey;
-          break;
-        case 3:
-          currentTextType = Attribute.h3.uniqueKey;
-          break;
+      if (format[Attribute.header.key] is int) {
+        final level = format[Attribute.header.key] as int;
+        switch (level) {
+          case 1:
+            currentTextType = Attribute.h1.uniqueKey;
+            break;
+          case 2:
+            currentTextType = Attribute.h2.uniqueKey;
+            break;
+          case 3:
+            currentTextType = Attribute.h3.uniqueKey;
+            break;
+        }
       }
     } else if (format.containsKey(Attribute.list.key)) {
       final listType = format[Attribute.list.key] as String?;

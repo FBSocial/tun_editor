@@ -54,12 +54,6 @@ class FullPageEditorState extends State<FullPageEditor> {
     super.initState();
 
     _loadDocument();
-    // _editorFocusNode.addListener(() {
-    //   if (_editorFocusNode.hasFocus) {
-    //     _titleFocusNode.unfocus();
-    //     _editorFocusNode.requestFocus();
-    //   }
-    // });
   }
 
   @override
@@ -129,12 +123,14 @@ class FullPageEditorState extends State<FullPageEditor> {
                       autoFocus: false,
                       readOnly: _readOnly,
                       scrollable: true,
+
                       onMentionClick: (String id, String prefixChar, String text) {
                         debugPrint('metion click $id, $prefixChar, $text');
                       },
                       onLinkClick: (String url) {
                         debugPrint('link click $url');
                       },
+
                       onFocusChange: (bool hasFocus) {
                         if (hasFocus) {
                           if (_showingSubToolbar != SubToolbar.none) {
@@ -339,6 +335,9 @@ class FullPageEditorState extends State<FullPageEditor> {
 
       final doc = json.encode(_controller.document.toDelta().toJson());
       debugPrint('document: $doc');
+    });
+    _controller.addSelectionListener((selection) {
+      debugPrint('new selection ${selection.baseOffset} ${selection.extentOffset}');
     });
     setState(() {
       _isLoading = false;
