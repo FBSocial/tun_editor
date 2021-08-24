@@ -516,12 +516,14 @@
         }
         setImageStyle = function(style) {
           imageStyle = style;
-          console.log('set image style', JSON.stringify(style));
         }
         setVideoStyle = function(style) {
           videoStyle = style;
-          console.log('set video style', JSON.stringify(style));
         }
+
+        window.addEventListener('resize', function() {
+          quill.scrollIntoView();
+        });
       })
     </script>
   </body>
