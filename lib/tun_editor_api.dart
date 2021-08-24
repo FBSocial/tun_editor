@@ -44,8 +44,9 @@ class TunEditorApi {
       case 'onMentionClick':
         final args = call.arguments as Map<dynamic, dynamic>;
         final id = args['id'] as String;
+        final prefixChar = args['prefixChar'] as String;
         final text = args['text'] as String;
-        _handler.onMentionClick(id, text);
+        _handler.onMentionClick(id, prefixChar, text);
         break;
 
       case 'onLinkClick':
@@ -154,7 +155,7 @@ class TunEditorApi {
 mixin TunEditorHandler {
   Future<void> onTextChange(String delta, String oldDelta);
   void onSelectionChange(int index, int length, Map<String, dynamic> format);
-  void onMentionClick(String id, String text);
+  void onMentionClick(String id, String prefixChar, String text);
   void onLinkClick(String url);
   void onFocusChange(bool hasFocus);
 }

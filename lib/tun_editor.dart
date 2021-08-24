@@ -9,7 +9,7 @@ import 'package:tun_editor/models/quill_delta.dart';
 import 'package:tun_editor/tun_editor_api.dart';
 import 'package:tun_editor/controller.dart';
 
-typedef MentionClickCallback = Function(String, String);
+typedef MentionClickCallback = Function(String, String, String);
 typedef LinkClickCallback = Function(String);
 
 class TunEditor extends StatefulWidget {
@@ -204,8 +204,8 @@ class TunEditorState extends State<TunEditor> with TunEditorHandler {
   }
 
   @override
-  void onMentionClick(String id, String text) {
-    mentionClickCallback?.call(id, text);
+  void onMentionClick(String id, String prefixChar, String text) {
+    mentionClickCallback?.call(id, prefixChar, text);
   }
 
   @override

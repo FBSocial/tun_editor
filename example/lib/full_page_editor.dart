@@ -95,14 +95,6 @@ class FullPageEditorState extends State<FullPageEditor> {
                 ..insert('Hello World', Attribute.bold.toJson()),
                 TextSelection.collapsed(offset: 2), ChangeSource.LOCAL);
 
-            // _controller.insertMention('1', 'Jeffrey Wu');
-
-            // if (_editorFocusNode.hasFocus) {
-            //   _editorFocusNode.unfocus();
-            // } else {
-            //   _editorFocusNode.requestFocus();
-            // }
-
             // _controller.formatText(0, 2, Attribute.bold);
             // _controller.insert(2, 'Bye Bye');
             // _controller.insert(_controller.selection.baseOffset, '🛹');
@@ -135,8 +127,8 @@ class FullPageEditorState extends State<FullPageEditor> {
                       autoFocus: false,
                       readOnly: _readOnly,
                       scrollable: true,
-                      onMentionClick: (String id, String text) {
-                        debugPrint('metion click $id, $text');
+                      onMentionClick: (String id, String prefixChar, String text) {
+                        debugPrint('metion click $id, $prefixChar, $text');
                       },
                       onLinkClick: (String url) {
                         debugPrint('link click $url');
@@ -253,7 +245,11 @@ class FullPageEditorState extends State<FullPageEditor> {
           return ListTile(
             title: Text('People $index'),
             onTap: () {
-              _controller.insertMention('$index', 'People $index');
+              if (index % 2 == 0) {
+                _controller.insertMention('$index', '@People $index');
+              } else {
+                _controller.insertMention('$index', '#Topic $index', prefixChar: '#');
+              }
             },
           );
         }

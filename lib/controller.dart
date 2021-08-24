@@ -75,16 +75,18 @@ class TunEditorController {
     }
   }
 
-  /// Insert mention with [id] and [text], [id] should be unqiue, will be used on click event.
-  void insertMention(String id, String text) {
-    // [{"retain":39},{"insert":{"mention":{"denotationChar":"@","id":"5","value":"People 5"}}}]
+  /// Insert mention with [id], [text] and [prefixChar], [id] should be unqiue, [id] and [prefixChar] will be used on click event.
+  void insertMention(String id, String text, {
+    String prefixChar = '@'
+  }) {
     final mentionDelta = new Delta()
         ..retain(selection.extentOffset)
         ..insert({
-          'mention': { 
-            'denotationChar': '@',
+          'mention': {
+            'denotationChar': '',
             'id': id,
             'value': text,
+            'prefixChar': prefixChar,
           },
         });
     compose(mentionDelta, null, ChangeSource.LOCAL);

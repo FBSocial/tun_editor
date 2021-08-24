@@ -53,7 +53,7 @@ class QuillEditor: WebView {
 
     private var onTextChangeListener: ((String, String) -> Unit)? = null
     private var onSelectionChangeListener: ((Int, Int, String) -> Unit)? = null
-    private var onMentionClickListener: ((String, String) -> Unit)? = null
+    private var onMentionClickListener: ((String, String, String) -> Unit)? = null
     private var onLinkClickListener: ((String) -> Unit)? = null
     private var onFocusChangeListener: ((Boolean) -> Unit)? = null
 
@@ -90,9 +90,9 @@ class QuillEditor: WebView {
                     onSelectionChangeListener?.invoke(index, length, format)
                 }
             },
-            onMentionClickListener = { id, text ->
+            onMentionClickListener = { id, prefixChar, text ->
                 (context as Activity).runOnUiThread {
-                    onMentionClickListener?.invoke(id, text)
+                    onMentionClickListener?.invoke(id, prefixChar, text)
                 }
             },
             onLinkClickListener = { url ->
@@ -205,7 +205,7 @@ class QuillEditor: WebView {
         this.onSelectionChangeListener = onSelectionChangeListener
     }
 
-    fun setOnMentionClickListener(onMentionClick: ((String, String) -> Unit)?) {
+    fun setOnMentionClickListener(onMentionClick: ((String, String, String) -> Unit)?) {
         this.onMentionClickListener = onMentionClick
     }
 
@@ -243,7 +243,7 @@ class QuillEditor: WebView {
     class JSInterface(
         private val onTextChangeListener: (String, String) -> Unit,
         private val onSelectionChangeListener: (Int, Int, String) -> Unit,
-        private val onMentionClickListener: (String, String) -> Unit,
+        private val onMentionClickListener: (String, String, String) -> Unit,
         private val onLinkClickListener: (String) -> Unit,
         private val onFocusChangeListener: (Boolean) -> Unit,
         private val onLoadImageListener: (String) -> Unit
@@ -259,8 +259,8 @@ class QuillEditor: WebView {
         }
 
         @JavascriptInterface
-        fun onMentionClick(id: String, text: String) {
-            onMentionClickListener(id, text)
+        fun onMentionClick(id: String, prefixChar: String, text: String) {
+            onMentionClickListener(id, prefixChar, text)
         }
 
         @JavascriptInterface

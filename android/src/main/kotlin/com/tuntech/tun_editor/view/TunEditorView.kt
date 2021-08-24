@@ -107,9 +107,10 @@ internal class TunEditorView(
             args["format"] = format
             methodChannel.invokeMethod(INVOKE_METHOD_ON_SELECTION_CHANGE, args)
         }
-        quillEditor.setOnMentionClickListener { mentionId, text ->
+        quillEditor.setOnMentionClickListener { mentionId, prefixChar, text ->
             val args = HashMap<String, Any>()
             args["id"] = mentionId
+            args["prefixChar"] = prefixChar
             args["text"] = text
             methodChannel.invokeMethod(INVOKE_METHOD_ON_MENTION_CLICK, args)
         }

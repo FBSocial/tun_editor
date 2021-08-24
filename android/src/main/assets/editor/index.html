@@ -43,14 +43,17 @@
             });
           }
         },
-        onMentionClick: function(id, text) {
+        onMentionClick: function(id, prefixChar, text) {
           if (isAndroid) {
-            tun.onMentionClick(id, text);
+            tun.onMentionClick(id, prefixChar, text);
           } else if (isIOS) {
             window.webkit.messageHandlers.onMentionClick.postMessage({
                id: id,
+               prefixChar: prefixChar,
                text: text,
             });
+          } else {
+            console.log('on mention click', id, prefixChar, text);  
           }
         },
         onLinkClick: function(url) {
@@ -339,11 +342,7 @@
             keyboard: {
               bindings: bindings
             },
-            mention: {
-              mentionDenotationChars: ["@"],
-              source: async function(searchTerm, renderList) {
-              },
-            },
+            mention: {},
           }
         };
         var quill = new Quill('#editor', options);
@@ -357,15 +356,24 @@
           // Mention click.
           if (ev.target.tagName === 'SPAN') {
             if (ev.target.className === 'mention') {
-              bridge.onMentionClick(ev.target.attributes['data-id'].value, ev.target.attributes['data-value'].value);
+              let id = ev.target.attributes['data-id'].value;
+              let prefixChar = ev.target.attributes['data-prefix-char'].value;
+              let value = ev.target.attributes['data-value'].value;
+              bridge.onMentionClick(prefixChar, value);
             } else if (ev.target.className === 'ql-mention-denotation-char') {
               let mentionNode = ev.target.parentElement.parentElement;
-              bridge.onMentionClick(mentionNode.attributes['data-id'].value, mentionNode.attributes['data-value'].value);
+              let id = mentionNode.attributes['data-id'].value;
+              let prefixChar = mentionNode.attributes['data-prefix-char'].value;
+              let value = mentionNode.attributes['data-value'].value;
+              bridge.onMentionClick(id, prefixChar, value);
             } else if (ev.target.attributes['contenteditable']
                   && ev.target.attributes['contenteditable'].value === 'false'
                   && ev.target.parentElement.className === 'mention') {
               let mentionNode = ev.target.parentElement;
-              bridge.onMentionClick(mentionNode.attributes['data-id'].value, mentionNode.attributes['data-value'].value);
+              let id = mentionNode.attributes['data-id'].value;
+              let prefixChar = mentionNode.attributes['data-prefix-char'].value;
+              let value = mentionNode.attributes['data-value'].value;
+              bridge.onMentionClick(id, prefixChar, value);
             }
           }
         });

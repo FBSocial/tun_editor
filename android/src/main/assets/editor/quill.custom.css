@@ -26,7 +26,7 @@
   padding-left: 20px;
 }
 .ql-editor ol li[data-list=bullet] {
-  counter-reset: none;
+  counter-reset: list-0 list-1 list-2 list-3 list-4 list-5 list-6 list-7 list-8 list-9;
   counter-increment: none;
 }
 .ql-editor li:not(.ql-direction-rtl)::before {
@@ -81,10 +81,7 @@ pre .hljs-line::before {
   margin-right: 16px;
 }
 span.mention {
-  background-color: #5562F2;
-  padding: 2px 12px;
-  border-radius: 20px;
-  color: #FFFFFF;
+  color: #5562F2;
 }
 .ql-snow .ql-editor blockquote {
   margin: 0;
