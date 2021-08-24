@@ -152,6 +152,12 @@ class TunEditorApi {
   void setFileBasePath(String fileBasePath) {
     _channel.invokeMethod('setFileBasePath', fileBasePath);
   }
+  void setImageStyle(Map<String, dynamic> style) {
+    _channel.invokeMethod('setImageStyle', style);
+  }
+  void setVideoStyle(Map<String, dynamic> style) {
+    _channel.invokeMethod('setVideoStyle', style);
+  }
 
 }
 

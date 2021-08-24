@@ -29,6 +29,10 @@ class TunEditor extends StatefulWidget {
   // File base path is used to load local image.
   final String fileBasePath;
 
+  // Image and video style.
+  final Map<String, dynamic> imageStyle;
+  final Map<String, dynamic> videoStyle;
+
   final MentionClickCallback? onMentionClick;
   final LinkClickCallback? onLinkClick;
 
@@ -38,6 +42,8 @@ class TunEditor extends StatefulWidget {
     Key? key,
     required this.controller,
     required this.fileBasePath,
+    this.imageStyle = const {},
+    this.videoStyle = const {},
     this.placeholder = '',
     this.readOnly = false,
     this.scrollable = true,
@@ -64,6 +70,8 @@ class TunEditorState extends State<TunEditor> with TunEditorHandler {
   // Widget fields.
   TunEditorController get controller => widget.controller;
   String get fileBasePath => widget.fileBasePath;
+  Map<String, dynamic> get imageStyle => widget.imageStyle;
+  Map<String, dynamic> get videoStyle => widget.videoStyle;
   String get placeholder => widget.placeholder;
   bool get readOnly => widget.readOnly;
   bool get scrollable => widget.scrollable;
@@ -121,6 +129,16 @@ class TunEditorState extends State<TunEditor> with TunEditorHandler {
         _tunEditorApi?.setFileBasePath(fileBasePath);
         creationParams['fileBasePath'] = fileBasePath;
       }
+      if (creationParams.containsKey('imageStyle')
+          && creationParams['imageStyle'] != imageStyle) {
+        _tunEditorApi?.setImageStyle(imageStyle);
+        creationParams['imageStyle'] = imageStyle;
+      }
+      if (creationParams.containsKey('videoStyle')
+          && creationParams['videoStyle'] != videoStyle) {
+        _tunEditorApi?.setVideoStyle(videoStyle);
+        creationParams['videoStyle'] = videoStyle;
+      }
     } else {
       creationParams = {
         'fileBasePath': fileBasePath,
@@ -130,6 +148,8 @@ class TunEditorState extends State<TunEditor> with TunEditorHandler {
         'padding': paddingList,
         'autoFocus': autoFocus,
         'delta': controller.document.toDelta().toJson(),
+        'imageStyle': imageStyle,
+        'videoStyle': videoStyle,
       };
     }
 

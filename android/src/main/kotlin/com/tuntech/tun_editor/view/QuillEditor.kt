@@ -36,7 +36,8 @@ class QuillEditor: WebView {
 
     constructor(
         context: Context, placeholder: String, padding: List<Int>, readOnly: Boolean,
-        scrollable: Boolean, autoFocus: Boolean, delta: List<*>, fileBasePath: String
+        scrollable: Boolean, autoFocus: Boolean, delta: List<*>, fileBasePath: String,
+        imageStyle: Map<String, Any>, videoStyle: Map<String, Any>
     ): this(context) {
         this.placeholder = placeholder
         this.readOnly = readOnly
@@ -45,6 +46,8 @@ class QuillEditor: WebView {
         this.padding = padding
         this.delta = delta
         this.fileBasePath = fileBasePath
+        this.imageStyle = imageStyle
+        this.videoStyle = videoStyle
     }
 
     private var placeholder: String = ""
@@ -54,6 +57,8 @@ class QuillEditor: WebView {
     private var autoFocus: Boolean = false
     private var delta: List<*> = listOf<Map<String, Any>>()
     private var fileBasePath: String = ""
+    private var imageStyle: Map<String, Any> = mapOf()
+    private var videoStyle: Map<String, Any> = mapOf()
 
     private var onTextChangeListener: ((String, String) -> Unit)? = null
     private var onSelectionChangeListener: ((Int, Int, String) -> Unit)? = null
@@ -75,6 +80,8 @@ class QuillEditor: WebView {
                 setContents(delta)
                 setScrollable(scrollable)
                 setFileBasePath(fileBasePath)
+                setImageStyle(imageStyle)
+                setVideoStyle(videoStyle)
 
                 if (autoFocus) {
                     focus()
@@ -208,6 +215,24 @@ class QuillEditor: WebView {
 
     fun setFileBasePath(fileBasePath: String) {
         this.fileBasePath = fileBasePath
+    }
+
+    fun setImageStyle(style: Map<String, Any>) {
+        imageStyle = style
+        val styleObject = JSONObject()
+        for ((k, v) in style) {
+            styleObject.put(k, v)
+        }
+        exec("javascript:setImageStyle($styleObject)")
+    }
+
+    fun setVideoStyle(style: Map<String, Any>) {
+        videoStyle = style
+        val styleObject = JSONObject()
+        for ((k, v) in style) {
+            styleObject.put(k, v)
+        }
+        exec("javascript:setVideoStyle($styleObject)")
     }
 
     fun setOnTextChangeListener(onTextChangeListener: ((String, String) -> Unit)?) {

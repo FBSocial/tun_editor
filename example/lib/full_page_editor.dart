@@ -120,6 +120,17 @@ class FullPageEditorState extends State<FullPageEditor> {
                     child: TunEditor(
                       controller: _controller,
                       fileBasePath: _fileBasePath,
+                      imageStyle: {
+                        'width': 100,
+                        'height': 100,
+                        'align': 'center',
+                      },
+                      videoStyle: {
+                        'width': 100,
+                        'height': 100,
+                        'align': 'center',
+                      },
+
                       padding: EdgeInsets.symmetric(
                         vertical: 12,
                         horizontal: 15,
@@ -366,10 +377,6 @@ class FullPageEditorState extends State<FullPageEditor> {
       _controller.insertImage(
         source: 'file://${image.name}',
         width: 230,
-        attributes: [
-          WidthAttribute("200"),
-          HeightAttribute("100"),
-        ]
       );
     }
   }

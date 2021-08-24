@@ -48,6 +48,8 @@ internal class TunEditorView(
         const val HANDLE_SET_SCROLLABLE = "setScrollable"
         const val HANDLE_SET_PADDING = "setPadding"
         const val HANDLE_SET_FILE_BASE_PATH = "setFileBasePath"
+        const val HANDLE_SET_IMAGE_STYLE = "setImageStyle"
+        const val HANDLE_SET_VIDEO_STYLE = "setVideoStyle"
     }
 
     // View.
@@ -77,6 +79,8 @@ internal class TunEditorView(
         var scrollable = false
         var fileBasePath = ""
         var delta: List<*> = listOf<Map<String, Any>>()
+        val imageStyle: HashMap<String, Any> = hashMapOf()
+        val videoStyle: HashMap<String, Any> = hashMapOf()
         if (creationParams?.containsKey("placeholder") == true) {
             placeholder = (creationParams["placeholder"] as? String) ?: ""
         }
@@ -100,9 +104,25 @@ internal class TunEditorView(
         if (creationParams?.containsKey("fileBasePath") == true) {
             fileBasePath = (creationParams["fileBasePath"] as? String) ?: ""
         }
+        if (creationParams?.containsKey("imageStyle") == true) {
+            val styleParam = (creationParams["imageStyle"] as? Map<*, *>) ?: mapOf<String, Any>()
+            for ((k, v) in styleParam) {
+                if (k is String && v != null) {
+                    imageStyle[k] = v
+                }
+            }
+        }
+        if (creationParams?.containsKey("videoStyle") == true) {
+            val styleParam = (creationParams["videoStyle"] as? Map<*, *>) ?: mapOf<String, Any>()
+            for ((k, v) in styleParam) {
+                if (k is String && v != null) {
+                    videoStyle[k] = v
+                }
+            }
+        }
 
         quillEditor = QuillEditor(context, placeholder, padding, readOnly,
-            scrollable, autoFocus, delta, fileBasePath)
+            scrollable, autoFocus, delta, fileBasePath, imageStyle, videoStyle)
         quillEditor.setOnTextChangeListener { changeDelta, oldDelta ->
             val text = HashMap<String, String>()
             text["delta"] = changeDelta
@@ -256,6 +276,26 @@ internal class TunEditorView(
             HANDLE_SET_FILE_BASE_PATH -> {
                 val fileBasePath = call.arguments as? String ?: return
                 quillEditor.setFileBasePath(fileBasePath)
+            }
+            HANDLE_SET_IMAGE_STYLE -> {
+                val args = call.arguments as? Map<*, *> ?: return
+                val style = HashMap<String, Any>()
+                for ((k, v) in args) {
+                    if (k is String && v != null) {
+                        style[k] = v
+                    }
+                }
+                quillEditor.setImageStyle(style)
+            }
+            HANDLE_SET_VIDEO_STYLE -> {
+                val args = call.arguments as? Map<*, *> ?: return
+                val style = HashMap<String, Any>()
+                for ((k, v) in args) {
+                    if (k is String && v != null) {
+                        style[k] = v
+                    }
+                }
+                quillEditor.setVideoStyle(style)
             }
 
             else -> {

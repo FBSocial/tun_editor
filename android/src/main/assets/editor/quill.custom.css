@@ -9,6 +9,9 @@
 .ql-editor {
   line-height: 1.5;
 }
+.ql-snow .ql-editor img {
+  display: block;
+}
 .ql-snow .ql-editor h1 {
   font-size: 22px;
 }
