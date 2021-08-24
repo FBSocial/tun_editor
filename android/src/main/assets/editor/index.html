@@ -122,7 +122,7 @@
         DividerBlot.tagName = 'hr';
         Quill.register(DividerBlot, true);
 
-        class ImageExtend extends Embed {
+        class ImageExtend extends BlockEmbed {
           static create(value) {
 
             const node = super.create(value);

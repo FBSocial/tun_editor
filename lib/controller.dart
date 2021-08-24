@@ -116,7 +116,7 @@ class TunEditorController {
     double? width,
     double? height,
     String? checkPath,
-    bool appendNewLine = true,
+    bool appendNewLine = false,
     List<Attribute>? attributes = const [],
   }) {
     // Wrap value.
@@ -141,22 +141,17 @@ class TunEditorController {
       }
     }
 
-    // Insert new line.
-    final newLineOffset = _insertNewLine();
-    if (newLineOffset == null) {
-      return;
-    }
-
     // Insert image.
     final delta = new Delta()
-      ..retain(newLineOffset)
+      ..retain(selection.extentOffset)
       ..insert({ 'image': imageBlot }, attrMap);
     if (appendNewLine) {
       delta.insert('\n');
     }
+    debugPrint('insert delta ${delta.toJson()}');
     compose(delta, null, ChangeSource.LOCAL);
 
-    int newOffset = newLineOffset + 1;
+    int newOffset = selection.extentOffset + 1;
     if (appendNewLine) {
       newOffset = newOffset + 1;
     }
@@ -325,6 +320,15 @@ class TunEditorController {
   void composeDocument(Delta delta) {
     debugPrint('compose delta ${delta.toJson()}');
     document.compose(delta, ChangeSource.LOCAL);
+  }
+
+  bool _isEmptyLine() {
+    final child = document.queryChild(selection.extentOffset);
+    if (child.node == null) {
+      return true;
+    }
+    debugPrint('child ${child.node!.length} ${child.node!.toDelta().toJson()} ${child.node!.toPlainText() == '\n'} ${child.node!.isLast}');
+    return child.node!.length == 1 && child.node!.toPlainText() == '\n';
   }
 
   // Insert new line and return new line's offset.
