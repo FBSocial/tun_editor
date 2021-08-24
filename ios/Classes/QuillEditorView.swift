@@ -18,6 +18,7 @@ class QuillEditorView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler {
     var padding: [Int] = [12, 15, 12, 15]
     var autoFocus: Bool = false
     var delta: [Any] = []
+    var fileBasePath: String = ""
     
     var onSelectionChangeHandler: (([String: AnyObject]) -> Void)? = nil
     var onTextChangeHandler: (([String: AnyObject]) -> Void)? = nil
@@ -43,7 +44,8 @@ class QuillEditorView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler {
         scrollable: Bool,
         padding: [Int],
         autoFocus: Bool,
-        delta: [Any]
+        delta: [Any],
+        fileBasePath: String
     ) {
         self.placeholder = placeholder
         self.readOnly = readOnly
@@ -51,6 +53,7 @@ class QuillEditorView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler {
         self.padding = padding
         self.autoFocus = autoFocus
         self.delta = delta
+        self.fileBasePath = fileBasePath
         
         super.init(frame: frame, configuration: configuration)
         setup()
@@ -109,8 +112,8 @@ class QuillEditorView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler {
                 onFocusChangeHandler?(args)
             }
         case "loadImage":
-            if let path = message.body as? String {
-                print("load image \(path)")
+            if let filename = message.body as? String {
+                refreshImage(filename)
             }
         default:
             debugPrint("missing message handler in quill editor \(message.name)")
@@ -183,14 +186,17 @@ class QuillEditorView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler {
     }
     
     func setPlaceholder(_ placeholder: String) {
+        self.placeholder = placeholder
         exec("setPlaceholder(\"\(placeholder)\")")
     }
     
     func setReadOnly(_ readOnly: Bool) {
+        self.readOnly = readOnly
         exec("setReadOnly(\(readOnly))")
     }
     
     func setScrollable(_ scrollable: Bool) {
+        self.scrollable = scrollable
         self.scrollView.isScrollEnabled = scrollable
     }
     
@@ -198,8 +204,13 @@ class QuillEditorView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler {
         if padding.count < 4 {
             return
         } else {
+            self.padding = padding
             exec("setPadding(\(padding[0]), \(padding[1]), \(padding[2]), \(padding[3]))")
         }
+    }
+    
+    func setFileBasePath(_ fileBasePath: String) {
+        self.fileBasePath = fileBasePath
     }
     
     func setOnTextChangeListener(_ handler: @escaping (([String: AnyObject]) -> Void)) {
@@ -233,6 +244,13 @@ class QuillEditorView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler {
         }
     }
     
+    private func refreshImage(_ filename: String) {
+        var url = URL(fileURLWithPath: fileBasePath)
+        url.appendPathComponent(filename)
+        exec("refreshImage(\"\(filename)\", \"file://\(url.path)\")")
+        print("refreshImage(\"\(filename)\", \"file://\(url.path)\")")
+    }
+    
     private func setup() {
         self.backgroundColor = .white
         self.navigationDelegate = self
@@ -241,6 +259,7 @@ class QuillEditorView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler {
         self.configuration.userContentController.add(self, name: "onMentionClick")
         self.configuration.userContentController.add(self, name: "onLinkClick")
         self.configuration.userContentController.add(self, name: "onFocusChange")
+        self.configuration.userContentController.add(self, name: "loadImage")
 
         
         if let filePath = Bundle.main.path(forResource: "index", ofType: "html") {

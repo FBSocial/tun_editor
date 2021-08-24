@@ -149,6 +149,9 @@ class TunEditorApi {
   void setPadding(List<int> padding) {
     _channel.invokeMethod('setPadding', padding);
   }
+  void setFileBasePath(String fileBasePath) {
+    _channel.invokeMethod('setFileBasePath', fileBasePath);
+  }
 
 }
 

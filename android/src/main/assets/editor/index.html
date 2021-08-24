@@ -127,8 +127,8 @@
 
             const node = super.create(value);
             let url = this.sanitize(value.source);
-            if (isAndroid && url.startsWith('file')) {
-              bridge.loadImage(url);
+            if (url.startsWith('file')) {
+              bridge.loadImage(url.replace('file://', ''));
             } else {
               node.setAttribute('src', url);
             }
@@ -455,8 +455,8 @@
           var editor = document.querySelector('.ql-editor');
           editor.style.padding = `${top}px ${right}px ${bottom}px ${left}px`;
         }
-        refreshImage = function(path, data) {
-          let image = document.querySelector(`[data-source="${path}"]`);
+        refreshImage = function(filename, data) {
+          let image = document.querySelector(`[data-source="file://${filename}"]`);
           if (image) {
             image.setAttribute('src', data);
           } else {

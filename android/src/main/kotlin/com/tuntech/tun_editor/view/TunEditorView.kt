@@ -8,6 +8,7 @@ import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.platform.PlatformView
 import android.animation.ObjectAnimator
+import android.util.Log
 
 
 internal class TunEditorView(
@@ -18,6 +19,8 @@ internal class TunEditorView(
 ) : PlatformView, MethodChannel.MethodCallHandler {
 
     companion object {
+        val TAG: String = QuillEditor::class.java.name
+
         const val INVOKE_METHOD_ON_TEXT_CHANGE = "onTextChange"
         const val INVOKE_METHOD_ON_SELECTION_CHANGE = "onSelectionChange"
         const val INVOKE_METHOD_ON_MENTION_CLICK = "onMentionClick"
@@ -44,6 +47,7 @@ internal class TunEditorView(
         const val HANDLE_SET_READ_ONLY = "setReadOnly"
         const val HANDLE_SET_SCROLLABLE = "setScrollable"
         const val HANDLE_SET_PADDING = "setPadding"
+        const val HANDLE_SET_FILE_BASE_PATH = "setFileBasePath"
     }
 
     // View.
@@ -71,6 +75,7 @@ internal class TunEditorView(
         var autoFocus = false
         var readOnly = false
         var scrollable = false
+        var fileBasePath = ""
         var delta: List<*> = listOf<Map<String, Any>>()
         if (creationParams?.containsKey("placeholder") == true) {
             placeholder = (creationParams["placeholder"] as? String) ?: ""
@@ -92,8 +97,12 @@ internal class TunEditorView(
         if (creationParams?.containsKey("delta") == true) {
             delta = (creationParams["delta"] as? List<*>) ?: listOf<Map<String, Any>>()
         }
+        if (creationParams?.containsKey("fileBasePath") == true) {
+            fileBasePath = (creationParams["fileBasePath"] as? String) ?: ""
+        }
 
-        quillEditor = QuillEditor(context, placeholder, padding, readOnly, scrollable, autoFocus, delta)
+        quillEditor = QuillEditor(context, placeholder, padding, readOnly,
+            scrollable, autoFocus, delta, fileBasePath)
         quillEditor.setOnTextChangeListener { changeDelta, oldDelta ->
             val text = HashMap<String, String>()
             text["delta"] = changeDelta
@@ -124,6 +133,7 @@ internal class TunEditorView(
     }
 
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
+        Log.d(TAG, "on method call ${call.method}")
         when (call.method) {
             // Content related.
             HANDLE_METHOD_REPLACE_TEXT -> {
@@ -242,6 +252,10 @@ internal class TunEditorView(
                     return@map it as? Int ?: 0
                 } ?: return
                 quillEditor.setPadding(padding)
+            }
+            HANDLE_SET_FILE_BASE_PATH -> {
+                val fileBasePath = call.arguments as? String ?: return
+                quillEditor.setFileBasePath(fileBasePath)
             }
 
             else -> {

@@ -1,8 +1,11 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:path/path.dart' as path;
 import 'package:tun_editor/iconfont.dart';
 import 'package:tun_editor/models/documents/attribute.dart';
 import 'package:tun_editor/models/documents/document.dart';
@@ -26,6 +29,8 @@ class FullPageEditorState extends State<FullPageEditor> {
 
   bool _isLoading = true;
   late TunEditorController _controller;
+
+  late String _fileBasePath;
 
   // FocusNode _titleFocusNode = FocusNode();
   FocusNode _editorFocusNode = FocusNode();
@@ -114,6 +119,7 @@ class FullPageEditorState extends State<FullPageEditor> {
                   Expanded(
                     child: TunEditor(
                       controller: _controller,
+                      fileBasePath: _fileBasePath,
                       padding: EdgeInsets.symmetric(
                         vertical: 12,
                         horizontal: 15,
@@ -337,8 +343,17 @@ class FullPageEditorState extends State<FullPageEditor> {
       debugPrint('document: $doc');
     });
     _controller.addSelectionListener((selection) {
-      debugPrint('new selection ${selection.baseOffset} ${selection.extentOffset}');
+      debugPrint('selection changed ${selection.baseOffset} ${selection.extentOffset}');
     });
+
+    if (Platform.isIOS) {
+      final appDocPath = await getApplicationDocumentsDirectory();
+      final tempPath = path.join(appDocPath.parent.path, 'tmp');
+      _fileBasePath = tempPath;
+    } else {
+      final tempPath = await getTemporaryDirectory();
+      _fileBasePath = tempPath.path;
+    }
     setState(() {
       _isLoading = false;
     });
@@ -349,7 +364,7 @@ class FullPageEditorState extends State<FullPageEditor> {
     final XFile? image = await picker.pickImage(source: ImageSource.gallery);
     if (image != null) {
       _controller.insertImage(
-        source: 'file://${image.path}',
+        source: 'file://${image.name}',
         width: 230,
         attributes: [
           WidthAttribute("200"),

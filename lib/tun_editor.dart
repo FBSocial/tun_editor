@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
@@ -25,6 +26,9 @@ class TunEditor extends StatefulWidget {
   final bool autoFocus;
   final FocusNode? focusNode;
 
+  // File base path is used to load local image.
+  final String fileBasePath;
+
   final MentionClickCallback? onMentionClick;
   final LinkClickCallback? onLinkClick;
 
@@ -33,6 +37,7 @@ class TunEditor extends StatefulWidget {
   const TunEditor({
     Key? key,
     required this.controller,
+    required this.fileBasePath,
     this.placeholder = '',
     this.readOnly = false,
     this.scrollable = true,
@@ -58,6 +63,7 @@ class TunEditorState extends State<TunEditor> with TunEditorHandler {
 
   // Widget fields.
   TunEditorController get controller => widget.controller;
+  String get fileBasePath => widget.fileBasePath;
   String get placeholder => widget.placeholder;
   bool get readOnly => widget.readOnly;
   bool get scrollable => widget.scrollable;
@@ -106,12 +112,18 @@ class TunEditorState extends State<TunEditor> with TunEditorHandler {
         creationParams['scrollable'] = scrollable;
       }
       if (creationParams.containsKey('padding')
-          && creationParams['padding'] != padding) {
+          && !listEquals(creationParams['padding'], paddingList)) {
         _tunEditorApi?.setPadding(paddingList);
         creationParams['padding'] = paddingList;
       }
+      if (creationParams.containsKey('fileBasePath')
+          && creationParams['fileBasePath'] != fileBasePath) {
+        _tunEditorApi?.setFileBasePath(fileBasePath);
+        creationParams['fileBasePath'] = fileBasePath;
+      }
     } else {
       creationParams = {
+        'fileBasePath': fileBasePath,
         'placeholder': placeholder,
         'readOnly': readOnly,
         'scrollable': scrollable,

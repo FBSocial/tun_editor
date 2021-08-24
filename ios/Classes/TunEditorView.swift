@@ -50,6 +50,7 @@ class TunEditorView: NSObject, FlutterPlatformView {
         var padding: [Int] = [12, 15, 12, 15]
         var autoFocus: Bool = false
         var delta: [Any] = []
+        var fileBasePath: String = ""
         
         if let argsMap = args as? [String: Any] {
             if let optPlaceholder = argsMap["placeholder"] as? String {
@@ -70,6 +71,9 @@ class TunEditorView: NSObject, FlutterPlatformView {
             if let optDelta = argsMap["delta"] as? [Any] {
                 delta = optDelta
             }
+            if let optFileBasePath = argsMap["fileBasePath"] as? String {
+                fileBasePath = optFileBasePath
+            }
         }
         _editor = QuillEditorView(
             frame: frame,
@@ -79,7 +83,8 @@ class TunEditorView: NSObject, FlutterPlatformView {
             scrollable: scrollable,
             padding: padding,
             autoFocus: autoFocus,
-            delta: delta
+            delta: delta,
+            fileBasePath: fileBasePath
         )
         methodChannel = FlutterMethodChannel(name: "tun/editor/\(viewId)", binaryMessenger: messenger)
         super.init()
@@ -237,6 +242,10 @@ class TunEditorView: NSObject, FlutterPlatformView {
         case "setPadding":
             if let padding = call.arguments as? [Int] {
                 _editor.setPadding(padding)
+            }
+        case "setFileBasePath":
+            if let fileBasePath = call.arguments as? String {
+                _editor.setFileBasePath(fileBasePath)
             }
             
         default:

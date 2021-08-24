@@ -34,14 +34,17 @@ class QuillEditor: WebView {
 
     constructor(context: Context, attr: AttributeSet, defStyle: Int): super (context, attr, defStyle)
 
-    constructor(context: Context, placeholder: String, padding: List<Int>, readOnly: Boolean,
-                scrollable: Boolean, autoFocus: Boolean, delta: List<*>): this(context) {
+    constructor(
+        context: Context, placeholder: String, padding: List<Int>, readOnly: Boolean,
+        scrollable: Boolean, autoFocus: Boolean, delta: List<*>, fileBasePath: String
+    ): this(context) {
         this.placeholder = placeholder
         this.readOnly = readOnly
         this.scrollable = scrollable
         this.autoFocus = autoFocus
         this.padding = padding
         this.delta = delta
+        this.fileBasePath = fileBasePath
     }
 
     private var placeholder: String = ""
@@ -50,6 +53,7 @@ class QuillEditor: WebView {
     private var padding: List<Int> = listOf(12, 15, 12, 15)
     private var autoFocus: Boolean = false
     private var delta: List<*> = listOf<Map<String, Any>>()
+    private var fileBasePath: String = ""
 
     private var onTextChangeListener: ((String, String) -> Unit)? = null
     private var onSelectionChangeListener: ((Int, Int, String) -> Unit)? = null
@@ -70,6 +74,7 @@ class QuillEditor: WebView {
                 setReadOnly(readOnly)
                 setContents(delta)
                 setScrollable(scrollable)
+                setFileBasePath(fileBasePath)
 
                 if (autoFocus) {
                     focus()
@@ -105,9 +110,9 @@ class QuillEditor: WebView {
                     onFocusChangeListener?.invoke(hasFocus)
                 }
             },
-            onLoadImageListener = { path ->
+            onLoadImageListener = { filename ->
                 (context as Activity).runOnUiThread {
-                    refreshImage(path)
+                    refreshImage(filename)
                 }
             }
         ), "tun")
@@ -174,14 +179,17 @@ class QuillEditor: WebView {
     }
 
     fun setPlaceholder(placeholder: String) {
+        this.placeholder = placeholder
         exec("javascript:setPlaceholder(\"$placeholder\")")
     }
 
     fun setReadOnly(readOnly: Boolean) {
+        this.readOnly = readOnly
         exec("javascript:setReadOnly($readOnly)")
     }
 
     fun setScrollable(scrollable: Boolean) {
+        this.scrollable = scrollable
         if (scrollable) {
             setOnTouchListener(null)
         } else {
@@ -190,11 +198,16 @@ class QuillEditor: WebView {
     }
 
     fun setPadding(padding: List<Int>) {
+        this.padding = padding
         if (padding.size < 4) {
             Log.w(TAG, "set editor padding failed: padding size is less then 4")
             return
         }
         exec("javascript:setPadding(${padding[0]}, ${padding[1]}, ${padding[2]}, ${padding[3]})")
+    }
+
+    fun setFileBasePath(fileBasePath: String) {
+        this.fileBasePath = fileBasePath
     }
 
     fun setOnTextChangeListener(onTextChangeListener: ((String, String) -> Unit)?) {
@@ -221,14 +234,14 @@ class QuillEditor: WebView {
         exec("javascript:setContents(${JSONArray(delta)})")
     }
 
-    private fun refreshImage(path: String) {
-        val file = File(path.replace("file://", ""))
+    private fun refreshImage(filename: String) {
+        val file = File(fileBasePath, filename)
         if (file.exists()) {
             val imageData = Base64.encodeToString(file.readBytes(), Base64.DEFAULT)
             val imageBase64 = URLEncoder.encode(imageData, "UTF-8")
-            exec("javascript:refreshImage(\"$path\", \"data:image/png;base64,$imageBase64\")")
+            exec("javascript:refreshImage(\"$filename\", \"data:image/png;base64,$imageBase64\")")
         } else {
-            Log.w(TAG, "image file not found: $path")
+            Log.w(TAG, "image file not found: ${file.path}")
         }
     }
 
@@ -274,8 +287,8 @@ class QuillEditor: WebView {
         }
 
         @JavascriptInterface
-        fun loadImage(path: String) {
-            onLoadImageListener.invoke(path)
+        fun loadImage(filename: String) {
+            onLoadImageListener.invoke(filename)
         }
     }
 
