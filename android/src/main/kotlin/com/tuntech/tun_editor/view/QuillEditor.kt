@@ -77,11 +77,11 @@ class QuillEditor: WebView {
                 setPlaceholder(placeholder)
                 setPadding(padding)
                 setReadOnly(readOnly)
-                setContents(delta)
                 setScrollable(scrollable)
                 setFileBasePath(fileBasePath)
                 setImageStyle(imageStyle)
                 setVideoStyle(videoStyle)
+                setContents(delta)
 
                 if (autoFocus) {
                     focus()
