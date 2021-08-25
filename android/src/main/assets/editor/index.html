@@ -78,9 +78,7 @@
           if (isAndroid) {
             return tun.loadImage(path);
           } else if (isIOS) {
-            return window.webkit.messageHandlers.loadImage.postMessage({
-               hasFocus: hasFocus,
-            });
+            return window.webkit.messageHandlers.loadImage.postMessage(path);
           }
         },
       }

@@ -51,6 +51,8 @@ class TunEditorView: NSObject, FlutterPlatformView {
         var autoFocus: Bool = false
         var delta: [Any] = []
         var fileBasePath: String = ""
+        var imageStyle: [String: Any] = [:]
+        var videoStyle: [String: Any] = [:]
         
         if let argsMap = args as? [String: Any] {
             if let optPlaceholder = argsMap["placeholder"] as? String {
@@ -74,6 +76,12 @@ class TunEditorView: NSObject, FlutterPlatformView {
             if let optFileBasePath = argsMap["fileBasePath"] as? String {
                 fileBasePath = optFileBasePath
             }
+            if let optImageStyle = argsMap["imageStyle"] as? [String: Any] {
+                imageStyle = optImageStyle
+            }
+            if let optVideoStyle = argsMap["videoStyle"] as? [String: Any] {
+                videoStyle = optVideoStyle
+            }
         }
         _editor = QuillEditorView(
             frame: frame,
@@ -84,7 +92,9 @@ class TunEditorView: NSObject, FlutterPlatformView {
             padding: padding,
             autoFocus: autoFocus,
             delta: delta,
-            fileBasePath: fileBasePath
+            fileBasePath: fileBasePath,
+            imageStyle: imageStyle,
+            videoStyle: videoStyle
         )
         methodChannel = FlutterMethodChannel(name: "tun/editor/\(viewId)", binaryMessenger: messenger)
         super.init()
@@ -246,6 +256,14 @@ class TunEditorView: NSObject, FlutterPlatformView {
         case "setFileBasePath":
             if let fileBasePath = call.arguments as? String {
                 _editor.setFileBasePath(fileBasePath)
+            }
+        case "setImageStyle":
+            if let style = call.arguments as? [String: Any] {
+                _editor.setImageStyle(style)
+            }
+        case "setVideoStyle":
+            if let style = call.arguments as? [String: Any] {
+                _editor.setVideoStyle(style)
             }
             
         default:

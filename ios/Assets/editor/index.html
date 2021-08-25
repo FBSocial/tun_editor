@@ -95,6 +95,11 @@
       var setReadOnly;
       var setPadding;
       var refreshImage;
+      var setImageStyle;
+      var setVideoStyle;
+
+      var imageStyle = {};
+      var videoStyle = {};
 
       document.addEventListener('DOMContentLoaded', () => {
         let Delta = Quill.import('delta');
@@ -134,6 +139,17 @@
               node.setAttribute('src', 'common_lost.svg');
             }
 
+            // Set default style.
+            if (imageStyle.width) {
+              node.setAttribute('width', imageStyle.width);
+            }
+            if (imageStyle.height) {
+              node.setAttribute('height', imageStyle.height);
+            }
+            if (imageStyle.align) {
+              ImageExtend.align(node, imageStyle.align);
+            }
+
             Object.keys(value).forEach(function(key) {
               node.dataset[key] = value[key];
             });
@@ -167,7 +183,7 @@
           }
 
           static formats(domNode) {
-            return ['width', 'height'].reduce((formats, attribute) => {
+            return ['width', 'height', 'align'].reduce((formats, attribute) => {
               if (domNode.hasAttribute(attribute)) {
                 formats[attribute] = domNode.getAttribute(attribute);
               }
@@ -182,8 +198,22 @@
               } else {
                 this.domNode.removeAttribute(name);
               }
+            } else if (name === 'align') {
+              ImageExtend.align(this.domNode, value);
             } else {
               super.format(name, value);
+            }
+          }
+
+          static align(node, position) {
+            if (position === 'center') {
+              node.style.margin = '0 auto';
+            } else if (position === 'left') {
+              node.style.margin = '0';
+            } else if (position === 'right') {
+              node.style.margin = '0 0 0 auto';
+            } else {
+              node.style.margin = '0';
             }
           }
 
@@ -220,6 +250,16 @@
             node.appendChild(video);
             node.appendChild(durationSpan);
 
+            if (videoStyle.width) {
+              node.style.width = `${videoStyle.width}px`;
+            }
+            if (videoStyle.height) {
+              node.style.height = `${videoStyle.height}px`;
+            }
+            if (videoStyle.align) {
+              VideoBlot.align(node, videoStyle.align);
+            }
+
             Object.keys(value).forEach(function(key) {
               node.dataset[key] = value[key];
             });
@@ -248,13 +288,24 @@
             }, {});
           }
 
+          static align(node, position) {
+            if (position === 'center') {
+              node.style.margin = '0 auto';
+            } else if (position === 'left') {
+              node.style.margin = '0';
+            } else if (position === 'right') {
+              node.style.margin = '0 0 0 auto';
+            } else {
+              node.style.margin = '0';
+            }
+          }
+
           format(name, value) {
             if (['width', 'height'].indexOf(name) > -1) {
               if (value) {
-                // this.domNode.setAttribute(name, value);
                 this.domNode.style[name] = `${value}px`;
               } else {
-                this.domNode.removeAttribute(name);
+                this.domNode.style[name] = null;
               }
             } else {
               super.format(name, value);
@@ -461,6 +512,16 @@
             console.log('not found image element', path);
           }
         }
+        setImageStyle = function(style) {
+          imageStyle = style;
+        }
+        setVideoStyle = function(style) {
+          videoStyle = style;
+        }
+
+        window.addEventListener('resize', function() {
+          quill.scrollIntoView();
+        });
       })
     </script>
   </body>

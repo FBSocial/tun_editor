@@ -19,6 +19,8 @@ class QuillEditorView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler {
     var autoFocus: Bool = false
     var delta: [Any] = []
     var fileBasePath: String = ""
+    var imageStyle: [String: Any] = [:]
+    var videoStyle: [String: Any] = [:]
     
     var onSelectionChangeHandler: (([String: AnyObject]) -> Void)? = nil
     var onTextChangeHandler: (([String: AnyObject]) -> Void)? = nil
@@ -45,7 +47,9 @@ class QuillEditorView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler {
         padding: [Int],
         autoFocus: Bool,
         delta: [Any],
-        fileBasePath: String
+        fileBasePath: String,
+        imageStyle: [String: Any],
+        videoStyle: [String: Any]
     ) {
         self.placeholder = placeholder
         self.readOnly = readOnly
@@ -54,6 +58,8 @@ class QuillEditorView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler {
         self.autoFocus = autoFocus
         self.delta = delta
         self.fileBasePath = fileBasePath
+        self.imageStyle = imageStyle
+        self.videoStyle = videoStyle
         
         super.init(frame: frame, configuration: configuration)
         setup()
@@ -72,6 +78,8 @@ class QuillEditorView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler {
         setReadOnly(readOnly)
         setScrollable(scrollable)
         setPadding(padding)
+        setImageStyle(imageStyle)
+        setVideoStyle(videoStyle)
         setContents(delta)
 
         if (autoFocus) {
@@ -125,7 +133,6 @@ class QuillEditorView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler {
             let attributesJson = try JSONSerialization.data(withJSONObject: attributes, options: JSONSerialization.WritingOptions(rawValue: 0))
             let attributesJsonStr = String(data: attributesJson, encoding: .utf8)
             if attributesJsonStr == nil {
-                print("attributes json str is nil")
                 return
             }
          
@@ -135,10 +142,8 @@ class QuillEditorView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler {
                 let dataJson = try JSONSerialization.data(withJSONObject: data, options: JSONSerialization.WritingOptions(rawValue: 0))
                 let dataJsonStr = String(data: dataJson, encoding: .utf8)
                 if dataJsonStr == nil {
-                    print("data json str is nil")
                     return
                 }
-                print("replaceText(\(index), \(length), \(dataJsonStr!), \(attributesJsonStr!), \(newLineAfterImage), true)")
                 exec("replaceText(\(index), \(length), \(dataJsonStr!), \(attributesJsonStr!), \(newLineAfterImage), true)")
             }
         } catch {
@@ -211,6 +216,36 @@ class QuillEditorView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler {
     
     func setFileBasePath(_ fileBasePath: String) {
         self.fileBasePath = fileBasePath
+    }
+    
+    func setImageStyle(_ style: [String: Any]) {
+        self.imageStyle = style
+        
+        do {
+            let styleJson = try JSONSerialization.data(withJSONObject: style, options: JSONSerialization.WritingOptions(rawValue: 0))
+            let styleJsonStr = String(data: styleJson, encoding: .utf8)
+            if styleJsonStr == nil {
+                return
+            }
+            exec("setImageStyle(\(styleJsonStr!))")
+        } catch {
+            print("serial image style failed: \(error)")
+        }
+    }
+    
+    func setVideoStyle(_ style: [String: Any]) {
+        self.videoStyle = style
+        
+        do {
+            let styleJson = try JSONSerialization.data(withJSONObject: style, options: JSONSerialization.WritingOptions(rawValue: 0))
+            let styleJsonStr = String(data: styleJson, encoding: .utf8)
+            if styleJsonStr == nil {
+                return
+            }
+            exec("setVideoStyle(\(styleJsonStr!))")
+        } catch {
+            print("serial image style failed: \(error)")
+        }
     }
     
     func setOnTextChangeListener(_ handler: @escaping (([String: AnyObject]) -> Void)) {

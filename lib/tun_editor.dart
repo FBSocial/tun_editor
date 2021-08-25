@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:tun_editor/models/documents/attribute.dart';
 import 'package:tun_editor/models/quill_delta.dart';
 import 'package:tun_editor/tun_editor_api.dart';
 import 'package:tun_editor/controller.dart';
@@ -29,10 +30,13 @@ class TunEditor extends StatefulWidget {
   // File base path is used to load local image.
   final String fileBasePath;
 
-  // Image and video style.
+  /// Image and video style. Same as [Attribute]'s rule.
+  /// Support [WidthAttribute], [HeightAttribute] and [AlignAttribute].
   final Map<String, dynamic> imageStyle;
   final Map<String, dynamic> videoStyle;
 
+  /// Mention click callback, first param is [id], next is [prefixChar],
+  /// And the last is [text].
   final MentionClickCallback? onMentionClick;
   final LinkClickCallback? onLinkClick;
 
@@ -130,12 +134,12 @@ class TunEditorState extends State<TunEditor> with TunEditorHandler {
         creationParams['fileBasePath'] = fileBasePath;
       }
       if (creationParams.containsKey('imageStyle')
-          && creationParams['imageStyle'] != imageStyle) {
+          && !mapEquals(creationParams['imageStyle'], imageStyle)) {
         _tunEditorApi?.setImageStyle(imageStyle);
         creationParams['imageStyle'] = imageStyle;
       }
       if (creationParams.containsKey('videoStyle')
-          && creationParams['videoStyle'] != videoStyle) {
+          && !mapEquals(creationParams['videoStyle'], videoStyle)) {
         _tunEditorApi?.setVideoStyle(videoStyle);
         creationParams['videoStyle'] = videoStyle;
       }

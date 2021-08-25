@@ -123,12 +123,12 @@ class FullPageEditorState extends State<FullPageEditor> {
                       imageStyle: {
                         'width': 100,
                         'height': 100,
-                        'align': 'center',
+                        'align': 'left',
                       },
                       videoStyle: {
                         'width': 100,
                         'height': 100,
-                        'align': 'center',
+                        'align': 'left',
                       },
 
                       padding: EdgeInsets.symmetric(

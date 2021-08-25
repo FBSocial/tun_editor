@@ -150,7 +150,6 @@ class TunEditorController {
     if (appendNewLine) {
       delta.insert('\n');
     }
-    debugPrint('insert delta ${delta.toJson()}');
     compose(delta, null, ChangeSource.LOCAL);
 
     int newOffset = selection.extentOffset + 1;
@@ -331,7 +330,6 @@ class TunEditorController {
   }
 
   void composeDocument(Delta delta) {
-    debugPrint('compose delta ${delta.toJson()}');
     document.compose(delta, ChangeSource.LOCAL);
   }
 
@@ -340,7 +338,6 @@ class TunEditorController {
     if (child.node == null) {
       return true;
     }
-    debugPrint('child ${child.node!.length} ${child.node!.toDelta().toJson()} ${child.node!.toPlainText() == '\n'} ${child.node!.isLast}');
     return child.node!.length == 1 && child.node!.toPlainText() == '\n';
   }
 
