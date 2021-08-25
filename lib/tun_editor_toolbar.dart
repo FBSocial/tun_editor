@@ -18,7 +18,7 @@ class TunEditorToolbar extends StatefulWidget {
   final List<ToolbarMenu> menu;
 
   // Disabled menu.
-  final List<ToolbarMenu> disabledMenu;
+  final List<ToolbarMenu>? disabledMenu;
   final ValueChanged<List<ToolbarMenu>>? onDisabledMenuChange;
 
   // Children is the custom tool menu.
@@ -30,7 +30,7 @@ class TunEditorToolbar extends StatefulWidget {
     this.showingSubToolbar = SubToolbar.none,
     this.onSubToolbarChange,
     this.menu = ToolbarMenu.values,
-    this.disabledMenu = const [],
+    this.disabledMenu,
     this.onDisabledMenuChange,
     this.children,
   }) : super(key: key);
@@ -50,7 +50,7 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
 
   List<ToolbarMenu> get menu => widget.menu;
 
-  List<ToolbarMenu> get disabledMenu => widget.disabledMenu;
+  List<ToolbarMenu> get disabledMenu => widget.disabledMenu ?? [];
   ValueChanged<List<ToolbarMenu>>? get onDisabledMenuChange => widget.onDisabledMenuChange;
 
   List<Widget>? get children => widget.children;

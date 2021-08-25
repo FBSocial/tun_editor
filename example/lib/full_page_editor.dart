@@ -3,13 +3,12 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_keyboard_size/flutter_keyboard_size.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
 import 'package:tun_editor/iconfont.dart';
-import 'package:tun_editor/models/documents/attribute.dart';
 import 'package:tun_editor/models/documents/document.dart';
-import 'package:tun_editor/models/quill_delta.dart';
 import 'package:tun_editor/tun_editor.dart';
 import 'package:tun_editor/tun_editor_toolbar.dart';
 import 'package:tun_editor/controller.dart';
@@ -32,14 +31,20 @@ class FullPageEditorState extends State<FullPageEditor> {
 
   late String _fileBasePath;
 
-  // FocusNode _titleFocusNode = FocusNode();
   FocusNode _editorFocusNode = FocusNode();
 
   bool _readOnly = false;
 
   SubToolbar _showingSubToolbar = SubToolbar.none;
-
+  bool get isShowingAIE => _showingSubToolbar == SubToolbar.at
+    || _showingSubToolbar == SubToolbar.image
+    || _showingSubToolbar == SubToolbar.emoji;
+  bool get isNotShowingAIE => _showingSubToolbar != SubToolbar.at
+    && _showingSubToolbar != SubToolbar.image
+    && _showingSubToolbar != SubToolbar.emoji;
   List<ToolbarMenu> _disabledMenu = [];
+
+  double _keyboardMaxHeight = 0;
 
   final _emojiList = [
     '😃', '😄', '😁', '😆', '😅', '😂', '🤣', '🥲', '☺️', '😊', '😇', '🙂',
@@ -75,145 +80,167 @@ class FullPageEditorState extends State<FullPageEditor> {
     if (_isLoading) {
       return const Scaffold(body: Center(child: Text('Loading...')));
     }
-    return Scaffold(
-      appBar: AppBar(
-        title: GestureDetector(
-          child: Text('Editor'),
-          onTap: () {
-            debugPrint('focus: ${_editorFocusNode.hasFocus}');
-            if (_editorFocusNode.hasFocus) {
-              _editorFocusNode.unfocus();
-            } else {
-              _editorFocusNode.requestFocus();
-            }
-          },
+    return KeyboardSizeProvider(
+      child: Scaffold(
+        resizeToAvoidBottomInset: false,
+        appBar: AppBar(
+          title: GestureDetector(
+            child: Text('Editor'),
+            onTap: () {
+              debugPrint('focus: ${_editorFocusNode.hasFocus}');
+              if (_editorFocusNode.hasFocus) {
+                _editorFocusNode.unfocus();
+              } else {
+                _editorFocusNode.requestFocus();
+              }
+            },
+          ),
         ),
-      ),
-      body: SafeArea(
-        child: Container(
-          width: double.infinity,
-          height: double.infinity,
-          alignment: Alignment.center,
-          child: Stack(
-            children: [
-              Column(
-                children: [
-                  Expanded(
-                    child: TunEditor(
-                      controller: _controller,
-                      fileBasePath: _fileBasePath,
-                      imageStyle: {
-                        'width': 100,
-                        'height': 100,
-                        'align': 'left',
-                      },
-                      videoStyle: {
-                        'width': 100,
-                        'height': 100,
-                        'align': 'left',
-                      },
-
-                      padding: EdgeInsets.symmetric(
-                        vertical: 12,
-                        horizontal: 15,
-                      ),
-                      placeholder: 'Hello World!',
-                      focusNode: _editorFocusNode,
-                      autoFocus: false,
-                      readOnly: _readOnly,
-                      scrollable: true,
-
-                      onMentionClick: (String id, String prefixChar, String text) {
-                        debugPrint('metion click $id, $prefixChar, $text');
-                      },
-                      onLinkClick: (String url) {
-                        debugPrint('link click $url');
-                      },
-                    ),
-                  ),
-                  SizedBox(height: 48),
-                ],
-              ),
-
-              Positioned(
-                left: 0,
-                right: 0,
-                bottom: 0,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
+        body: SafeArea(
+          child: Container(
+            width: double.infinity,
+            height: double.infinity,
+            alignment: Alignment.center,
+            child: Consumer<ScreenHeight>(
+              builder: (BuildContext context, ScreenHeight keyboard, child) {
+                if (keyboard.keyboardHeight > _keyboardMaxHeight) {
+                  _keyboardMaxHeight = keyboard.keyboardHeight;
+                }
+                return Stack(
                   children: [
-                    TunEditorToolbar(
-                      controller: _controller,
-
-                      // Sub toolbar control.
-                      showingSubToolbar: _showingSubToolbar,
-                      onSubToolbarChange: (SubToolbar subToolbar) {
-                        // Hide keyboard on panel showing.
-                        if (subToolbar == SubToolbar.at || subToolbar == SubToolbar.image
-                            || subToolbar == SubToolbar.emoji) {
-                          // TODO Hide keyboard only.
-                          _editorFocusNode.unfocus();
-                        }
-                        setState(() {
-                          _showingSubToolbar = subToolbar;
-                          _readOnly = _showingSubToolbar == SubToolbar.emoji;
-                        });
-                      },
-
-                      // menu: [
-                      //   ToolbarMenu.textType,
-                      //   ToolbarMenu.textTypeHeadline1,
-                      //   ToolbarMenu.textTypeHeadline2,
-                      //   ToolbarMenu.textTypeHeadline3,
-
-                      //   ToolbarMenu.textStyle,
-                      //   ToolbarMenu.textStyleBold,
-                      //   ToolbarMenu.textStyleItalic,
-
-                      //   ToolbarMenu.link,
-                      // ],
-
-                      disabledMenu: _disabledMenu,
-                      onDisabledMenuChange: (disabledMenu) {
-                        setState(() {
-                          _disabledMenu = disabledMenu;
-                        });
-                      },
-
+                    Column(
                       children: [
-                        Spacer(),
+                        Expanded(
+                          child: TunEditor(
+                            controller: _controller,
+                            fileBasePath: _fileBasePath,
+                            imageStyle: {
+                              'width': 100,
+                              'height': 100,
+                              'align': 'left',
+                            },
+                            videoStyle: {
+                              'width': 100,
+                              'height': 100,
+                              'align': 'left',
+                            },
 
-                        // Send button.
-                        GestureDetector(
-                          onTap: () {},
-                          child: Container(
-                            width: 48,
-                            height: 36,
-                            decoration: BoxDecoration(
-                              color: Color(0x268F959E),
-                              borderRadius: BorderRadius.circular(18),
+                            padding: EdgeInsets.symmetric(
+                              vertical: 12,
+                              horizontal: 15,
                             ),
-                            child: Icon(
-                              IconFont.send,
-                              size: 24,
-                              color: Color(0xA6363940),
-                            ),
+                            placeholder: 'Hello World!',
+                            focusNode: _editorFocusNode,
+                            autoFocus: false,
+                            readOnly: _readOnly,
+                            scrollable: true,
+
+                            onMentionClick: (String id, String prefixChar, String text) {
+                              debugPrint('metion click $id, $prefixChar, $text');
+                            },
+                            onLinkClick: (String url) {
+                              debugPrint('link click $url');
+                            },
                           ),
                         ),
+                        SizedBox(height: 48),
+                        keyboard.isOpen || isShowingAIE
+                            ? SizedBox(
+                              height: isShowingAIE ? _keyboardMaxHeight : keyboard.keyboardHeight,
+                            )
+                            : SizedBox.shrink(),
                       ],
                     ),
 
-                    _showingSubToolbar == SubToolbar.at
-                        ? _buildAtPicker() : SizedBox.shrink(),
-                    _showingSubToolbar == SubToolbar.image
-                        ? _buildImagePicker() : SizedBox.shrink(),
-                    _showingSubToolbar == SubToolbar.emoji
-                        ? _buildbEmojiPicker() : SizedBox.shrink(),
+                    Positioned(
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          TunEditorToolbar(
+                            controller: _controller,
 
+                            // Sub toolbar control.
+                            showingSubToolbar: _showingSubToolbar,
+                            onSubToolbarChange: (SubToolbar subToolbar) {
+                              // Hide keyboard on panel showing.
+                              if (subToolbar == SubToolbar.at || subToolbar == SubToolbar.image
+                                  || subToolbar == SubToolbar.emoji) {
+                                _controller.toggleKeyboard(false);
+                              }
+                              setState(() {
+                                _showingSubToolbar = subToolbar;
+                                // _readOnly = _showingSubToolbar == SubToolbar.emoji;
+                              });
+                            },
+
+                            // menu: [
+                            //   ToolbarMenu.textType,
+                            //   ToolbarMenu.textTypeHeadline1,
+                            //   ToolbarMenu.textTypeHeadline2,
+                            //   ToolbarMenu.textTypeHeadline3,
+
+                            //   ToolbarMenu.textStyle,
+                            //   ToolbarMenu.textStyleBold,
+                            //   ToolbarMenu.textStyleItalic,
+
+                            //   ToolbarMenu.link,
+                            // ],
+
+                            // disabledMenu: _disabledMenu,
+                            // onDisabledMenuChange: (disabledMenu) {
+                            //   setState(() {
+                            //     _disabledMenu = disabledMenu;
+                            //   });
+                            // },
+
+                            children: [
+                              Spacer(),
+
+                              // Send button.
+                              GestureDetector(
+                                onTap: () {},
+                                child: Container(
+                                  width: 48,
+                                  height: 36,
+                                  decoration: BoxDecoration(
+                                    color: Color(0x268F959E),
+                                    borderRadius: BorderRadius.circular(18),
+                                  ),
+                                  child: Icon(
+                                    IconFont.send,
+                                    size: 24,
+                                    color: Color(0xA6363940),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+
+                          _showingSubToolbar == SubToolbar.at
+                              ? _buildAtPicker() : SizedBox.shrink(),
+                          _showingSubToolbar == SubToolbar.image
+                              ? _buildImagePicker() : SizedBox.shrink(),
+                          _showingSubToolbar == SubToolbar.emoji
+                              ? _buildbEmojiPicker() : SizedBox.shrink(),
+
+                          keyboard.isOpen && _showingSubToolbar != SubToolbar.at
+                              && _showingSubToolbar != SubToolbar.image
+                              && _showingSubToolbar != SubToolbar.emoji
+                              ? SizedBox(
+                                height: keyboard.keyboardHeight,
+                              )
+                              : SizedBox.shrink(),
+
+                        ],
+                      ),
+                    ),
                   ],
-                ),
-              ),
-            ],
+                );
+              }
+            ),
           ),
         ),
       ),
@@ -230,7 +257,7 @@ class FullPageEditorState extends State<FullPageEditor> {
   Widget _buildAtPicker() {
     return Container(
       width: double.infinity,
-      height: 300,
+      height: _keyboardMaxHeight,
       decoration: BoxDecoration(
         color: Colors.white,
       ),
@@ -255,7 +282,7 @@ class FullPageEditorState extends State<FullPageEditor> {
   Widget _buildImagePicker() {
     return Container(
       width: double.infinity,
-      height: 300,
+      height: _keyboardMaxHeight,
       decoration: BoxDecoration(
         color: Colors.white,
       ),
@@ -273,7 +300,7 @@ class FullPageEditorState extends State<FullPageEditor> {
   Widget _buildbEmojiPicker() {
     return Container(
       width: double.infinity,
-      height: 300,
+      height: _keyboardMaxHeight,
       decoration: BoxDecoration(
         color: Colors.white,
       ),
@@ -327,6 +354,12 @@ class FullPageEditorState extends State<FullPageEditor> {
     });
     _controller.addSelectionListener((selection) {
       debugPrint('selection changed ${selection.baseOffset} ${selection.extentOffset}');
+      if (_showingSubToolbar == SubToolbar.at || _showingSubToolbar == SubToolbar.image
+          || _showingSubToolbar == SubToolbar.emoji) {
+        setState(() {
+          _showingSubToolbar = SubToolbar.none;
+        });
+      }
     });
 
     if (Platform.isIOS) {

@@ -115,15 +115,17 @@ class TunEditorController {
   /// Insert image with given [url] to current [selection].
   void insertImage({
     required String source,
+    String type = 'image',
+    String? checkPath,
     double? width,
     double? height,
-    String? checkPath,
     bool appendNewLine = false,
     List<Attribute>? attributes = const [],
   }) {
     // Wrap value.
     final Map<String, dynamic> imageBlot = {
       'source': source,
+      '_type': type,
     };
     if (width != null) {
       imageBlot['width'] = width;
@@ -173,11 +175,11 @@ class TunEditorController {
     required String source,
     required double duration,
     required String thumbUrl,
+    required String fileType,
+    String type = 'video',
+    bool inline = false,
     double? width,
     double? height,
-    String? fillType,
-    String? videoType,
-    bool? inline,
     List<Attribute>? attributes = const [],
   }) {
     // Wrap value.
@@ -185,21 +187,15 @@ class TunEditorController {
       'source': source,
       'duration': duration,
       'thumbUrl': thumbUrl,
+      'fileType': fileType,
+      '_type': type,
+      '_inline': inline,
     };
     if (width != null) {
       videoBlot['width'] = width;
     }
     if (height != null) {
       videoBlot['height'] = height;
-    }
-    if (fillType != null) {
-      videoBlot['fillType'] = fillType;
-    }
-    if (videoType != null) {
-      videoBlot['videoType'] = videoType;
-    }
-    if (inline != null) {
-      videoBlot['inline'] = inline;
     }
 
     // Wrap attributes
@@ -301,6 +297,10 @@ class TunEditorController {
 
   void scrollToBottom() {
     _tunEditorApi?.scrollToBottom();
+  }
+
+  void toggleKeyboard(bool isShow) {
+    _tunEditorApi?.toggleKeyboard(isShow);
   }
 
   void addSelectionListener(ValueChanged<TextSelection> listener) {

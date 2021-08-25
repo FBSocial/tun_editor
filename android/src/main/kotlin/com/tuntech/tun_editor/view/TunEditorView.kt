@@ -50,6 +50,7 @@ internal class TunEditorView(
         const val HANDLE_SET_FILE_BASE_PATH = "setFileBasePath"
         const val HANDLE_SET_IMAGE_STYLE = "setImageStyle"
         const val HANDLE_SET_VIDEO_STYLE = "setVideoStyle"
+        const val HANDLE_TOGGLE_KEYBOARD = "toggleKeyboard"
     }
 
     // View.
@@ -296,6 +297,10 @@ internal class TunEditorView(
                     }
                 }
                 quillEditor.setVideoStyle(style)
+            }
+            HANDLE_TOGGLE_KEYBOARD -> {
+                val isShow = call.arguments as? Boolean ?: return
+                quillEditor.toggleKeyboard(isShow)
             }
 
             else -> {

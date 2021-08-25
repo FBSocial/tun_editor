@@ -174,14 +174,10 @@ class QuillEditor: WebView {
 
     fun focus() {
         requestFocus()
-        val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
-        imm?.showSoftInput(this, 0)
         exec("javascript:focus()");
     }
 
     fun blur() {
-        val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
-        imm?.hideSoftInputFromWindow(windowToken, 0)
         exec("javascript:blur()");
     }
 
@@ -233,6 +229,15 @@ class QuillEditor: WebView {
             styleObject.put(k, v)
         }
         exec("javascript:setVideoStyle($styleObject)")
+    }
+
+    fun toggleKeyboard(isShow: Boolean) {
+        val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        if (isShow) {
+            imm.showSoftInput(this, 0)
+        } else {
+            imm.hideSoftInputFromWindow(windowToken, 0)
+        }
     }
 
     fun setOnTextChangeListener(onTextChangeListener: ((String, String) -> Unit)?) {
