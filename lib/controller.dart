@@ -143,19 +143,26 @@ class TunEditorController {
       }
     }
 
+    int insertOffset = selection.extentOffset;
+    int newOffset = selection.extentOffset + 1;
+    if (!_isEmptyLine()) {
+      final newLineOffset = _insertNewLine();
+      if (newLineOffset != null) {
+        insertOffset = newLineOffset;
+        newOffset = newLineOffset + 1;
+      }
+    }
+
     // Insert image.
     final delta = new Delta()
-      ..retain(selection.extentOffset)
+      ..retain(insertOffset)
       ..insert({ 'image': imageBlot }, attrMap);
     if (appendNewLine) {
       delta.insert('\n');
+      newOffset = newOffset + 1;
     }
     compose(delta, null, ChangeSource.LOCAL);
 
-    int newOffset = selection.extentOffset + 1;
-    if (appendNewLine) {
-      newOffset = newOffset + 1;
-    }
     updateSelection(
       TextSelection.collapsed(offset: newOffset),
       ChangeSource.LOCAL,

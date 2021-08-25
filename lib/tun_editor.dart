@@ -40,8 +40,6 @@ class TunEditor extends StatefulWidget {
   final MentionClickCallback? onMentionClick;
   final LinkClickCallback? onLinkClick;
 
-  final ValueChanged<bool>? onFocusChange;
-
   const TunEditor({
     Key? key,
     required this.controller,
@@ -59,7 +57,6 @@ class TunEditor extends StatefulWidget {
     this.focusNode,
     this.onMentionClick,
     this.onLinkClick,
-    this.onFocusChange,
   }) : super(key: key);
 
   @override
@@ -84,11 +81,12 @@ class TunEditorState extends State<TunEditor> with TunEditorHandler {
   FocusNode? get focusNode => widget.focusNode;
   MentionClickCallback? get mentionClickCallback => widget.onMentionClick;
   LinkClickCallback? get linkClickCallback => widget.onLinkClick;
-  ValueChanged<bool>? get onFocusChangeCallback => widget.onFocusChange;
 
   TunEditorApi? _tunEditorApi;
 
   Map<String, dynamic> creationParams = {};
+
+  bool _isFocused = false;
 
   @override
   void initState() {
@@ -162,13 +160,7 @@ class TunEditorState extends State<TunEditor> with TunEditorHandler {
       return Focus(
         focusNode: focusNode,
         canRequestFocus: true,
-        onFocusChange: (bool hasFocus) {
-          if (hasFocus) {
-            _tunEditorApi?.focus();
-          } else {
-            _tunEditorApi?.blur();
-          }
-        },
+        onFocusChange: _handleFocusChange,
         child: PlatformViewLink(
           viewType: VIEW_TYPE_TUN_EDITOR,
           surfaceFactory: (BuildContext context, PlatformViewController controller) {
@@ -215,7 +207,9 @@ class TunEditorState extends State<TunEditor> with TunEditorHandler {
 
   @override
   void dispose() {
+    focusNode?.dispose();
     controller.setTunEditorApi(null);
+    controller.dispose();
   
     super.dispose();
   }
@@ -251,12 +245,23 @@ class TunEditorState extends State<TunEditor> with TunEditorHandler {
 
   @override
   void onFocusChange(bool hasFocus) {
-    onFocusChangeCallback?.call(hasFocus);
-    // if (hasFocus) {
-    //   focusNode?.requestFocus();
-    // } else {
-    //   focusNode?.unfocus();
-    // }
+    _isFocused = hasFocus;
+    if (hasFocus) {
+      focusNode?.requestFocus();
+    } else {
+      focusNode?.unfocus();
+    }
+  }
+
+  void _handleFocusChange(bool hasFocus) {
+    if (hasFocus != _isFocused) {
+      _isFocused = focusNode!.hasFocus;
+      if (focusNode!.hasFocus) {
+        _tunEditorApi?.focus();
+      } else {
+        _tunEditorApi?.blur();
+      }
+    }
   }
 
 }

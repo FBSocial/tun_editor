@@ -59,6 +59,15 @@ class FullPageEditorState extends State<FullPageEditor> {
     super.initState();
 
     _loadDocument();
+    _editorFocusNode.addListener(() {
+      if (_editorFocusNode.hasFocus) {
+        if (_showingSubToolbar != SubToolbar.none) {
+          setState(() {
+            _showingSubToolbar = SubToolbar.none;
+          });
+        }
+      }
+    });
   }
 
   @override
@@ -71,35 +80,12 @@ class FullPageEditorState extends State<FullPageEditor> {
         title: GestureDetector(
           child: Text('Editor'),
           onTap: () {
-            // _controller.insertVideo(
-            //   source: 'https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_20mb.mp4',
-            //   width: 230,
-            //   height: 460,
-            //   duration: 7,
-            //   thumbUrl: 'https://fb-cdn.fanbook.mobi/fanbook/app/files/chatroom/image/43789ea4452106628661d9014d45c873.jpg',
-            // );
-            // _controller.updateSelection(TextSelection.collapsed(offset: 10), ChangeSource.LOCAL);
-
-            // final imageBlock = BlockEmbed.image(
-            //   'https://user-images.githubusercontent.com/122956/72955931-ccc07900-3d52-11ea-89b1-d468a6e2aa2b.png',
-            // );
-            // _controller.replaceText(0, 0, imageBlock, null,
-            //   ignoreFocus: false,
-            //   autoAppendNewlineAfterImage: true,
-            //   attributes: [
-            //     WidthAttribute('100'),
-            //   ],
-            // );
-
-            _controller.compose(new Delta()
-                ..retain(1)
-                ..insert('Hello World', Attribute.bold.toJson()),
-                TextSelection.collapsed(offset: 2), ChangeSource.LOCAL);
-
-            // _controller.formatText(0, 2, Attribute.bold);
-            // _controller.insert(2, 'Bye Bye');
-            // _controller.insert(_controller.selection.baseOffset, '🛹');
-            // _controller.replaceText(6, 5, 'Jeffrey Wu', null);
+            debugPrint('focus: ${_editorFocusNode.hasFocus}');
+            if (_editorFocusNode.hasFocus) {
+              _editorFocusNode.unfocus();
+            } else {
+              _editorFocusNode.requestFocus();
+            }
           },
         ),
       ),
@@ -112,10 +98,6 @@ class FullPageEditorState extends State<FullPageEditor> {
             children: [
               Column(
                 children: [
-                  // TextField(
-                  //   focusNode: _titleFocusNode,
-                  //   textInputAction: TextInputAction.next,
-                  // ),
                   Expanded(
                     child: TunEditor(
                       controller: _controller,
@@ -147,16 +129,6 @@ class FullPageEditorState extends State<FullPageEditor> {
                       onLinkClick: (String url) {
                         debugPrint('link click $url');
                       },
-
-                      onFocusChange: (bool hasFocus) {
-                        if (hasFocus) {
-                          if (_showingSubToolbar != SubToolbar.none) {
-                            setState(() {
-                              _showingSubToolbar = SubToolbar.none;
-                            });
-                          }
-                        }
-                      },
                     ),
                   ),
                   SizedBox(height: 48),
@@ -180,7 +152,7 @@ class FullPageEditorState extends State<FullPageEditor> {
                         if (subToolbar == SubToolbar.at || subToolbar == SubToolbar.image
                             || subToolbar == SubToolbar.emoji) {
                           // TODO Hide keyboard only.
-                          _controller.blur();
+                          _editorFocusNode.unfocus();
                         }
                         setState(() {
                           _showingSubToolbar = subToolbar;

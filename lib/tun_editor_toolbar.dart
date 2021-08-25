@@ -571,8 +571,8 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
           LinkAttribute(url),
         );
       }
-      Future.delayed(Duration(milliseconds: 200), () => controller.focus());
     }
+    Future.delayed(Duration(milliseconds: 200), () => controller.focus());
   }
 
   // Sync toolbar' status with format.
