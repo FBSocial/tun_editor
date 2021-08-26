@@ -189,12 +189,12 @@ class FullPageEditorState extends State<FullPageEditor> {
                             //   ToolbarMenu.link,
                             // ],
 
-                            // disabledMenu: _disabledMenu,
-                            // onDisabledMenuChange: (disabledMenu) {
-                            //   setState(() {
-                            //     _disabledMenu = disabledMenu;
-                            //   });
-                            // },
+                            disabledMenu: _disabledMenu,
+                            onDisabledMenuChange: (disabledMenu) {
+                              setState(() {
+                                _disabledMenu = disabledMenu;
+                              });
+                            },
 
                             children: [
                               Spacer(),

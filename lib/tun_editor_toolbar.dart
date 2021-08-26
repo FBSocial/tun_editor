@@ -633,6 +633,7 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
     if (currentTextType == Attribute.codeBlock.uniqueKey) {
       disabledMenu.addAll([
         ToolbarMenu.at,
+        ToolbarMenu.image,
         ToolbarMenu.textStyleBold,
         ToolbarMenu.textStyleItalic,
         ToolbarMenu.textStyleUnderline,

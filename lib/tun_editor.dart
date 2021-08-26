@@ -256,10 +256,12 @@ class TunEditorState extends State<TunEditor> with TunEditorHandler {
   void _handleFocusChange(bool hasFocus) {
     if (hasFocus != _isFocused) {
       _isFocused = focusNode!.hasFocus;
-      if (focusNode!.hasFocus) {
+      if (hasFocus) {
         _tunEditorApi?.focus();
+        _tunEditorApi?.toggleKeyboard(true);
       } else {
         _tunEditorApi?.blur();
+        _tunEditorApi?.toggleKeyboard(false);
       }
     }
   }

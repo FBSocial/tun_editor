@@ -265,6 +265,15 @@ class TunEditorView: NSObject, FlutterPlatformView {
             if let style = call.arguments as? [String: Any] {
                 _editor.setVideoStyle(style)
             }
+        case "toggleKeyboard":
+            if let isShow = call.arguments as? Bool {
+                if isShow {
+//                    _editor.resignFirstResponder()
+                    _editor.inputView?.becomeFirstResponder()
+                } else {
+                    _editor.endEditing(true)
+                }
+            }
             
         default:
             print("missing tun editor method")

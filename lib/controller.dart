@@ -62,6 +62,7 @@ class TunEditorController {
     }
     if (!ignoreFocus) {
       focus();
+      toggleKeyboard(true);
     }
   }
 
@@ -79,7 +80,8 @@ class TunEditorController {
 
   /// Insert mention with [id], [text] and [prefixChar], [id] should be unqiue, [id] and [prefixChar] will be used on click event.
   void insertMention(String id, String text, {
-    String prefixChar = '@'
+    String prefixChar = '@',
+    bool ignoreFocus = false,
   }) {
     final mentionDelta = new Delta()
         ..retain(selection.extentOffset)
@@ -102,6 +104,11 @@ class TunEditorController {
       TextSelection.collapsed(offset: selection.extentOffset + 2),
       ChangeSource.LOCAL,
     );
+
+    if (!ignoreFocus) {
+      focus();
+      toggleKeyboard(true);
+    }
   }
 
   /// Insert [data] at the given [index].
@@ -110,17 +117,22 @@ class TunEditorController {
     bool ignoreFocus = false,
   }) {
     replaceText(index, 0, data, null, ignoreFocus: ignoreFocus);
+    if (!ignoreFocus) {
+      focus();
+      toggleKeyboard(true);
+    }
   }
 
   /// Insert image with given [url] to current [selection].
   void insertImage({
     required String source,
-    String type = 'image',
     String? checkPath,
     double? width,
     double? height,
+    String type = 'image',
     bool appendNewLine = false,
     List<Attribute>? attributes = const [],
+    bool ignoreFocus = false,
   }) {
     // Wrap value.
     final Map<String, dynamic> imageBlot = {
@@ -169,6 +181,11 @@ class TunEditorController {
       TextSelection.collapsed(offset: newOffset),
       ChangeSource.LOCAL,
     );
+
+    if (!ignoreFocus) {
+      focus();
+      toggleKeyboard(true);
+    }
   }
 
   void insertVideo({
@@ -181,6 +198,7 @@ class TunEditorController {
     double? width,
     double? height,
     List<Attribute>? attributes = const [],
+    bool ignoreFocus = false,
   }) {
     // Wrap value.
     final Map<String, dynamic> videoBlot = {
@@ -214,10 +232,16 @@ class TunEditorController {
       TextSelection.collapsed(offset: selection.extentOffset + 1),
       ChangeSource.LOCAL,
     );
+    if (!ignoreFocus) {
+      focus();
+      toggleKeyboard(true);
+    }
   }
 
   /// Insert divider to current [selection].
-  void insertDivider() {
+  void insertDivider({
+    bool ignoreFocus = false
+  }) {
     final newLineOffset = _insertNewLine();
     if (newLineOffset == null) {
       return;
@@ -231,16 +255,28 @@ class TunEditorController {
 
     updateSelection(TextSelection.collapsed(
       offset: newLineOffset + 1), ChangeSource.LOCAL);
+
+    if (!ignoreFocus) {
+      focus();
+      toggleKeyboard(true);
+    }
   }
 
   /// Insert [text] with [link] format to current [selection].
-  void insertLink(String text, String url) {
+  void insertLink(String text, String url, {
+    bool ignoreFocus = false
+  }) {
     final delta = new Delta()
         ..retain(selection.extentOffset)
         ..insert(text, LinkAttribute(url).toJson());
     compose(delta, null, ChangeSource.LOCAL);
     updateSelection(TextSelection.collapsed(
       offset: selection.extentOffset + text.length), ChangeSource.LOCAL);
+
+    if (!ignoreFocus) {
+      focus();
+      toggleKeyboard(true);
+    }
   }
 
   /// Format current [selection] with text type.
