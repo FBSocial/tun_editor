@@ -269,6 +269,7 @@ class QuillEditor: WebView {
         if (file.exists()) {
             val imageData = Base64.encodeToString(file.readBytes(), Base64.DEFAULT)
             val imageBase64 = URLEncoder.encode(imageData, "UTF-8")
+            Log.d(TAG, "refresh image $filename")
             exec("javascript:refreshImage(\"$filename\", \"data:image/png;base64,$imageBase64\")")
         } else {
             Log.w(TAG, "image file not found: ${file.path}")

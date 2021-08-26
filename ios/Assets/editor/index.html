@@ -174,8 +174,11 @@
             const anchor = document.createElement('a');
             anchor.href = url;
             const protocol = anchor.href.slice(0, anchor.href.indexOf(':'));
+            if (protocol === 'file' && !url.startsWith('file://')) {
+              return `file://${url}`;
+            }
             let isValid = protocols.indexOf(protocol) > -1;
-            return isValid ? url: '//:0';
+            return isValid ? url : '//:0';
           }
 
           static value(domNode) {
@@ -490,7 +493,6 @@
         }
         focus = function() {
           quill.focus();
-          document.querySelector('.ql-editor').focus();
         }
         blur = function() {
           quill.blur();
@@ -506,12 +508,15 @@
           editor.style.padding = `${top}px ${right}px ${bottom}px ${left}px`;
         }
         refreshImage = function(filename, data) {
-          let image = document.querySelector(`[data-source="file://${filename}"]`);
-          if (image) {
-            image.setAttribute('src', data);
-          } else {
-            console.log('not found image element', path);
+          var image = document.querySelector(`[data-source="${filename}"]`);
+          if (image === null) {
+            image = document.querySelector(`[data-source="file://${filename}"]`);
           }
+          if (image === null) {
+            console.log('not found image element', path);
+            return;
+          }
+          image.setAttribute('src', data);
         }
         setImageStyle = function(style) {
           imageStyle = style;

@@ -168,7 +168,8 @@ class FullPageEditorState extends State<FullPageEditor> {
                               // Hide keyboard on panel showing.
                               if (subToolbar == SubToolbar.at || subToolbar == SubToolbar.image
                                   || subToolbar == SubToolbar.emoji) {
-                                _controller.toggleKeyboard(false);
+                                _controller.blur();
+                                // _controller.toggleKeyboard(false);
                               }
                               setState(() {
                                 _showingSubToolbar = subToolbar;
@@ -381,6 +382,7 @@ class FullPageEditorState extends State<FullPageEditor> {
     if (image != null) {
       _controller.insertImage(
         source: 'file://${image.name}',
+        // source: image.name,
         width: 230,
       );
     }

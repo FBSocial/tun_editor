@@ -268,10 +268,9 @@ class TunEditorView: NSObject, FlutterPlatformView {
         case "toggleKeyboard":
             if let isShow = call.arguments as? Bool {
                 if isShow {
-//                    _editor.resignFirstResponder()
-                    _editor.inputView?.becomeFirstResponder()
+                    _editor.becomeFirstResponder()
                 } else {
-                    _editor.endEditing(true)
+                    _editor.resignFirstResponder()
                 }
             }
             
