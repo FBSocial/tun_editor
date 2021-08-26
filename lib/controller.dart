@@ -130,6 +130,7 @@ class TunEditorController {
     double? width,
     double? height,
     String type = 'image',
+    bool inline = false,
     bool appendNewLine = false,
     List<Attribute>? attributes = const [],
     bool ignoreFocus = false,
@@ -138,6 +139,7 @@ class TunEditorController {
     final Map<String, dynamic> imageBlot = {
       'source': source,
       '_type': type,
+      '_inline': inline,
     };
     if (width != null) {
       imageBlot['width'] = width;
@@ -192,6 +194,7 @@ class TunEditorController {
     required String source,
     required double duration,
     required String thumbUrl,
+    required String thumbName,
     required String fileType,
     String type = 'video',
     bool inline = false,
@@ -205,6 +208,7 @@ class TunEditorController {
       'source': source,
       'duration': duration,
       'thumbUrl': thumbUrl,
+      'thumbName': thumbName,
       'fileType': fileType,
       '_type': type,
       '_inline': inline,

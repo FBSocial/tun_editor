@@ -270,7 +270,7 @@
           }
 
           static sanitize(url) {
-            let protocols = ['http', 'https', 'mailto', 'tel'];
+            let protocols = ['http', 'https', 'mailto', 'tel', 'blob'];
             const anchor = document.createElement('a');
             anchor.href = url;
             const protocol = anchor.href.slice(0, anchor.href.indexOf(':'));
@@ -524,7 +524,6 @@
         setVideoStyle = function(style) {
           videoStyle = style;
         }
-
         window.addEventListener('resize', function() {
           quill.scrollIntoView();
         });
