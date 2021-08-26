@@ -1,6 +1,6 @@
 name: tun_editor
 description: A rich text editor implemented by platform native plugin.
-version: 0.0.9+9
+version: 0.0.10+10
 homepage: www.tuntech.com
 
 environment:
