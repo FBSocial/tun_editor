@@ -121,6 +121,11 @@ class QuillEditor: WebView {
                 (context as Activity).runOnUiThread {
                     refreshImage(filename)
                 }
+            },
+            onLoadVideoThumbListener = { filename ->
+                (context as Activity).runOnUiThread {
+                    refreshVideoThumb(filename)
+                }
             }
         ), "tun")
 
@@ -269,8 +274,18 @@ class QuillEditor: WebView {
         if (file.exists()) {
             val imageData = Base64.encodeToString(file.readBytes(), Base64.DEFAULT)
             val imageBase64 = URLEncoder.encode(imageData, "UTF-8")
-            Log.d(TAG, "refresh image $filename")
             exec("javascript:refreshImage(\"$filename\", \"data:image/png;base64,$imageBase64\")")
+        } else {
+            Log.w(TAG, "image file not found: ${file.path}")
+        }
+    }
+
+    private fun refreshVideoThumb(filename: String) {
+        val file = File(fileBasePath, filename)
+        if (file.exists()) {
+            val imageData = Base64.encodeToString(file.readBytes(), Base64.DEFAULT)
+            val imageBase64 = URLEncoder.encode(imageData, "UTF-8")
+            exec("javascript:refreshVideoThumb(\"$filename\", \"data:image/png;base64,$imageBase64\")")
         } else {
             Log.w(TAG, "image file not found: ${file.path}")
         }
@@ -290,7 +305,8 @@ class QuillEditor: WebView {
         private val onMentionClickListener: (String, String, String) -> Unit,
         private val onLinkClickListener: (String) -> Unit,
         private val onFocusChangeListener: (Boolean) -> Unit,
-        private val onLoadImageListener: (String) -> Unit
+        private val onLoadImageListener: (String) -> Unit,
+        private val onLoadVideoThumbListener: (String) -> Unit
     ) {
         @JavascriptInterface
         fun onSelectionChange(index: Int, length: Int, format: String) {
@@ -320,6 +336,11 @@ class QuillEditor: WebView {
         @JavascriptInterface
         fun loadImage(filename: String) {
             onLoadImageListener.invoke(filename)
+        }
+
+        @JavascriptInterface
+        fun loadVideoThumb(filename: String) {
+            onLoadVideoThumbListener.invoke(filename)
         }
     }
 
