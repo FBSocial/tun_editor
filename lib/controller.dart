@@ -125,10 +125,11 @@ class TunEditorController {
 
   /// Insert image with given [url] to current [selection].
   void insertImage({
+    required String name,
     required String source,
-    String? checkPath,
-    double? width,
-    double? height,
+    required String checkPath,
+    required double width,
+    required double height,
     String type = 'image',
     bool inline = false,
     bool appendNewLine = false,
@@ -137,19 +138,14 @@ class TunEditorController {
   }) {
     // Wrap value.
     final Map<String, dynamic> imageBlot = {
+      'name': name,
       'source': source,
+      'checkPath': checkPath,
+      'width': width,
+      'height': height,
       '_type': type,
       '_inline': inline,
     };
-    if (width != null) {
-      imageBlot['width'] = width;
-    }
-    if (height != null) {
-      imageBlot['height'] = height;
-    }
-    if (checkPath != null) {
-      imageBlot['checkPath'] = checkPath;
-    }
 
     // Wrap attributes
     final Map<String, dynamic> attrMap = {};
@@ -192,14 +188,14 @@ class TunEditorController {
 
   void insertVideo({
     required String source,
+    required String fileType,
     required double duration,
     required String thumbUrl,
     required String thumbName,
-    required String fileType,
+    required double width,
+    required double height,
     String type = 'video',
     bool inline = false,
-    double? width,
-    double? height,
     List<Attribute>? attributes = const [],
     bool ignoreFocus = false,
   }) {
@@ -210,15 +206,11 @@ class TunEditorController {
       'thumbUrl': thumbUrl,
       'thumbName': thumbName,
       'fileType': fileType,
+      'width': width,
+      'height': height,
       '_type': type,
       '_inline': inline,
     };
-    if (width != null) {
-      videoBlot['width'] = width;
-    }
-    if (height != null) {
-      videoBlot['height'] = height;
-    }
 
     // Wrap attributes
     final Map<String, dynamic> attrMap = {};
@@ -228,12 +220,22 @@ class TunEditorController {
       }
     }
 
+    int insertOffset = selection.extentOffset;
+    int newOffset = selection.extentOffset + 1;
+    if (!_isEmptyLine()) {
+      final newLineOffset = _insertNewLine();
+      if (newLineOffset != null) {
+        insertOffset = newLineOffset;
+        newOffset = newLineOffset + 1;
+      }
+    }
+
     final delta = new Delta()
-      ..retain(selection.extentOffset)
+      ..retain(insertOffset)
       ..insert({ 'video': videoBlot }, attrMap);
     compose(delta, null, ChangeSource.LOCAL);
     updateSelection(
-      TextSelection.collapsed(offset: selection.extentOffset + 1),
+      TextSelection.collapsed(offset: newOffset),
       ChangeSource.LOCAL,
     );
     if (!ignoreFocus) {

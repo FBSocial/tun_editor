@@ -9,6 +9,7 @@ import 'dart:math' as math;
 
 import 'package:collection/collection.dart';
 import 'package:quiver/core.dart';
+import 'package:tun_editor/models/documents/nodes/embed.dart';
 
 const _attributeEquality = DeepCollectionEquality();
 const _valueEquality = DeepCollectionEquality();
@@ -101,6 +102,21 @@ class Operation {
   Map<String, dynamic> toJson() {
     final json = {key: value};
     if (_attributes != null) json[Operation.attributesKey] = attributes;
+    // Embeddable.
+    if (key == Operation.insertKey && value is Map) {
+      json[key] = Embeddable.fromJson(value).toJson();
+    }
+    return json;
+  }
+
+  /// Returns JSON-serializable representation of this operation.
+  Map<String, dynamic> toCompatibleJson() {
+    final json = {key: value};
+    if (_attributes != null) json[Operation.attributesKey] = attributes;
+    // Embeddable.
+    if (key == Operation.insertKey && value is Map) {
+      json[key] = Embeddable.fromJson(value).toCompatibleJson();
+    }
     return json;
   }
 
@@ -137,9 +153,16 @@ class Operation {
     if (identical(this, other)) return true;
     if (other is! Operation) return false;
     final typedOther = other;
+    bool isValueEqual = _valueEquality.equals(data, typedOther.data);
+    if (data is Map<String, dynamic> && other.data is Map<String, dynamic>) {
+      isValueEqual = _valueEquality.equals(
+        Embeddable.fromJson(data as Map<String, dynamic>).toJson(),
+        Embeddable.fromJson(typedOther.data as Map<String, dynamic>).toJson(),
+      );
+    }
     return key == typedOther.key &&
         length == typedOther.length &&
-        _valueEquality.equals(data, typedOther.data) &&
+        isValueEqual &&
         hasSameAttributes(typedOther);
   }
 
@@ -267,6 +290,9 @@ class Delta {
 
   /// Returns JSON-serializable version of this delta.
   List toJson() => toList().map((operation) => operation.toJson()).toList();
+
+  /// Returns JSON-serializable version of this delta.
+  List toCompatibleJson() => toList().map((operation) => operation.toCompatibleJson()).toList();
 
   /// Returns `true` if this delta is empty.
   bool get isEmpty => _operations.isEmpty;

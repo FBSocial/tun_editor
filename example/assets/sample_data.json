@@ -1,186 +1,208 @@
 [
-   {
-      "insert":"H1 一级标题 44px"
-   },
-   {
-      "attributes":{
-         "header":1
-      },
-      "insert":"\n"
-   },
-   {
-      "insert":"H2 二级标题 40px"
-   },
-   {
-      "attributes":{
-         "header":2
-      },
-      "insert":"\n"
-   },
-   {
-      "insert":"H3 三级标题 36px"
-   },
-   {
-      "attributes":{
-         "header":3
-      },
-      "insert":"\n"
-   },
-   {
-      "insert":"\n正文 32px"
-   },
-   {
-      "insert":"\n无序列表预设内容"
-   },
-   {
-      "attributes":{
-         "list":"bullet"
-      },
-      "insert":"\n"
-   },
-   {
-      "insert":"无序列表预设内容换行"
-   },
-   {
-      "attributes":{
-         "list":"bullet"
-      },
-      "insert":"\n"
-   },
-   {
-      "insert":"\n有序列表预设内容"
-   },
-   {
-      "attributes":{
-         "list":"ordered"
-      },
-      "insert":"\n"
-   },
-   {
-      "insert":"有序列表预设内容换行"
-   },
-   {
-      "attributes":{
-         "list":"ordered"
-      },
-      "insert":"\n"
-   },
-   {
-      "insert":"\n引用预设内容，引用预设内容，引用预设内容，引用预设内容，引用预设内容，引用预设内容"
-   },
-   {
-      "attributes":{
-         "blockquote":true
-      },
-      "insert":"\n"
-   },
-   {
-      "insert": "\n"
-   },
-   {
-      "insert": {
-        "divider": "hr"
+  {
+    "insert":"H1 一级标题 44px"
+  },
+  {
+    "attributes":{
+      "header":1
+    },
+    "insert":"\n"
+  },
+  {
+    "insert":"H2 二级标题 40px"
+  },
+  {
+    "attributes":{
+      "header":2
+    },
+    "insert":"\n"
+  },
+  {
+    "insert":"H3 三级标题 36px"
+  },
+  {
+    "attributes":{
+      "header":3
+    },
+    "insert":"\n"
+  },
+  {
+    "insert":"\n正文 32px"
+  },
+  {
+    "insert":"\n无序列表预设内容"
+  },
+  {
+    "attributes":{
+      "list":"bullet"
+    },
+    "insert":"\n"
+  },
+  {
+    "insert":"无序列表预设内容换行"
+  },
+  {
+    "attributes":{
+      "list":"bullet"
+    },
+    "insert":"\n"
+  },
+  {
+    "insert":"\n有序列表预设内容"
+  },
+  {
+    "attributes":{
+      "list":"ordered"
+    },
+    "insert":"\n"
+  },
+  {
+    "insert":"有序列表预设内容换行"
+  },
+  {
+    "attributes":{
+      "list":"ordered"
+    },
+    "insert":"\n"
+  },
+  {
+    "insert":"\n引用预设内容，引用预设内容，引用预设内容，引用预设内容，引用预设内容，引用预设内容"
+  },
+  {
+    "attributes":{
+      "blockquote":true
+    },
+    "insert":"\n"
+  },
+  {
+    "insert": "\n"
+  },
+  {
+    "insert": {
+      "divider": "hr"
+    }
+  },
+  {
+    "insert": "\n"
+  },
+  {
+    "insert": {
+      "name": "72955931-ccc07900-3d52-11ea-89b1-d468a6e2aa2b.png",
+      "source": "https://user-images.githubusercontent.com/122956/72955931-ccc07900-3d52-11ea-89b1-d468a6e2aa2b.png",
+      "width": 330.0,
+      "height": 330.0,
+      "checkPath": "https://user-images.githubusercontent.com/122956/72955931-ccc07900-3d52-11ea-89b1-d468a6e2aa2b.png",
+      "_type": "image",
+      "_inline": false
+    },
+    "attributes":{
+      "width": 230,
+      "height": 230
+    }
+  },
+  {
+    "insert": "\n"
+  },
+  {
+    "insert": {
+      "source": "https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_20mb.mp4",
+      "width": 360.0,
+      "height": 720.0,
+      "fileType": "video",
+      "duration": 7,
+      "thumbUrl": "https://fb-cdn.fanbook.mobi/fanbook/app/files/chatroom/image/43789ea4452106628661d9014d45c873.jpg",
+      "thumbName": "43789ea4452106628661d9014d45c873.jpg",
+      "_type": "video",
+      "_inline": false
+    },
+    "attributes":{
+      "width": 230,
+      "height": 460
+    }
+  },
+  {
+    "insert": "\n"
+  },
+  {
+    "insert": {
+      "video": {
+        "source": "https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_20mb.mp4",
+        "width": 360.0,
+        "height": 720.0,
+        "fileType": "video",
+        "duration": 7,
+        "thumbUrl": "https://fb-cdn.fanbook.mobi/fanbook/app/files/chatroom/image/43789ea4452106628661d9014d45c873.jpg",
+        "thumbName": "43789ea4452106628661d9014d45c873.jpg",
+        "_type": "video",
+        "_inline": false
       }
-   },
-   {
-      "insert": "\n"
-   },
-   {
-      "insert": {
-        "image": {
-          "source": "https://user-images.githubusercontent.com/122956/72955931-ccc07900-3d52-11ea-89b1-d468a6e2aa2b.png",
-          "width": 330.0,
-          "height": 330.0,
-          "checkPath": "https://user-images.githubusercontent.com/122956/72955931-ccc07900-3d52-11ea-89b1-d468a6e2aa2b.png"
-        }
-      },
-      "attributes":{
-         "width": 230,
-         "height": 230
-      }
-   },
-   {
-      "insert": "\n"
-   },
-   {
-      "insert": {
-        "video": {
-          "source": "https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_20mb.mp4",
-          "width": 360.0,
-          "height": 720.0,
-          "fillType": "video",
-          "duration": 7,
-          "thumbUrl": "https://fb-cdn.fanbook.mobi/fanbook/app/files/chatroom/image/43789ea4452106628661d9014d45c873.jpg",
-          "_type": "video",
-          "_inline": false
-        }
-      },
-      "attributes":{
-         "width": 230,
-         "height": 460
-      }
-   },
-   {
-      "insert":"\n加粗",
-      "attributes":{
-         "bold":true
-      }
-   },
-   {
-      "insert":"\nABCDEFG",
-      "attributes":{
-         "italic": true
-      }
-   },
-   {
-      "insert":"\n下划线",
-      "attributes":{
-         "underline": true
-      }
-   },
-   {
-      "insert":"\n删除线",
-      "attributes":{
-         "strike": true
-      }
-   },
-   {
-      "insert":"\n链接",
-      "attributes":{
-         "link": "https://www.wujianhui.com"
-      }
-   },
-   {
-      "insert":"\n"
-   },
-   {
-      "insert":"\n代码块"
-   },
-   {
-      "attributes":{
-         "code-block": true
-      },
-      "insert":"\n"
-   },
-   {
-      "insert":"代码块折行"
-   },
-   {
-      "attributes":{
-         "code-block": true
-      },
-      "insert":"\n"
-   },
-   {
-      "insert":"代码块折行预设内容"
-   },
-   {
-      "attributes":{
-         "code-block": true
-      },
-      "insert":"\n"
-   },
-   {
-      "insert": "\n"
-   }
+    },
+    "attributes":{
+      "width": 230,
+      "height": 460
+    }
+  },
+  {
+    "insert":"\n加粗",
+    "attributes":{
+      "bold":true
+    }
+  },
+  {
+    "insert":"\nABCDEFG",
+    "attributes":{
+      "italic": true
+    }
+  },
+  {
+    "insert":"\n下划线",
+    "attributes":{
+      "underline": true
+    }
+  },
+  {
+    "insert":"\n删除线",
+    "attributes":{
+      "strike": true
+    }
+  },
+  {
+    "insert":"\n链接",
+    "attributes":{
+      "link": "https://www.wujianhui.com"
+    }
+  },
+  {
+    "insert":"\n"
+  },
+  {
+    "insert":"\n代码块"
+  },
+  {
+    "attributes":{
+      "code-block": true
+    },
+    "insert":"\n"
+  },
+  {
+    "insert":"代码块折行"
+  },
+  {
+    "attributes":{
+      "code-block": true
+    },
+    "insert":"\n"
+  },
+  {
+    "insert":"代码块折行预设内容"
+  },
+  {
+    "attributes":{
+      "code-block": true
+    },
+    "insert":"\n"
+  },
+  {
+    "insert": "\n"
+  }
 ]
