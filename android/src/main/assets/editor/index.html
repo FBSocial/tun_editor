@@ -398,6 +398,19 @@
             handler: function(range) {
               this.quill.format('header', false, Quill.sources.USER);
             }
+          },
+          'enter to new line': {
+            key: 'Enter',
+            collapsed: true,
+            format: ['bold', 'italic', 'underline', 'strike'],
+            handler: function(range) {
+              this.quill.format('bold', false);
+              this.quill.format('italic', false);
+              this.quill.format('underline', false);
+              this.quill.format('strike', false);
+              this.quill.insertText(range.index, '\n', Quill.sources.USER);
+              this.quill.setSelection(range.index + 1, Quill.sources.USER);
+            }
           }
         }
         var options = {
