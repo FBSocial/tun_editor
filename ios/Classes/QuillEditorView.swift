@@ -123,6 +123,10 @@ class QuillEditorView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler {
             if let filename = message.body as? String {
                 refreshImage(filename)
             }
+        case "loadVideoThumb":
+            if let filename = message.body as? String {
+                refreshVideoThumb(filename)
+            }
         default:
             debugPrint("missing message handler in quill editor \(message.name)")
         }
@@ -282,7 +286,27 @@ class QuillEditorView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler {
     private func refreshImage(_ filename: String) {
         var url = URL(fileURLWithPath: fileBasePath)
         url.appendPathComponent(filename)
-        exec("refreshImage(\"\(filename)\", \"file://\(url.path)\")")
+        
+        do {
+            let fileData = try Data.init(contentsOf: url).base64EncodedString()
+            exec("refreshImage(\"\(filename)\", \"data:image/png;base64,\(fileData)\")")
+        }
+        catch {
+            print("read image file failed \(error)")
+        }
+    }
+    
+    private func refreshVideoThumb(_ filename: String) {
+        var url = URL(fileURLWithPath: fileBasePath)
+        url.appendPathComponent(filename)
+        
+        do {
+            let fileData = try Data.init(contentsOf: url).base64EncodedString()
+            exec("refreshVideoThumb(\"\(filename)\", \"data:image/png;base64,\(fileData)\")")
+        }
+        catch {
+            print("read video thumb file failed \(error)")
+        }
     }
     
     private func setup() {
@@ -295,6 +319,7 @@ class QuillEditorView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler {
         self.configuration.userContentController.add(self, name: "onLinkClick")
         self.configuration.userContentController.add(self, name: "onFocusChange")
         self.configuration.userContentController.add(self, name: "loadImage")
+        self.configuration.userContentController.add(self, name: "loadVideoThumb")
 
         if let filePath = Bundle.main.path(forResource: "index", ofType: "html") {
             let url = URL(fileURLWithPath: filePath, isDirectory: false)

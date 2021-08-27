@@ -81,6 +81,13 @@
             return window.webkit.messageHandlers.loadImage.postMessage(path);
           }
         },
+        loadVideoThumb: function(path) {
+          if (isAndroid) {
+            return tun.loadVideoThumb(path);
+          } else if (isIOS) {
+            return window.webkit.messageHandlers.loadVideoThumb.postMessage(path);
+          }
+        },
       }
 
       var replaceText;
@@ -95,6 +102,7 @@
       var setReadOnly;
       var setPadding;
       var refreshImage;
+      var refreshVideoThumb;
       var setImageStyle;
       var setVideoStyle;
 
@@ -230,13 +238,17 @@
           static create(value) {
             const node = super.create(value);
 
-            node.setAttribute('src', this.sanitize(value));
-
             const video = document.createElement("video");
             video.innerHTML = node.duration;
             video.setAttribute('src', this.sanitize(value.source));
             video.controls = false;
-            video.poster = value.thumbUrl;
+
+            let posterUrl = this.sanitize(value.thumbUrl);
+            if (posterUrl.startsWith('file')) {
+              bridge.loadVideoThumb(posterUrl.replace('file://', ''));
+            } else {
+              video.poster = posterUrl;
+            }
 
             const durationSpan = document.createElement("div");
             durationSpan.className = 'video-duration-mask';
@@ -270,10 +282,13 @@
           }
 
           static sanitize(url) {
-            let protocols = ['http', 'https', 'mailto', 'tel'];
+            let protocols = ['http', 'https', 'mailto', 'tel', 'blob', 'file'];
             const anchor = document.createElement('a');
             anchor.href = url;
             const protocol = anchor.href.slice(0, anchor.href.indexOf(':'));
+            if (protocol === 'file' && !url.startsWith('file://')) {
+              return `file://${url}`;
+            }
             let isValid = protocols.indexOf(protocol) > -1;
             return isValid ? url: 'about:blank';
           }
@@ -518,13 +533,29 @@
           }
           image.setAttribute('src', data);
         }
+        refreshVideoThumb = function(filename, data) {
+          var video = document.querySelector(`[data-thumb-url="${filename}"]`);
+          if (video === null) {
+            video = document.querySelector(`[data-thumb-url="file://${filename}"]`);
+          }
+          if (video === null) {
+            console.log('not found video thumb element', path);
+            return;
+          }
+
+          video = video.querySelector('video');
+          fetch(data)
+            .then(response => response.blob())
+            .then(blob => {
+                video.poster = URL.createObjectURL(blob);
+            });
+        }
         setImageStyle = function(style) {
           imageStyle = style;
         }
         setVideoStyle = function(style) {
           videoStyle = style;
         }
-
         window.addEventListener('resize', function() {
           quill.scrollIntoView();
         });
