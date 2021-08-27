@@ -378,10 +378,6 @@ class TunEditorController {
     }
   }
 
-  void composeDocument(Delta delta) {
-    document.compose(delta, ChangeSource.LOCAL);
-  }
-
   bool _isEmptyLine() {
     final child = document.queryChild(selection.extentOffset);
     if (child.node == null) {

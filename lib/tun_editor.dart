@@ -7,6 +7,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:tun_editor/models/documents/attribute.dart';
+import 'package:tun_editor/models/documents/document.dart';
 import 'package:tun_editor/models/quill_delta.dart';
 import 'package:tun_editor/tun_editor_api.dart';
 import 'package:tun_editor/controller.dart';
@@ -219,12 +220,31 @@ class TunEditorState extends State<TunEditor> with TunEditorHandler {
     String delta, String oldDelta,
   ) async {
     final deltaMap = json.decode(delta) as Map;
-    if (deltaMap['ops'] is List<dynamic>) {
+    final oldDeltaMap = json.decode(oldDelta) as Map;
+    if (deltaMap['ops'] is List<dynamic> && oldDeltaMap['ops'] is List<dynamic>) {
       final deltaList = deltaMap['ops'] as List<dynamic>;
       final deltaObj = Delta.fromJson(deltaList);
+
+      // bool isCrashed = false;
       if (deltaObj.isNotEmpty) {
-        controller.composeDocument(deltaObj);
+        try {
+          // debugPrint('compose ${deltaObj.toJson()} ${controller.document.toDelta().toJson()}');
+          controller.document.compose(deltaObj, ChangeSource.LOCAL);
+        } catch (e, s) {
+          debugPrint('compose failed, start restore $e, $s');
+          // isCrashed = true;
+        }
       }
+
+      // if (isCrashed) {
+      //   final oldDeltaList = oldDeltaMap['ops'] as List<dynamic>;
+      //   final oldDeltaObj = Delta.fromJson(oldDeltaList);
+
+      //   final restoreDelta = oldDeltaObj.compose(deltaObj)..trim();
+      //   debugPrint('restore delta ${restoreDelta.toJson()}');
+      //   controller.document.delete(0, controller.document.length);
+      //   controller.document.compose(restoreDelta, ChangeSource.LOCAL);
+      // }
     }
   }
 
