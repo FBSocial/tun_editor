@@ -180,6 +180,7 @@ class QuillEditor: WebView {
     fun focus() {
         requestFocus()
         exec("javascript:focus()");
+        toggleKeyboard(true)
     }
 
     fun blur() {

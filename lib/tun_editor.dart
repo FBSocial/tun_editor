@@ -156,42 +156,38 @@ class TunEditorState extends State<TunEditor> with TunEditorHandler {
       };
     }
 
+    Widget child;
     if (Platform.isAndroid) {
       // Android platform.
-      return Focus(
-        focusNode: focusNode,
-        canRequestFocus: true,
-        onFocusChange: _handleFocusChange,
-        child: PlatformViewLink(
-          viewType: VIEW_TYPE_TUN_EDITOR,
-          surfaceFactory: (BuildContext context, PlatformViewController controller) {
-            return AndroidViewSurface(
-              controller: controller as AndroidViewController,
-              gestureRecognizers: {},
-              hitTestBehavior: PlatformViewHitTestBehavior.translucent,
-            );
-          },
-          onCreatePlatformView: (PlatformViewCreationParams params) {
-            return PlatformViewsService.initSurfaceAndroidView(
-              id: params.id,
-              viewType: VIEW_TYPE_TUN_EDITOR,
-              layoutDirection: TextDirection.ltr,
-              creationParams: creationParams,
-              creationParamsCodec: StandardMessageCodec(),
-            )
-              ..addOnPlatformViewCreatedListener(params.onPlatformViewCreated)
-              ..addOnPlatformViewCreatedListener((int id) {
-                _tunEditorApi = TunEditorApi(id, this);
-                controller.setTunEditorApi(_tunEditorApi);
-              })
-              ..create();
-          },
-        ),
+      child = PlatformViewLink(
+        viewType: VIEW_TYPE_TUN_EDITOR,
+        surfaceFactory: (BuildContext context, PlatformViewController controller) {
+          return AndroidViewSurface(
+            controller: controller as AndroidViewController,
+            gestureRecognizers: {},
+            hitTestBehavior: PlatformViewHitTestBehavior.translucent,
+          );
+        },
+        onCreatePlatformView: (PlatformViewCreationParams params) {
+          return PlatformViewsService.initSurfaceAndroidView(
+            id: params.id,
+            viewType: VIEW_TYPE_TUN_EDITOR,
+            layoutDirection: TextDirection.ltr,
+            creationParams: creationParams,
+            creationParamsCodec: StandardMessageCodec(),
+          )
+            ..addOnPlatformViewCreatedListener(params.onPlatformViewCreated)
+            ..addOnPlatformViewCreatedListener((int id) {
+              _tunEditorApi = TunEditorApi(id, this);
+              controller.setTunEditorApi(_tunEditorApi);
+            })
+            ..create();
+        },
       );
 
     } else if (Platform.isIOS) {
       // IOS platform.
-      return UiKitView(
+      child = UiKitView(
         viewType: VIEW_TYPE_TUN_EDITOR,
         layoutDirection: TextDirection.ltr,
         creationParams: creationParams,
@@ -204,6 +200,12 @@ class TunEditorState extends State<TunEditor> with TunEditorHandler {
     } else {
       throw UnsupportedError('Unsupported platform view');
     }
+    return Focus(
+      focusNode: focusNode,
+      canRequestFocus: true,
+      onFocusChange: _handleFocusChange,
+      child: child,
+    );
   }
 
   @override
@@ -279,10 +281,8 @@ class TunEditorState extends State<TunEditor> with TunEditorHandler {
       _isFocused = hasFocus;
       if (hasFocus) {
         _tunEditorApi?.focus();
-        _tunEditorApi?.toggleKeyboard(true);
       } else {
         _tunEditorApi?.blur();
-        _tunEditorApi?.toggleKeyboard(false);
       }
     }
   }

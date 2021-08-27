@@ -62,7 +62,6 @@ class TunEditorController {
     }
     if (!ignoreFocus) {
       focus();
-      toggleKeyboard(true);
     }
   }
 
@@ -107,7 +106,6 @@ class TunEditorController {
 
     if (!ignoreFocus) {
       focus();
-      toggleKeyboard(true);
     }
   }
 
@@ -119,7 +117,6 @@ class TunEditorController {
     replaceText(index, 0, data, null, ignoreFocus: ignoreFocus);
     if (!ignoreFocus) {
       focus();
-      toggleKeyboard(true);
     }
   }
 
@@ -182,7 +179,6 @@ class TunEditorController {
 
     if (!ignoreFocus) {
       focus();
-      toggleKeyboard(true);
     }
   }
 
@@ -240,7 +236,6 @@ class TunEditorController {
     );
     if (!ignoreFocus) {
       focus();
-      toggleKeyboard(true);
     }
   }
 
@@ -264,7 +259,6 @@ class TunEditorController {
 
     if (!ignoreFocus) {
       focus();
-      toggleKeyboard(true);
     }
   }
 
@@ -281,7 +275,6 @@ class TunEditorController {
 
     if (!ignoreFocus) {
       focus();
-      toggleKeyboard(true);
     }
   }
 
@@ -339,10 +332,6 @@ class TunEditorController {
 
   void scrollToBottom() {
     _tunEditorApi?.scrollToBottom();
-  }
-
-  void toggleKeyboard(bool isShow) {
-    _tunEditorApi?.toggleKeyboard(isShow);
   }
 
   void addSelectionListener(ValueChanged<TextSelection> listener) {

@@ -158,9 +158,6 @@ class TunEditorApi {
   void setVideoStyle(Map<String, dynamic> style) {
     _channel.invokeMethod('setVideoStyle', style);
   }
-  void toggleKeyboard(bool isShow) {
-    _channel.invokeMethod('toggleKeyboard', isShow);
-  }
 
 }
 

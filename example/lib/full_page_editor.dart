@@ -87,12 +87,12 @@ class FullPageEditorState extends State<FullPageEditor> {
           title: GestureDetector(
             child: Text('Editor'),
             onTap: () {
-              // debugPrint('focus: ${_editorFocusNode.hasFocus}');
-              // if (_editorFocusNode.hasFocus) {
-              //   _editorFocusNode.unfocus();
-              // } else {
-              //   _editorFocusNode.requestFocus();
-              // }
+              debugPrint('focus: ${_editorFocusNode.hasFocus}');
+              if (_editorFocusNode.hasFocus) {
+                _editorFocusNode.unfocus();
+              } else {
+                _editorFocusNode.requestFocus();
+              }
             },
           ),
         ),
@@ -337,9 +337,9 @@ class FullPageEditorState extends State<FullPageEditor> {
   }
 
   Future<void> _loadDocument() async {
-    // final result = await rootBundle.loadString('assets/sample_data.json');
-    // final doc = Document.fromJson(jsonDecode(result));
-    final doc = Document();
+    final result = await rootBundle.loadString('assets/sample_data.json');
+    final doc = Document.fromJson(jsonDecode(result));
+    // final doc = Document();
 
     final list = doc.toDelta().toJson();
     for (final i in list) {
