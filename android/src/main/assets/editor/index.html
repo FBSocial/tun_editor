@@ -536,31 +536,35 @@
           editor.style.padding = `${top}px ${right}px ${bottom}px ${left}px`;
         }
         refreshImage = function(filename, data) {
-          var image = document.querySelector(`[data-source="${filename}"]`);
-          if (image === null) {
-            image = document.querySelector(`[data-source="file://${filename}"]`);
+          var image = document.querySelectorAll(`[data-source="${filename}"]`);
+          if (image.length === 0) {
+            image = document.querySelectorAll(`[data-source="file://${filename}"]`);
           }
-          if (image === null) {
+          if (image.length === 0) {
             console.log('not found image element', path);
             return;
           }
-          image.setAttribute('src', data);
+          for (const i of image) {
+            i.setAttribute('src', data);
+          }
         }
         refreshVideoThumb = function(filename, data) {
-          var video = document.querySelector(`[data-thumb-url="${filename}"]`);
-          if (video === null) {
-            video = document.querySelector(`[data-thumb-url="file://${filename}"]`);
+          var video = document.querySelectorAll(`[data-thumb-url="${filename}"]`);
+          if (video.length === 0) {
+            video = document.querySelectorAll(`[data-thumb-url="file://${filename}"]`);
           }
-          if (video === null) {
+          if (video.length === 0) {
             console.log('not found video thumb element', path);
             return;
           }
 
-          video = video.querySelector('video');
           fetch(data)
             .then(response => response.blob())
             .then(blob => {
-                video.poster = URL.createObjectURL(blob);
+              for (const v of video) {
+                const videoNode = v.querySelector('video');
+                videoNode.poster = URL.createObjectURL(blob);
+              }
             });
         }
         setImageStyle = function(style) {

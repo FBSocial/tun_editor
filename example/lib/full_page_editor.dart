@@ -385,23 +385,23 @@ class FullPageEditorState extends State<FullPageEditor> {
     final picker = ImagePicker();
     final XFile? image = await picker.pickImage(source: ImageSource.gallery);
     if (image != null) {
-      // _controller.insertImage(
-      //   // source: 'file://${image.name}',
-      //   name: image.name,
-      //   source: image.name,
-      //   checkPath: image.name,
-      //   width: 230,
-      //   height: 230,
-      // );
-      _controller.insertVideo(
-        source: 'https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_20mb.mp4',
-        duration: 100,
-        thumbUrl: 'file://${image.name}',
-        thumbName: image.name,
-        fileType: 'mp4',
-        width: 100,
-        height: 200,
+      _controller.insertImage(
+        // source: 'file://${image.name}',
+        name: image.name,
+        source: image.name,
+        checkPath: image.name,
+        width: 230,
+        height: 230,
       );
+      // _controller.insertVideo(
+      //   source: 'https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_20mb.mp4',
+      //   duration: 100,
+      //   thumbUrl: 'file://${image.name}',
+      //   thumbName: image.name,
+      //   fileType: 'mp4',
+      //   width: 100,
+      //   height: 200,
+      // );
     }
   }
 
