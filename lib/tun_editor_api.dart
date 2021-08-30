@@ -79,14 +79,14 @@ class TunEditorApi {
     _channel.invokeMethod('replaceText', {
       'index': index,
       'len': len,
-      'data': data is Embeddable ? data.toJson() : data,
+      'data': data is Embeddable ? data.toFormalJson() : data,
       'attributes': attrMap,
       'newLineAfterImage': autoAppendNewlineAfterImage,
     });
   }
   void updateContents(Delta delta, ChangeSource source) {
     _channel.invokeMethod('updateContents', {
-      'delta': delta.toJson(),
+      'delta': delta.toFormalJson(),
       'source': source == ChangeSource.LOCAL ? 'user' : 'api',
     });
   }

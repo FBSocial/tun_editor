@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 /// An object which can be embedded into a Quill document.
 ///
 /// See also:
@@ -13,20 +15,20 @@ class Embeddable {
   final dynamic data;
 
   Map<String, dynamic> toJson() {
+    if (type == 'image' || type == 'video') {
+      return data;
+    }
+    return toFormalJson();
+  }
+
+  Map<String, dynamic> toFormalJson() {
     final m = <String, dynamic>{type: data};
     return m;
   }
 
-  Map<String, dynamic> toCompatibleJson() {
-    if (type == 'image' || type == 'video') {
-      return data;
-    }
-    return toJson();
-  }
-
   static Embeddable fromJson(Map<String, dynamic> json) {
     final m = Map<String, dynamic>.from(json);
-    // assert(m.length == 1, 'Embeddable map has one key');
+    assert(m.length > 0, 'Embeddable can not be empty');
     if (m.length > 1 && m.containsKey('_type')) {
       final type = m['_type'];
       if (type == 'image') {
@@ -36,7 +38,12 @@ class Embeddable {
         return VideoEmbed.fromJson(m);
       }
     }
-
+    if (m.containsKey('image')) {
+      return ImageEmbed.fromJson(m['image']);
+    }
+    if (m.containsKey('video')) {
+      return VideoEmbed.fromJson(m['video']);
+    }
     return BlockEmbed(m.keys.first, m.values.first);
   }
 }
@@ -82,7 +89,7 @@ class ImageEmbed extends Embeddable {
           '_inline': false,
         });
   @override
-  Map<String, dynamic> toCompatibleJson() {
+  Map<String, dynamic> toJson() {
     return <String, dynamic>{
       'name': name,
       'source': source,
@@ -93,13 +100,33 @@ class ImageEmbed extends Embeddable {
       '_inline': false,
     };
   }
+  @override
+  Map<String, dynamic> toFormalJson() {
+    final res = <String, dynamic>{
+      'image': toJson(),
+    };
+    return res;
+  }
+
   static ImageEmbed fromJson(Map<String, dynamic> data) {
+    double width = 0;
+    if (data['width'] is String) {
+      width = double.tryParse(data['width']) ?? 0;
+    } else if (data['width'] is num) {
+      width = data['width'];
+    }
+    double height = 0;
+    if (data['height'] is String) {
+      height = double.tryParse(data['height']) ?? 0;
+    } else if (data['height'] is num) {
+      height = data['height'];
+    }
     return ImageEmbed(
       name: data['name'] as String,
       source: data['source'] as String,
       checkPath: data['checkPath'] as String,
-      width: data['width'] as num,
-      height: data['height'] as num,
+      width: width,
+      height: height,
     );
   }
 }
@@ -132,7 +159,7 @@ class VideoEmbed extends Embeddable {
           '_inline': false,
         });
   @override
-  Map<String, dynamic> toCompatibleJson() {
+  Map<String, dynamic> toJson() {
     return <String, dynamic>{
       'width': width,
       'height': height,
@@ -145,14 +172,38 @@ class VideoEmbed extends Embeddable {
       '_inline': false,
     };
   }
+  @override
+  Map<String, dynamic> toFormalJson() {
+    return <String, dynamic>{
+      'video': toJson(),
+    };
+  }
 
   static VideoEmbed fromJson(Map<String, dynamic> data) {
+    double width = 0;
+    if (data['width'] is String) {
+      width = double.tryParse(data['width']) ?? 0;
+    } else if (data['width'] is num) {
+      width = data['width'];
+    }
+    double height = 0;
+    if (data['height'] is String) {
+      height = double.tryParse(data['height']) ?? 0;
+    } else if (data['height'] is num) {
+      height = data['height'];
+    }
+    double duration = 0;
+    if (data['duration'] is String) {
+      duration = double.tryParse(data['duration']) ?? 0;
+    } else if (data['duration'] is num) {
+      duration = data['duration'];
+    }
     return VideoEmbed(
-      width: data['width'],
-      height: data['height'],
+      width: width,
+      height: height,
       source: data['source'],
       fileType: data['fileType'],
-      duration: data['duration'],
+      duration: duration,
       thumbUrl: data['thumbUrl'],
       thumbName: data['thumbName'],
     );

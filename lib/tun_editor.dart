@@ -150,7 +150,7 @@ class TunEditorState extends State<TunEditor> with TunEditorHandler {
         'scrollable': scrollable,
         'padding': paddingList,
         'autoFocus': autoFocus,
-        'delta': controller.document.toDelta().toJson(),
+        'delta': controller.document.toDelta().toFormalJson(),
         'imageStyle': imageStyle,
         'videoStyle': videoStyle,
       };
@@ -230,7 +230,7 @@ class TunEditorState extends State<TunEditor> with TunEditorHandler {
       // bool isCrashed = false;
       if (deltaObj.isNotEmpty) {
         try {
-          // debugPrint('compose ${deltaObj.toJson()} ${controller.document.toDelta().toJson()}');
+          // debugPrint('compose ${json.encode(deltaObj.toJson())} ${controller.document.toDelta().toJson()}');
           controller.document.compose(deltaObj, ChangeSource.LOCAL);
         } catch (e, s) {
           debugPrint('compose failed, start restore $e, $s');

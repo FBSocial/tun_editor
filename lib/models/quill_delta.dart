@@ -5,6 +5,7 @@
 /// Implementation of Quill Delta format in Dart.
 library quill_delta;
 
+import 'dart:convert';
 import 'dart:math' as math;
 
 import 'package:collection/collection.dart';
@@ -110,12 +111,12 @@ class Operation {
   }
 
   /// Returns JSON-serializable representation of this operation.
-  Map<String, dynamic> toCompatibleJson() {
+  Map<String, dynamic> toFormalJson() {
     final json = {key: value};
     if (_attributes != null) json[Operation.attributesKey] = attributes;
     // Embeddable.
     if (key == Operation.insertKey && value is Map) {
-      json[key] = Embeddable.fromJson(value).toCompatibleJson();
+      json[key] = Embeddable.fromJson(value).toFormalJson();
     }
     return json;
   }
@@ -156,8 +157,8 @@ class Operation {
     bool isValueEqual = _valueEquality.equals(data, typedOther.data);
     if (data is Map<String, dynamic> && other.data is Map<String, dynamic>) {
       isValueEqual = _valueEquality.equals(
-        Embeddable.fromJson(data as Map<String, dynamic>).toJson(),
-        Embeddable.fromJson(typedOther.data as Map<String, dynamic>).toJson(),
+        Embeddable.fromJson(data as Map<String, dynamic>).toFormalJson(),
+        Embeddable.fromJson(typedOther.data as Map<String, dynamic>).toFormalJson(),
       );
     }
     return key == typedOther.key &&
@@ -292,7 +293,7 @@ class Delta {
   List toJson() => toList().map((operation) => operation.toJson()).toList();
 
   /// Returns JSON-serializable version of this delta.
-  List toCompatibleJson() => toList().map((operation) => operation.toCompatibleJson()).toList();
+  List toFormalJson() => toList().map((operation) => operation.toFormalJson()).toList();
 
   /// Returns `true` if this delta is empty.
   bool get isEmpty => _operations.isEmpty;
