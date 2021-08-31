@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 /// An object which can be embedded into a Quill document.
 ///
 /// See also:
@@ -43,6 +41,9 @@ class Embeddable {
     }
     if (m.containsKey('video')) {
       return VideoEmbed.fromJson(m['video']);
+    }
+    if (m.containsKey('mention')) {
+      return MentionEmbed.fromJson(m['mention']);
     }
     return BlockEmbed(m.keys.first, m.values.first);
   }
@@ -208,4 +209,61 @@ class VideoEmbed extends Embeddable {
       thumbName: data['thumbName'],
     );
   }
+}
+
+class MentionEmbed extends Embeddable {
+
+  String denotationChar;
+  String id;
+  String value;
+  String prefixChar;
+
+  String get attributeKey {
+    switch (prefixChar) {
+      case '@':
+        return 'at';
+      case 'at':
+        return 'at';
+      case 'channel':
+        return 'channel';
+      case '#':
+        return 'channel';
+      default:
+        return 'at';
+    }
+  }
+
+  MentionEmbed({
+    required this.denotationChar,
+    required this.id,
+    required this.value,
+    required this.prefixChar,
+  }) : super('mention', {
+    'denotationChar': denotationChar,
+    'id': id,
+    'value': value,
+    'prefixChar': prefixChar,
+  });
+
+  @override
+  Map<String, dynamic> toFormalJson() {
+    return <String, dynamic>{
+      'mention': {
+        'denotationChar': denotationChar,
+        'id': id,
+        'value': value,
+        'prefixChar': prefixChar,
+      },
+    };
+  }
+
+  static MentionEmbed fromJson(Map<String, dynamic> data) {
+    return MentionEmbed(
+      denotationChar: data['denotationChar'],
+      id: data['id'],
+      value: data['value'],
+      prefixChar: data['prefixChar'],
+    );
+  }
+
 }

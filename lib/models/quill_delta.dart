@@ -105,7 +105,16 @@ class Operation {
     if (_attributes != null) json[Operation.attributesKey] = attributes;
     // Embeddable.
     if (key == Operation.insertKey && value is Map) {
-      json[key] = Embeddable.fromJson(value).toJson();
+      final embed = Embeddable.fromJson(value);
+      if (embed.type == 'mention' && embed is MentionEmbed) {
+        json[key] = embed.value;
+        Map<String, dynamic> attrMap = attributes != null
+            ? Map.from(attributes!) : {};
+        attrMap[embed.attributeKey] = embed.id;
+        json[Operation.attributesKey] = attrMap;
+      } else {
+        json[key] = Embeddable.fromJson(value).toJson();
+      }
     }
     return json;
   }
