@@ -110,15 +110,15 @@ class ImageEmbed extends Embeddable {
   }
 
   static ImageEmbed fromJson(Map<String, dynamic> data) {
-    double width = 0;
+    num width = 0;
     if (data['width'] is String) {
-      width = double.tryParse(data['width']) ?? 0;
+      width = num.tryParse(data['width']) ?? 0;
     } else if (data['width'] is num) {
       width = data['width'];
     }
-    double height = 0;
+    num height = 0;
     if (data['height'] is String) {
-      height = double.tryParse(data['height']) ?? 0;
+      height = num.tryParse(data['height']) ?? 0;
     } else if (data['height'] is num) {
       height = data['height'];
     }
@@ -183,19 +183,19 @@ class VideoEmbed extends Embeddable {
   static VideoEmbed fromJson(Map<String, dynamic> data) {
     num width = 0;
     if (data['width'] is String) {
-      width = double.tryParse(data['width']) ?? 0;
+      width = num.tryParse(data['width']) ?? 0;
     } else if (data['width'] is num) {
       width = data['width'];
     }
     num height = 0;
     if (data['height'] is String) {
-      height = double.tryParse(data['height']) ?? 0;
+      height = num.tryParse(data['height']) ?? 0;
     } else if (data['height'] is num) {
       height = data['height'];
     }
     num duration = 0;
     if (data['duration'] is String) {
-      duration = double.tryParse(data['duration']) ?? 0;
+      duration = num.tryParse(data['duration']) ?? 0;
     } else if (data['duration'] is num) {
       duration = data['duration'];
     }

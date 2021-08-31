@@ -201,3 +201,21 @@ class Delta {
 
 }
 ```
+
+## lib/models/documents/document.dart
+
+1. 修改 `Document` 追加 `refreshDocument` 方法。
+
+```dart
+class Document {
+
+  void refreshDocument(Delta change, Delta oldDelta, ChangeSource changeSource) {
+    _root.children.clear();
+    _delta = oldDelta.compose(change);
+    _loadDocument(_delta);
+    final onChange = Tuple3(oldDelta, change, changeSource);
+    _observer.add(onChange);
+  }
+
+}
+```

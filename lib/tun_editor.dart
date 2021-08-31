@@ -226,27 +226,12 @@ class TunEditorState extends State<TunEditor> with TunEditorHandler {
     if (deltaMap['ops'] is List<dynamic> && oldDeltaMap['ops'] is List<dynamic>) {
       final deltaList = deltaMap['ops'] as List<dynamic>;
       final deltaObj = Delta.fromJson(deltaList);
+      final oldDeltaList = oldDeltaMap['ops'] as List<dynamic>;
+      final oldDeltaObj = Delta.fromJson(oldDeltaList);
 
-      // bool isCrashed = false;
       if (deltaObj.isNotEmpty) {
-        try {
-          // debugPrint('compose ${json.encode(deltaObj.toJson())} ${controller.document.toDelta().toJson()}');
-          controller.document.compose(deltaObj, ChangeSource.LOCAL);
-        } catch (e, s) {
-          debugPrint('compose failed, start restore $e, $s');
-          // isCrashed = true;
-        }
+        controller.document.refreshDocument(deltaObj, oldDeltaObj, ChangeSource.LOCAL);
       }
-
-      // if (isCrashed) {
-      //   final oldDeltaList = oldDeltaMap['ops'] as List<dynamic>;
-      //   final oldDeltaObj = Delta.fromJson(oldDeltaList);
-
-      //   final restoreDelta = oldDeltaObj.compose(deltaObj)..trim();
-      //   debugPrint('restore delta ${restoreDelta.toJson()}');
-      //   controller.document.delete(0, controller.document.length);
-      //   controller.document.compose(restoreDelta, ChangeSource.LOCAL);
-      // }
     }
   }
 
