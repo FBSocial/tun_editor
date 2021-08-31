@@ -5,7 +5,6 @@
 /// Implementation of Quill Delta format in Dart.
 library quill_delta;
 
-import 'dart:convert';
 import 'dart:math' as math;
 
 import 'package:collection/collection.dart';
