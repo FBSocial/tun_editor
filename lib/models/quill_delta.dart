@@ -84,6 +84,20 @@ class Operation {
     final map = Map<String, dynamic>.from(data);
     if (map.containsKey(Operation.insertKey)) {
       final data = dataDecoder(map[Operation.insertKey]);
+
+      final Map<String, dynamic>? attributes = map[Operation.attributesKey] == null
+          ? null : Map.from(map[Operation.attributesKey]);
+      if (attributes?.containsKey('at') == true) {
+        final mentionValue = data is String ? data : '';
+        final embed = MentionEmbed.fromAttribute(attributes!['at'], '@', mentionValue);
+        return Operation._(Operation.insertKey, 1, embed.toFormalJson(), attributes);
+      }
+      if (attributes?.containsKey('channel') == true) {
+        final mentionValue = data is String ? data : '';
+        final embed = MentionEmbed.fromAttribute(attributes!['channel'], '#', mentionValue);
+        return Operation._(Operation.insertKey, 1, embed.toFormalJson(), attributes);
+      }
+
       final dataLength = data is String ? data.length : 1;
       return Operation._(
           Operation.insertKey, dataLength, data, map[Operation.attributesKey]);
@@ -102,17 +116,44 @@ class Operation {
   Map<String, dynamic> toJson() {
     final json = {key: value};
     if (_attributes != null) json[Operation.attributesKey] = attributes;
-    // Embeddable.
-    if (key == Operation.insertKey && value is Map) {
-      final embed = Embeddable.fromJson(value);
-      if (embed.type == 'mention' && embed is MentionEmbed) {
-        json[key] = embed.value;
-        Map<String, dynamic> attrMap = attributes != null
-            ? Map.from(attributes!) : {};
-        attrMap[embed.attributeKey] = embed.id;
-        json[Operation.attributesKey] = attrMap;
+
+    if (key == Operation.insertKey) {
+      // Embeddable.
+      if (value is Map) {
+        final embed = Embeddable.fromJson(value);
+        if (embed.type == 'mention' && embed is MentionEmbed) {
+          json[key] = embed.value;
+          Map<String, dynamic> attrMap = attributes != null
+              ? Map.from(attributes!) : {};
+          attrMap[embed.attributeKey] = embed.id;
+          json[Operation.attributesKey] = attrMap;
+        } else {
+          json[key] = Embeddable.fromJson(value).toJson();
+        }
       } else {
-        json[key] = Embeddable.fromJson(value).toJson();
+        // Check if data is mention embed.
+        if (attributes != null && attributes!.containsKey('at')) {
+          final mentionId = attributes!['at'] is String ? attributes!['at'] as String : '';
+          final mentionValue = value is String ? value as String : '';
+          final embed = MentionEmbed.fromAttribute(mentionId, '@', mentionValue);
+          json[key] = embed.value;
+
+          Map<String, dynamic> attrMap = attributes != null
+              ? Map.from(attributes!) : {};
+          attrMap[embed.attributeKey] = embed.id;
+          json[Operation.attributesKey] = attrMap;
+        }
+        if (attributes != null && attributes!.containsKey('channel')) {
+          final mentionId = attributes!['channel'] is String ? attributes!['channel'] as String : '';
+          final mentionValue = value is String ? value as String : '';
+          final embed = MentionEmbed.fromAttribute(mentionId, '#', mentionValue);
+          json[key] = embed.value;
+
+          Map<String, dynamic> attrMap = attributes != null
+              ? Map.from(attributes!) : {};
+          attrMap[embed.attributeKey] = embed.id;
+          json[Operation.attributesKey] = attrMap;
+        }
       }
     }
     return json;
@@ -122,9 +163,25 @@ class Operation {
   Map<String, dynamic> toFormalJson() {
     final json = {key: value};
     if (_attributes != null) json[Operation.attributesKey] = attributes;
-    // Embeddable.
     if (key == Operation.insertKey && value is Map) {
-      json[key] = Embeddable.fromJson(value).toFormalJson();
+      // Embeddable.
+      if (value is Map) {
+        json[key] = Embeddable.fromJson(value).toFormalJson();
+      } else {
+        // Check if data is mention embed.
+        if (attributes != null && attributes!.containsKey('at')) {
+          final mentionId = attributes!['at'] is String ? attributes!['at'] as String : '';
+          final mentionValue = value is String ? value as String : '';
+          final embed = MentionEmbed.fromAttribute(mentionId, '@', mentionValue);
+          json[key] = embed.toFormalJson();
+        }
+        if (attributes != null && attributes!.containsKey('channel')) {
+          final mentionId = attributes!['channel'] is String ? attributes!['channel'] as String : '';
+          final mentionValue = value is String ? value as String : '';
+          final embed = MentionEmbed.fromAttribute(mentionId, '#', mentionValue);
+          json[key] = embed.toFormalJson();
+        }
+      }
     }
     return json;
   }

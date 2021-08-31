@@ -48,6 +48,8 @@ class Attribute<T> {
     Attribute.height.key: Attribute.height,
     Attribute.style.key: Attribute.style,
     Attribute.token.key: Attribute.token,
+    Attribute.at.key: Attribute.at,
+    Attribute.channel.key: Attribute.channel,
   });
 
   static final BoldAttribute bold = BoldAttribute();
@@ -89,6 +91,10 @@ class Attribute<T> {
   static final StyleAttribute style = StyleAttribute(null);
 
   static final TokenAttribute token = TokenAttribute('');
+
+  static final AtAttribute at = AtAttribute('');
+
+  static final ChannelAttribute channel = ChannelAttribute('');
 
   static final Set<String> inlineKeys = {
     Attribute.bold.key,
@@ -300,4 +306,12 @@ class StyleAttribute extends Attribute<String?> {
 
 class TokenAttribute extends Attribute<String> {
   TokenAttribute(String val) : super('token', AttributeScope.IGNORE, val);
+}
+
+class AtAttribute extends Attribute<String> {
+  AtAttribute(String val) : super('at', AttributeScope.INLINE, val);
+}
+
+class ChannelAttribute extends Attribute<String> {
+  ChannelAttribute(String val) : super('channel', AttributeScope.INLINE, val);
 }

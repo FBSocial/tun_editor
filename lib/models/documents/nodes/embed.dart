@@ -181,19 +181,19 @@ class VideoEmbed extends Embeddable {
   }
 
   static VideoEmbed fromJson(Map<String, dynamic> data) {
-    double width = 0;
+    num width = 0;
     if (data['width'] is String) {
       width = double.tryParse(data['width']) ?? 0;
     } else if (data['width'] is num) {
       width = data['width'];
     }
-    double height = 0;
+    num height = 0;
     if (data['height'] is String) {
       height = double.tryParse(data['height']) ?? 0;
     } else if (data['height'] is num) {
       height = data['height'];
     }
-    double duration = 0;
+    num duration = 0;
     if (data['duration'] is String) {
       duration = double.tryParse(data['duration']) ?? 0;
     } else if (data['duration'] is num) {
@@ -263,6 +263,15 @@ class MentionEmbed extends Embeddable {
       id: data['id'],
       value: data['value'],
       prefixChar: data['prefixChar'],
+    );
+  }
+
+  static MentionEmbed fromAttribute(String id, String prefixChar, String value) {
+    return MentionEmbed(
+      denotationChar: '',
+      id: id,
+      value: value,
+      prefixChar: prefixChar,
     );
   }
 

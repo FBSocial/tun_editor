@@ -154,6 +154,24 @@
     "insert":"\n"
   },
   {
+    "insert":"@Jeffrey Wu",
+    "attributes": {
+        "at": "${@&235238717659287552}"
+    }
+  },
+  {
+    "insert":" \n"
+  },
+  {
+    "insert":"#Skateboard",
+    "attributes": {
+        "channel": "${@&235238717659287552}"
+    }
+  },
+  {
+    "insert":" \n"
+  },
+  {
     "insert":"\n代码块"
   },
   {
