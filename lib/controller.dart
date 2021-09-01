@@ -131,6 +131,43 @@ class TunEditorController {
     }
   }
 
+  void batchInsertImage({
+    required List<ImageEmbed> images,
+    bool appendNewLine = false,
+    bool ignoreFocus = false,
+  }) {
+    int insertOffset = selection.extentOffset;
+    int newOffset = selection.extentOffset + 1;
+    if (!_isEmptyLine()) {
+      final newLineOffset = _insertNewLine();
+      if (newLineOffset != null) {
+        insertOffset = newLineOffset;
+        newOffset = newLineOffset + 1;
+      }
+    }
+
+    final delta = new Delta()
+      ..retain(insertOffset);
+    for (final image in images) {
+      delta.insert(image.toFormalJson());
+      newOffset = newOffset + 1;
+    }
+    if (appendNewLine) {
+      delta.insert('\n');
+      newOffset = newOffset + 1;
+    }
+    compose(delta, null, ChangeSource.LOCAL);
+
+    updateSelection(
+      TextSelection.collapsed(offset: newOffset),
+      ChangeSource.LOCAL,
+    );
+
+    if (!ignoreFocus) {
+      focus();
+    }
+  }
+
   /// Insert image with given [url] to current [selection].
   void insertImage({
     required String name,
@@ -141,7 +178,7 @@ class TunEditorController {
     String type = 'image',
     bool inline = false,
     bool appendNewLine = false,
-    List<Attribute>? attributes = const [],
+    List<Attribute> attributes = const [],
     bool ignoreFocus = false,
   }) {
     // Wrap value.
@@ -157,10 +194,8 @@ class TunEditorController {
 
     // Wrap attributes
     final Map<String, dynamic> attrMap = {};
-    if (attributes != null) {
-      for (final attr in attributes) {
-        attrMap[attr.key] = attr.value;
-      }
+    for (final attr in attributes) {
+      attrMap[attr.key] = attr.value;
     }
 
     int insertOffset = selection.extentOffset;
@@ -177,6 +212,43 @@ class TunEditorController {
     final delta = new Delta()
       ..retain(insertOffset)
       ..insert({ 'image': imageBlot }, attrMap);
+    if (appendNewLine) {
+      delta.insert('\n');
+      newOffset = newOffset + 1;
+    }
+    compose(delta, null, ChangeSource.LOCAL);
+
+    updateSelection(
+      TextSelection.collapsed(offset: newOffset),
+      ChangeSource.LOCAL,
+    );
+
+    if (!ignoreFocus) {
+      focus();
+    }
+  }
+
+  void batchInsertVideo({
+    required List<VideoEmbed> videos,
+    bool appendNewLine = false,
+    bool ignoreFocus = false,
+  }) {
+    int insertOffset = selection.extentOffset;
+    int newOffset = selection.extentOffset + 1;
+    if (!_isEmptyLine()) {
+      final newLineOffset = _insertNewLine();
+      if (newLineOffset != null) {
+        insertOffset = newLineOffset;
+        newOffset = newLineOffset + 1;
+      }
+    }
+
+    final delta = new Delta()
+      ..retain(insertOffset);
+    for (final video in videos) {
+      delta.insert(video.toFormalJson());
+      newOffset = newOffset + 1;
+    }
     if (appendNewLine) {
       delta.insert('\n');
       newOffset = newOffset + 1;
