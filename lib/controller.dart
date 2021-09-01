@@ -78,12 +78,23 @@ class TunEditorController {
   }
 
   /// Insert mention with [id], [text] and [prefixChar], [id] should be unqiue, [id] and [prefixChar] will be used on click event.
+  /// If [replaceLength] is given, it will delete some words before insert.
   void insertMention(String id, String text, {
     String prefixChar = '@',
+    int replaceLength = 0,
     bool ignoreFocus = false,
   }) {
+    int insertIndex = selection.extentOffset;
+    if (replaceLength > 0 && insertIndex - replaceLength >= 0) {
+      insertIndex = insertIndex - replaceLength;
+    }
+    final deleteDelta = new Delta()
+        ..retain(insertIndex)
+        ..delete(replaceLength);
+    compose(deleteDelta, null, ChangeSource.LOCAL);
+
     final mentionDelta = new Delta()
-        ..retain(selection.extentOffset)
+        ..retain(insertIndex)
         ..insert({
           'mention': {
             'denotationChar': '',
@@ -95,12 +106,12 @@ class TunEditorController {
     compose(mentionDelta, null, ChangeSource.LOCAL);
 
     final spaceDelta = new Delta()
-        ..retain(selection.extentOffset + 1)
+        ..retain(insertIndex + 1)
         ..insert(' ');
     compose(spaceDelta, null, ChangeSource.LOCAL);
 
     updateSelection(
-      TextSelection.collapsed(offset: selection.extentOffset + 2),
+      TextSelection.collapsed(offset: insertIndex + 2),
       ChangeSource.LOCAL,
     );
 
