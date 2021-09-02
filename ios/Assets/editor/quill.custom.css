@@ -9,6 +9,10 @@
 .ql-editor {
   line-height: 1.5;
 }
+.ql-editor.ql-blank::before {
+  font-style: normal;
+  color: #36394099;
+}
 .ql-snow .ql-editor img {
   display: block;
 }
