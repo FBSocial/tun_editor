@@ -79,12 +79,23 @@ class TunEditorController {
   }
 
   /// Insert mention with [id], [text] and [prefixChar], [id] should be unqiue, [id] and [prefixChar] will be used on click event.
+  /// If [replaceLength] is given, it will delete some words before insert.
   void insertMention(String id, String text, {
     String prefixChar = '@',
+    int replaceLength = 0,
     bool ignoreFocus = false,
   }) {
+    int insertIndex = selection.extentOffset;
+    if (replaceLength > 0 && insertIndex - replaceLength >= 0) {
+      insertIndex = insertIndex - replaceLength;
+    }
+    final deleteDelta = new Delta()
+        ..retain(insertIndex)
+        ..delete(replaceLength);
+    compose(deleteDelta, null, ChangeSource.LOCAL);
+
     final mentionDelta = new Delta()
-        ..retain(selection.extentOffset)
+        ..retain(insertIndex)
         ..insert({
           'mention': {
             'denotationChar': '',
@@ -92,16 +103,17 @@ class TunEditorController {
             'value': text,
             'prefixChar': prefixChar,
           },
-        });
+        })
+        ..insert(' ');
     compose(mentionDelta, null, ChangeSource.LOCAL);
 
-    final spaceDelta = new Delta()
-        ..retain(selection.extentOffset + 1)
-        ..insert(' ');
-    compose(spaceDelta, null, ChangeSource.LOCAL);
+    // final spaceDelta = new Delta()
+    //     ..retain(insertIndex + 1)
+    //     ..insert(' ');
+    // compose(spaceDelta, null, ChangeSource.LOCAL);
 
     updateSelection(
-      TextSelection.collapsed(offset: selection.extentOffset + 2),
+      TextSelection.collapsed(offset: insertIndex + 2),
       ChangeSource.LOCAL,
     );
 
@@ -121,6 +133,43 @@ class TunEditorController {
     }
   }
 
+  void batchInsertEmbed({
+    required List<Embeddable> embeds,
+    bool appendNewLine = false,
+    bool ignoreFocus = false,
+  }) {
+    int insertOffset = selection.extentOffset;
+    int newOffset = selection.extentOffset + 1;
+    if (!_isEmptyLine()) {
+      final newLineOffset = _insertNewLine();
+      if (newLineOffset != null) {
+        insertOffset = newLineOffset;
+        newOffset = newLineOffset + 1;
+      }
+    }
+
+    final delta = new Delta()
+      ..retain(insertOffset);
+    for (final embed in embeds) {
+      delta.insert(embed.toFormalJson());
+      newOffset = newOffset + 1;
+    }
+    if (appendNewLine) {
+      delta.insert('\n');
+      newOffset = newOffset + 1;
+    }
+    compose(delta, null, ChangeSource.LOCAL);
+
+    updateSelection(
+      TextSelection.collapsed(offset: newOffset),
+      ChangeSource.LOCAL,
+    );
+
+    if (!ignoreFocus) {
+      focus();
+    }
+  }
+
   /// Insert image with given [url] to current [selection].
   void insertImage({
     required String name,
@@ -131,7 +180,7 @@ class TunEditorController {
     String type = 'image',
     bool inline = false,
     bool appendNewLine = false,
-    List<Attribute>? attributes = const [],
+    List<Attribute> attributes = const [],
     bool ignoreFocus = false,
   }) {
     // Wrap value.
@@ -147,10 +196,8 @@ class TunEditorController {
 
     // Wrap attributes
     final Map<String, dynamic> attrMap = {};
-    if (attributes != null) {
-      for (final attr in attributes) {
-        attrMap[attr.key] = attr.value;
-      }
+    for (final attr in attributes) {
+      attrMap[attr.key] = attr.value;
     }
 
     int insertOffset = selection.extentOffset;
