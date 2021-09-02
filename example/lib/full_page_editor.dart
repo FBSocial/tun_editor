@@ -46,6 +46,8 @@ class FullPageEditorState extends State<FullPageEditor> {
 
   double _keyboardMaxHeight = 0;
 
+  String _previewText = '';
+
   final _emojiList = [
     '😃', '😄', '😁', '😆', '😅', '😂', '🤣', '🥲', '☺️', '😊', '😇', '🙂',
     '🙃', '😉', '😌', '😍', '🥰', '😘', '😗', '😙', '😚', '😋', '😛', '😝',
@@ -66,7 +68,9 @@ class FullPageEditorState extends State<FullPageEditor> {
     _loadDocument();
     _editorFocusNode.addListener(() {
       if (_editorFocusNode.hasFocus) {
-        if (_showingSubToolbar != SubToolbar.none) {
+        debugPrint('on focus change ${_editorFocusNode.hasFocus}');
+        if (_showingSubToolbar != SubToolbar.none
+            && _showingSubToolbar != SubToolbar.emoji) {
           setState(() {
             _showingSubToolbar = SubToolbar.none;
           });
@@ -141,6 +145,11 @@ class FullPageEditorState extends State<FullPageEditor> {
                             onLinkClick: (String url) {
                               debugPrint('link click $url');
                             },
+                          ),
+                        ),
+                        Expanded(
+                          child: SingleChildScrollView(
+                            child: Text(_previewText),
                           ),
                         ),
                         SizedBox(height: 48),
@@ -357,11 +366,15 @@ class FullPageEditorState extends State<FullPageEditor> {
 
       final doc = jsonEncode(_controller.document.toDelta().toJson());
       debugPrint('document: $doc');
+
+      setState(() {
+        final encoder = JsonEncoder.withIndent('  ');
+        _previewText = encoder.convert(_controller.document.toDelta().toJson());
+      });
     });
     _controller.addSelectionListener((selection) {
       debugPrint('selection changed ${selection.baseOffset} ${selection.extentOffset}');
-      if (_showingSubToolbar == SubToolbar.at || _showingSubToolbar == SubToolbar.image
-          || _showingSubToolbar == SubToolbar.emoji) {
+      if (_showingSubToolbar == SubToolbar.at || _showingSubToolbar == SubToolbar.image) {
         setState(() {
           _showingSubToolbar = SubToolbar.none;
         });
@@ -377,6 +390,8 @@ class FullPageEditorState extends State<FullPageEditor> {
       _fileBasePath = tempPath.path;
     }
     setState(() {
+      final encoder = JsonEncoder.withIndent('  ');
+      _previewText = encoder.convert(_controller.document.toDelta().toJson());
       _isLoading = false;
     });
   }
@@ -385,23 +400,23 @@ class FullPageEditorState extends State<FullPageEditor> {
     final picker = ImagePicker();
     final XFile? image = await picker.pickImage(source: ImageSource.gallery);
     if (image != null) {
-      // _controller.insertImage(
-      //   // source: 'file://${image.name}',
-      //   name: image.name,
-      //   source: image.name,
-      //   checkPath: image.name,
-      //   width: 230,
-      //   height: 230,
-      // );
-      _controller.insertVideo(
-        source: 'https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_20mb.mp4',
-        duration: 100,
-        thumbUrl: 'file://${image.name}',
-        thumbName: image.name,
-        fileType: 'mp4',
-        width: 100,
-        height: 200,
+      _controller.insertImage(
+        // source: 'file://${image.name}',
+        name: image.name,
+        source: image.name,
+        checkPath: image.name,
+        width: 230,
+        height: 230,
       );
+      // _controller.insertVideo(
+      //   source: 'https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_20mb.mp4',
+      //   duration: 100,
+      //   thumbUrl: 'file://${image.name}',
+      //   thumbName: image.name,
+      //   fileType: 'mp4',
+      //   width: 100,
+      //   height: 200,
+      // );
     }
   }
 

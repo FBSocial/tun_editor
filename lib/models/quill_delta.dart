@@ -9,7 +9,7 @@ import 'dart:math' as math;
 
 import 'package:collection/collection.dart';
 import 'package:quiver/core.dart';
-import 'package:tun_editor/models/documents/nodes/embed.dart';
+import 'package:flutter_quill/flutter_quill.dart';
 
 const _attributeEquality = DeepCollectionEquality();
 const _valueEquality = DeepCollectionEquality();
@@ -121,14 +121,14 @@ class Operation {
       // Embeddable.
       if (value is Map) {
         final embed = Embeddable.fromJson(value);
-        if (embed.type == 'mention' && embed is MentionEmbed) {
+        if (embed is MentionEmbed) {
           json[key] = embed.value;
           Map<String, dynamic> attrMap = attributes != null
               ? Map.from(attributes!) : {};
           attrMap[embed.attributeKey] = embed.id;
           json[Operation.attributesKey] = attrMap;
         } else {
-          json[key] = Embeddable.fromJson(value).toJson();
+          json[key] = embed.toJson();
         }
       } else {
         // Check if data is mention embed.
@@ -163,7 +163,7 @@ class Operation {
   Map<String, dynamic> toFormalJson() {
     final json = {key: value};
     if (_attributes != null) json[Operation.attributesKey] = attributes;
-    if (key == Operation.insertKey && value is Map) {
+    if (key == Operation.insertKey) {
       // Embeddable.
       if (value is Map) {
         json[key] = Embeddable.fromJson(value).toFormalJson();

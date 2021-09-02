@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:tun_editor/models/documents/attribute.dart';
-import 'package:tun_editor/models/documents/document.dart';
-import 'package:tun_editor/models/documents/nodes/embed.dart';
-import 'package:tun_editor/models/quill_delta.dart';
+// import 'package:tun_editor/models/documents/attribute.dart';
+// import 'package:tun_editor/models/documents/document.dart';
+// import 'package:tun_editor/models/documents/nodes/embed.dart';
+// import 'package:tun_editor/models/quill_delta.dart';
 import 'package:tun_editor/tun_editor_api.dart';
+import 'package:flutter_quill/flutter_quill.dart';
 
 class TunEditorController {
 

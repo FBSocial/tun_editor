@@ -183,6 +183,14 @@ class Document {
     _history.handleDocChange(change);
   }
 
+  void refreshDocument(Delta change, Delta oldDelta, ChangeSource changeSource) {
+    _root.children.clear();
+    _delta = oldDelta.compose(change);
+    _loadDocument(_delta);
+    final onChange = Tuple3(oldDelta, change, changeSource);
+    _observer.add(onChange);
+  }
+
   Tuple2 undo() {
     return _history.undo(this);
   }

@@ -194,12 +194,13 @@
           }
 
           static formats(domNode) {
-            return ['width', 'height', 'align'].reduce((formats, attribute) => {
-              if (domNode.hasAttribute(attribute)) {
-                formats[attribute] = domNode.getAttribute(attribute);
-              }
-              return formats;
-            }, {});
+            // return ['width', 'height', 'align'].reduce((formats, attribute) => {
+            //   if (domNode.hasAttribute(attribute)) {
+            //     formats[attribute] = domNode.getAttribute(attribute);
+            //   }
+            //   return formats;
+            // }, {});
+            return {};
           }
 
           format(name, value) {
@@ -298,12 +299,13 @@
           }
 
           static formats(domNode) {
-            return ['width', 'height'].reduce((formats, attribute) => {
-              if (domNode.style.hasOwnProperty(attribute)) {
-                formats[attribute] = domNode.style[attribute].replace('px', '');
-              }
-              return formats;
-            }, {});
+            // return ['width', 'height'].reduce((formats, attribute) => {
+            //   if (domNode.style.hasOwnProperty(attribute)) {
+            //     formats[attribute] = domNode.style[attribute].replace('px', '');
+            //   }
+            //   return formats;
+            // }, {});
+            return {};
           }
 
           static align(node, position) {
@@ -422,7 +424,10 @@
             keyboard: {
               bindings: bindings
             },
-            mention: {},
+            mention: {
+              source: function(searchTerm, renderList, mentionChar) {
+              }
+            },
           }
         };
         var quill = new Quill('#editor', options);

@@ -127,14 +127,14 @@ class Operation {
       // Embeddable.
       if (value is Map) {
         final embed = Embeddable.fromJson(value);
-        if (embed.type == 'mention' && embed is MentionEmbed) {
+        if (embed is MentionEmbed) {
           json[key] = embed.value;
           Map<String, dynamic> attrMap = attributes != null
               ? Map.from(attributes!) : {};
           attrMap[embed.attributeKey] = embed.id;
           json[Operation.attributesKey] = attrMap;
         } else {
-          json[key] = Embeddable.fromJson(value).toJson();
+          json[key] = embed.toJson();
         }
       } else {
         // Check if data is mention embed.
@@ -169,7 +169,7 @@ class Operation {
   Map<String, dynamic> toFormalJson() {
     final json = {key: value};
     if (_attributes != null) json[Operation.attributesKey] = attributes;
-    if (key == Operation.insertKey && value is Map) {
+    if (key == Operation.insertKey) {
       // Embeddable.
       if (value is Map) {
         json[key] = Embeddable.fromJson(value).toFormalJson();
@@ -198,6 +198,24 @@ class Delta {
 
   /// Returns JSON-serializable version of this delta.
   List toFormalJson() => toList().map((operation) => operation.toFormalJson()).toList();
+
+}
+```
+
+## lib/models/documents/document.dart
+
+1. 修改 `Document` 追加 `refreshDocument` 方法。
+
+```dart
+class Document {
+
+  void refreshDocument(Delta change, Delta oldDelta, ChangeSource changeSource) {
+    _root.children.clear();
+    _delta = oldDelta.compose(change);
+    _loadDocument(_delta);
+    final onChange = Tuple3(oldDelta, change, changeSource);
+    _observer.add(onChange);
+  }
 
 }
 ```

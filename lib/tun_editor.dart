@@ -6,11 +6,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
-import 'package:tun_editor/models/documents/attribute.dart';
-import 'package:tun_editor/models/documents/document.dart';
-import 'package:tun_editor/models/quill_delta.dart';
+// import 'package:tun_editor/models/documents/attribute.dart';
+// import 'package:tun_editor/models/documents/document.dart';
+// import 'package:tun_editor/models/quill_delta.dart';
 import 'package:tun_editor/tun_editor_api.dart';
 import 'package:tun_editor/controller.dart';
+import 'package:flutter_quill/flutter_quill.dart';
 
 typedef MentionClickCallback = Function(String, String, String);
 typedef LinkClickCallback = Function(String);
@@ -226,27 +227,12 @@ class TunEditorState extends State<TunEditor> with TunEditorHandler {
     if (deltaMap['ops'] is List<dynamic> && oldDeltaMap['ops'] is List<dynamic>) {
       final deltaList = deltaMap['ops'] as List<dynamic>;
       final deltaObj = Delta.fromJson(deltaList);
+      final oldDeltaList = oldDeltaMap['ops'] as List<dynamic>;
+      final oldDeltaObj = Delta.fromJson(oldDeltaList);
 
-      // bool isCrashed = false;
       if (deltaObj.isNotEmpty) {
-        try {
-          // debugPrint('compose ${json.encode(deltaObj.toJson())} ${controller.document.toDelta().toJson()}');
-          controller.document.compose(deltaObj, ChangeSource.LOCAL);
-        } catch (e, s) {
-          debugPrint('compose failed, start restore $e, $s');
-          // isCrashed = true;
-        }
+        controller.document.refreshDocument(deltaObj, oldDeltaObj, ChangeSource.LOCAL);
       }
-
-      // if (isCrashed) {
-      //   final oldDeltaList = oldDeltaMap['ops'] as List<dynamic>;
-      //   final oldDeltaObj = Delta.fromJson(oldDeltaList);
-
-      //   final restoreDelta = oldDeltaObj.compose(deltaObj)..trim();
-      //   debugPrint('restore delta ${restoreDelta.toJson()}');
-      //   controller.document.delete(0, controller.document.length);
-      //   controller.document.compose(restoreDelta, ChangeSource.LOCAL);
-      // }
     }
   }
 
