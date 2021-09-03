@@ -135,7 +135,6 @@
 
         class ImageExtend extends BlockEmbed {
           static create(value) {
-
             const node = super.create(value);
             let url = this.sanitize(value.source);
             if (url.startsWith('file')) {
@@ -444,12 +443,18 @@
               let id = ev.target.attributes['data-id'].value;
               let prefixChar = ev.target.attributes['data-prefix-char'].value;
               let value = ev.target.attributes['data-value'].value;
-              bridge.onMentionClick(prefixChar, value);
+              let blot = Quill.find(ev.target);
+              let index = blot.offset(quill.scroll);
+              quill.setSelection(index + 1, 0, Quill.sources.API)
+              bridge.onMentionClick(id, prefixChar, value);
             } else if (ev.target.className === 'ql-mention-denotation-char') {
               let mentionNode = ev.target.parentElement.parentElement;
               let id = mentionNode.attributes['data-id'].value;
               let prefixChar = mentionNode.attributes['data-prefix-char'].value;
               let value = mentionNode.attributes['data-value'].value;
+              let blot = Quill.find(mentionNode);
+              let index = blot.offset(quill.scroll);
+              quill.setSelection(index + 1, 0, Quill.sources.API)
               bridge.onMentionClick(id, prefixChar, value);
             } else if (ev.target.attributes['contenteditable']
                   && ev.target.attributes['contenteditable'].value === 'false'
@@ -458,6 +463,9 @@
               let id = mentionNode.attributes['data-id'].value;
               let prefixChar = mentionNode.attributes['data-prefix-char'].value;
               let value = mentionNode.attributes['data-value'].value;
+              let blot = Quill.find(mentionNode);
+              let index = blot.offset(quill.scroll);
+              quill.setSelection(index + 1, 0, Quill.sources.API)
               bridge.onMentionClick(id, prefixChar, value);
             }
           }
