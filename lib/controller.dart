@@ -84,6 +84,7 @@ class TunEditorController {
     String prefixChar = '@',
     int replaceLength = 0,
     bool ignoreFocus = false,
+    bool appendSpace = false,
   }) {
     int insertIndex = selection.extentOffset;
     if (replaceLength > 0 && insertIndex - replaceLength >= 0) {
@@ -103,17 +104,15 @@ class TunEditorController {
             'value': text,
             'prefixChar': prefixChar,
           },
-        })
-        ..insert(' ');
+        });
+    if (appendSpace) {
+        mentionDelta.insert(' ');
+    }
     compose(mentionDelta, null, ChangeSource.LOCAL);
 
-    // final spaceDelta = new Delta()
-    //     ..retain(insertIndex + 1)
-    //     ..insert(' ');
-    // compose(spaceDelta, null, ChangeSource.LOCAL);
-
+    final newIndex = appendSpace ? insertIndex + 2 : insertIndex + 1;
     updateSelection(
-      TextSelection.collapsed(offset: insertIndex + 2),
+      TextSelection.collapsed(offset: newIndex),
       ChangeSource.LOCAL,
     );
 

@@ -489,6 +489,13 @@
         quill.root.addEventListener('focus', function() {
           bridge.onFocusChange(true);
         });
+        // quill.root.addEventListener('compositionstart', function() {
+        //   quill.root.classList.toggle('ql-blank', false);
+        // });
+        // quill.root.addEventListener('compositionend', function() {
+        //   console.log('composition end');
+        //   quill.root.classList.toggle('ql-blank', quill.editor.isBlank());
+        // });
 
         var markdownOptions = {
           ignoreTags: [ 'h4', 'h5', 'h6' ], // @option - if you need to ignore some tags.
