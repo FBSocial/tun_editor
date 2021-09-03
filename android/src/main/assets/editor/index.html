@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="normalize.css" type="text/css" charset="utf-8">
     <link rel="stylesheet" href="snow.css" type="text/css" charset="utf-8">
     <link rel="stylesheet" href="quill.custom.css" type="text/css" charset="utf-8">
-    <script src="quill2.min.js" charset="utf-8"></script>
+    <script src="quill.min.js" charset="utf-8"></script>
     <script src="quill.mention.min.js" charset="utf-8"></script>
     <script src="quill.markdown.min.js" charset="utf-8"></script>
   </head>
@@ -30,6 +30,9 @@
                oldDelta: oldDelta,
                source: source,
             });
+          } else {
+            console.log(JSON.stringify(delta));
+            console.log(JSON.stringify(oldDelta));
           }
         },
         onSelectionChange: function(index, length, format) {
@@ -110,8 +113,10 @@
       var videoStyle = {};
 
       document.addEventListener('DOMContentLoaded', () => {
+        let Parchment = Quill.import('parchment');
         let Delta = Quill.import('delta');
         let Keyboard = Quill.import('modules/keyboard');
+        let Block = Quill.import('blots/block');
         let BlockEmbed = Quill.import('blots/block/embed');
         let Container = Quill.import('blots/container');
         let Embed = Quill.import('blots/embed');
@@ -347,46 +352,132 @@
         VideoBlot.tagName = 'DIV';
         Quill.register(VideoBlot, true);
 
+        class CodeBlockLine extends Block {
+
+          static formats(domNode) {
+            return domNode.className === this.className ? undefined : super.formats(domNode);
+          }
+
+          format(name, value) {
+            if (name === CodeBlock.blotName && !value) {
+              this.replaceWith(Parchment.create(this.statics.scope));
+            } else {
+              // super.format();
+            }
+          }
+
+          remove() {
+            if (this.prev == null && this.next == null) {
+              this.parent.remove();
+            } else {
+              super.remove();
+            }
+          }
+
+          replaceWith(name, value) {
+            this.parent.isolate(this.offset(this.parent), this.length());
+            if (name === this.parent.statics.blotName) {
+              this.parent.replaceWith(name, value);
+              return this;
+            } else {
+              this.parent.unwrap();
+              return super.replaceWith(name, value);
+            }
+          }
+        }
+        CodeBlockLine.blotName = 'code-block-line';
+        CodeBlockLine.className = 'ql-code-block';
+        CodeBlockLine.tagName = 'DIV';
+        Quill.register(CodeBlockLine, true);
+
+        class CodeBlock extends Container {
+          static create(value) {
+            let tagName = value === 'ordered' ? 'OL' : 'UL';
+            let node = super.create(tagName);
+            node.setAttribute('spellcheck', false);
+            return node;
+          }
+
+          static formats(domNode) {
+            if (domNode.className === this.className) return true;
+            return undefined;
+          }
+
+          optimize(context) {
+            super.optimize(context);
+            let next = this.next;
+            if (next != null && next.prev === this &&
+                next.statics.blotName === this.statics.blotName &&
+                next.domNode.tagName === this.domNode.tagName &&
+                next.domNode.getAttribute('data-checked') === this.domNode.getAttribute('data-checked')) {
+              next.moveChildren(this);
+              next.remove();
+            }
+          }
+
+          replace(target) {
+            if (target.statics.blotName !== this.statics.blotName) {
+              let item = Parchment.create(this.statics.defaultChild);
+              target.moveChildren(item);
+              this.appendChild(item);
+            }
+            super.replace(target);
+          }
+
+          formats() {
+            return { [this.statics.blotName]: this.statics.formats(this.domNode) };
+          }
+
+        }
+        CodeBlock.blotName = 'code-block';
+        CodeBlock.scope = Parchment.Scope.BLOCK_BLOT;
+        CodeBlock.tagName = 'DIV';
+        CodeBlock.className = 'ql-code-block-container';
+        CodeBlock.defaultChild = 'code-block-line';
+        CodeBlock.allowedChildren = [CodeBlockLine];
+        Quill.register(CodeBlock, true);
+
         let bindings = {
-          'code exit': {
+          'code exit new': {
             key: 'Enter',
             collapsed: true,
             format: ['code-block'],
-            prefix: /^$/,
-            suffix: /^\s*$/,
+            offset: 0,
+            suffix: /^$/,
+            // suffix: /^\s*$/,
             handler: function(range, context) {
               const [line, offset] = this.quill.getLine(range.index);
-              let numLines = 1;
-              let cur = line;
-              while (
-                cur != null &&
-                cur.length() <= 1 &&
-                cur.formats()['code-block'] &&
-                (cur.next === null || !cur.next.formats()['code-block'])
-              ) {
-                cur = cur.prev;
-                numLines -= 1;
-                // Requisite prev lines are empty
-                if (numLines <= 0) {
-                  const delta = new Delta()
-                    .retain(range.index + line.length() - offset - 1)
-                    .retain(1, { 'code-block': null })
-                    .delete(1);
-                  this.quill.updateContents(delta, Quill.sources.USER);
-                  this.quill.setSelection(range.index, Quill.sources.SILENT);
-                  return false;
-                }
+              const isCodeBlock = line.domNode.className === 'ql-code-block';
+              if (!isCodeBlock) {
+                return true;
               }
-              return true;
+              const isNextCodeBlock = line.next !== null && line.next.domNode.className === 'ql-code-block'
+              if (isNextCodeBlock) {
+                return true;
+              }
+              this.quill.format('code-block', false, Quill.sources.USER);
             }
           },
           'code delete': {
             key: 'Backspace',
             collapsed: true,
             format: ['code-block'],
-            prefix: /^$/,
-            suffix: /^\s*$/,
-            handler: function(range) {
+            offset: 0,
+            suffix: /^$/,
+            handler: function(range, context) {
+              const [line, offset] = this.quill.getLine(range.index);
+              const isCodeBlock = line.domNode.className === 'ql-code-block';
+              if (!isCodeBlock) {
+                return true;
+              }
+              const isPrevCodeBlock = line.prev !== null && line.prev.domNode.className === 'ql-code-block'
+              if (isPrevCodeBlock) {
+                return true;
+              }
+              const isNextCodeBlock = line.next !== null && line.next.domNode.className === 'ql-code-block'
+              if (isNextCodeBlock) {
+                return true;
+              }
               this.quill.format('code-block', false, Quill.sources.USER);
             }
           },
@@ -507,13 +598,6 @@
         quill.root.addEventListener('focus', function() {
           bridge.onFocusChange(true);
         });
-        // quill.root.addEventListener('compositionstart', function() {
-        //   quill.root.classList.toggle('ql-blank', false);
-        // });
-        // quill.root.addEventListener('compositionend', function() {
-        //   console.log('composition end');
-        //   quill.root.classList.toggle('ql-blank', quill.editor.isBlank());
-        // });
 
         var markdownOptions = {
           ignoreTags: [ 'h4', 'h5', 'h6' ], // @option - if you need to ignore some tags.
