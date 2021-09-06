@@ -21,8 +21,8 @@ class TunEditor extends StatefulWidget {
 
   /// [placehodler] will show if document is empty.
   final String placeholder;
-  /// [placeHolderStyle] custom [placeholder] text style.
-  final TextStyle? placeHolderStyle;
+  /// [placeholderStyle] custom [placeholder] text style.
+  final TextStyle? placeholderStyle;
 
   final bool readOnly;
   final bool scrollable;
@@ -52,7 +52,7 @@ class TunEditor extends StatefulWidget {
     this.imageStyle = const {},
     this.videoStyle = const {},
     this.placeholder = '',
-    this.placeHolderStyle,
+    this.placeholderStyle,
     this.readOnly = false,
     this.scrollable = true,
     this.padding = const EdgeInsets.symmetric(
@@ -80,7 +80,7 @@ class TunEditorState extends State<TunEditor> with TunEditorHandler {
   Map<String, dynamic> get imageStyle => widget.imageStyle;
   Map<String, dynamic> get videoStyle => widget.videoStyle;
   String get placeholder => widget.placeholder;
-  TextStyle? get placeholderStyle => widget.placeHolderStyle;
+  TextStyle? get placeholderStyle => widget.placeholderStyle;
   Map<String, String> get placeholderStyleMap {
     if (placeholderStyle == null) {
       return {};

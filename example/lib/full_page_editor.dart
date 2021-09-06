@@ -146,6 +146,14 @@ class FullPageEditorState extends State<FullPageEditor> {
                             ),
 
                             placeholder: 'Hello World!',
+                            placeholderStyle: TextStyle(
+                              color: Colors.pink,
+                              fontStyle: FontStyle.italic,
+                              decoration: TextDecoration.combine([
+                                TextDecoration.underline,
+                                TextDecoration.lineThrough,
+                              ])
+                            ),
 
                             focusNode: _editorFocusNode,
                             autoFocus: false,
