@@ -53,6 +53,7 @@ class TunEditorView: NSObject, FlutterPlatformView {
         var fileBasePath: String = ""
         var imageStyle: [String: Any] = [:]
         var videoStyle: [String: Any] = [:]
+        var placeholderStyle: [String: Any] = [:]
         
         if let argsMap = args as? [String: Any] {
             if let optPlaceholder = argsMap["placeholder"] as? String {
@@ -82,6 +83,9 @@ class TunEditorView: NSObject, FlutterPlatformView {
             if let optVideoStyle = argsMap["videoStyle"] as? [String: Any] {
                 videoStyle = optVideoStyle
             }
+            if let optPlaceholderStyle = argsMap["placeholderStyle"] as? [String: Any] {
+                placeholderStyle = optPlaceholderStyle
+            }
         }
         _editor = QuillEditorView(
             frame: frame,
@@ -94,7 +98,8 @@ class TunEditorView: NSObject, FlutterPlatformView {
             delta: delta,
             fileBasePath: fileBasePath,
             imageStyle: imageStyle,
-            videoStyle: videoStyle
+            videoStyle: videoStyle,
+            placeholderStyle: placeholderStyle
         )
         methodChannel = FlutterMethodChannel(name: "tun/editor/\(viewId)", binaryMessenger: messenger)
         super.init()
@@ -264,6 +269,10 @@ class TunEditorView: NSObject, FlutterPlatformView {
         case "setVideoStyle":
             if let style = call.arguments as? [String: Any] {
                 _editor.setVideoStyle(style)
+            }
+        case "setPlaceholderStyle":
+            if let style = call.arguments as? [String: Any] {
+                _editor.setPlaceholderStyle(style)
             }
             
         default:

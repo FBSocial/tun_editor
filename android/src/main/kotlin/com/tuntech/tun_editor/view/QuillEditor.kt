@@ -37,7 +37,7 @@ class QuillEditor: WebView {
     constructor(
         context: Context, placeholder: String, padding: List<Int>, readOnly: Boolean,
         scrollable: Boolean, autoFocus: Boolean, delta: List<*>, fileBasePath: String,
-        imageStyle: Map<String, Any>, videoStyle: Map<String, Any>
+        imageStyle: Map<String, Any>, videoStyle: Map<String, Any>, placeholderStyle: Map<String, Any>
     ): this(context) {
         this.placeholder = placeholder
         this.readOnly = readOnly
@@ -48,6 +48,7 @@ class QuillEditor: WebView {
         this.fileBasePath = fileBasePath
         this.imageStyle = imageStyle
         this.videoStyle = videoStyle
+        this.placeholderStyle = placeholderStyle
     }
 
     private var placeholder: String = ""
@@ -59,6 +60,7 @@ class QuillEditor: WebView {
     private var fileBasePath: String = ""
     private var imageStyle: Map<String, Any> = mapOf()
     private var videoStyle: Map<String, Any> = mapOf()
+    private var placeholderStyle: Map<String, Any> = mapOf()
 
     private var onTextChangeListener: ((String, String) -> Unit)? = null
     private var onSelectionChangeListener: ((Int, Int, String) -> Unit)? = null
@@ -81,6 +83,7 @@ class QuillEditor: WebView {
                 setFileBasePath(fileBasePath)
                 setImageStyle(imageStyle)
                 setVideoStyle(videoStyle)
+                setPlaceholderStyle(placeholderStyle)
                 setContents(delta)
 
                 if (autoFocus) {
@@ -237,13 +240,13 @@ class QuillEditor: WebView {
         exec("javascript:setVideoStyle($styleObject)")
     }
 
-    fun toggleKeyboard(isShow: Boolean) {
-        val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        if (isShow) {
-            imm.showSoftInput(this, 0)
-        } else {
-            imm.hideSoftInputFromWindow(windowToken, 0)
+    fun setPlaceholderStyle(style: Map<String, Any>) {
+        placeholderStyle = style
+        val styleObject = JSONObject()
+        for ((k, v) in style) {
+            styleObject.put(k, v)
         }
+        exec("javascript:setPlaceholderStyle($styleObject)")
     }
 
     fun setOnTextChangeListener(onTextChangeListener: ((String, String) -> Unit)?) {
@@ -297,6 +300,15 @@ class QuillEditor: WebView {
             evaluateJavascript(command, null)
         } else {
             loadUrl(command)
+        }
+    }
+
+    private fun toggleKeyboard(isShow: Boolean) {
+        val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        if (isShow) {
+            imm.showSoftInput(this, 0)
+        } else {
+            imm.hideSoftInputFromWindow(windowToken, 0)
         }
     }
 

@@ -108,6 +108,7 @@
       var refreshVideoThumb;
       var setImageStyle;
       var setVideoStyle;
+      var setPlaceholderStyle;
 
       var imageStyle = {};
       var videoStyle = {};
@@ -518,6 +519,7 @@
         var options = {
           readOnly: false,
           theme: 'snow',
+          placeholder: 'Hello World',
           modules: {
             syntax: false,
             toolbar: false,
@@ -686,6 +688,22 @@
         }
         setVideoStyle = function(style) {
           videoStyle = style;
+        }
+        setPlaceholderStyle = function(style) {
+          let headChildren = document.head.children;
+          for (let ele of headChildren) {
+            if (ele.id === 'custom') {
+              document.head.removeChild(ele);
+              break;
+            }
+          }
+          let inlineStyle = document.createElement('style');
+          document.head.appendChild(inlineStyle);
+          inlineStyle.id = 'custom';
+          let sheet = inlineStyle.sheet;
+          for (k in style) {
+            sheet.addRule('.ql-editor.ql-blank::before', `${k}: ${style[k]}`);
+          }
         }
         window.addEventListener('resize', function() {
           quill.scrollIntoView();

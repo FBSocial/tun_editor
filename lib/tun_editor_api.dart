@@ -159,6 +159,32 @@ class TunEditorApi {
   void setVideoStyle(Map<String, dynamic> style) {
     _channel.invokeMethod('setVideoStyle', style);
   }
+  void setPlaceholderStyle(TextStyle style) {
+    final color = style.color ?? Color(0x99363940);
+    final colorHex = '#${color.red.toRadixString(16).padLeft(2, '0')}'
+        '${color.green.toRadixString(16).padLeft(2, '0')}'
+        '${color.blue.toRadixString(16).padLeft(2, '0')}'
+        '${color.alpha.toRadixString(16).padLeft(2, '0')}';
+
+    final decoration = style.decoration ?? TextDecoration.none;
+    final List<String> decorationList = [];
+    if (decoration.contains(TextDecoration.underline)) {
+      decorationList.add('underline');
+    }
+    if (decoration.contains(TextDecoration.lineThrough)) {
+      decorationList.add('line-through');
+    }
+
+    final fontWeight = style.fontWeight ?? FontWeight.normal;
+
+    final Map<String, String> args = {
+      'color': colorHex,
+      'text-decoration': decorationList.join(' '),
+      'font-weight': '${(fontWeight.index + 1) * 100}',
+      'font-style': style.fontStyle == FontStyle.italic ? 'italic' : 'normal',
+    };
+    _channel.invokeMethod('setPlaceholderStyle', args);
+  }
 
 }
 

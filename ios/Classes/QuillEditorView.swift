@@ -26,6 +26,7 @@ class QuillEditorView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler {
     var fileBasePath: String = ""
     var imageStyle: [String: Any] = [:]
     var videoStyle: [String: Any] = [:]
+    var placeholderStyle: [String: Any] = [:]
     
     var onSelectionChangeHandler: (([String: AnyObject]) -> Void)? = nil
     var onTextChangeHandler: (([String: AnyObject]) -> Void)? = nil
@@ -54,7 +55,8 @@ class QuillEditorView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler {
         delta: [Any],
         fileBasePath: String,
         imageStyle: [String: Any],
-        videoStyle: [String: Any]
+        videoStyle: [String: Any],
+        placeholderStyle: [String: Any]
     ) {
         self.placeholder = placeholder
         self.readOnly = readOnly
@@ -65,6 +67,7 @@ class QuillEditorView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler {
         self.fileBasePath = fileBasePath
         self.imageStyle = imageStyle
         self.videoStyle = videoStyle
+        self.placeholderStyle = placeholderStyle
         
         super.init(frame: frame, configuration: configuration)
         setup()
@@ -85,6 +88,7 @@ class QuillEditorView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler {
         setPadding(padding)
         setImageStyle(imageStyle)
         setVideoStyle(videoStyle)
+        setPlaceholderStyle(placeholderStyle)
         setContents(delta)
         setKeyboardRequiresUserInteraction(false)
 
@@ -255,6 +259,21 @@ class QuillEditorView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler {
             exec("setVideoStyle(\(styleJsonStr!))")
         } catch {
             print("serial image style failed: \(error)")
+        }
+    }
+    
+    func setPlaceholderStyle(_ style: [String: Any]) {
+        self.placeholderStyle = style
+        
+        do {
+            let styleJson = try JSONSerialization.data(withJSONObject: style, options: JSONSerialization.WritingOptions(rawValue: 0))
+            let styleJsonStr = String(data: styleJson, encoding: .utf8)
+            if styleJsonStr == nil {
+                return
+            }
+            exec("setPlaceholderStyle(\(styleJsonStr!))")
+        } catch {
+            print("serial placeholder style failed: \(error)")
         }
     }
     

@@ -134,6 +134,8 @@ class TunEditorController {
 
   void batchInsertEmbed({
     required List<Embeddable> embeds,
+    bool appendNewLineAfterImage = true,
+    bool appendNewLineAfterVideo = true,
     bool appendNewLine = false,
     bool ignoreFocus = false,
   }) {
@@ -152,6 +154,14 @@ class TunEditorController {
     for (final embed in embeds) {
       delta.insert(embed.toFormalJson());
       newOffset = newOffset + 1;
+      if (appendNewLineAfterImage && embed is ImageEmbed) {
+        delta.insert('\n');
+        newOffset = newOffset + 1;
+      }
+      if (appendNewLineAfterVideo && embed is VideoEmbed) {
+        delta.insert('\n');
+        newOffset = newOffset + 1;
+      }
     }
     if (appendNewLine) {
       delta.insert('\n');
