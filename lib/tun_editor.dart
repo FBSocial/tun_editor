@@ -18,7 +18,11 @@ typedef LinkClickCallback = Function(String);
 class TunEditor extends StatefulWidget {
 
   final TunEditorController controller;
+
+  /// [placehodler] will show if document is empty.
   final String placeholder;
+  /// [placeHolderStyle] custom [placeholder] text style.
+  final TextStyle? placeHolderStyle;
 
   final bool readOnly;
   final bool scrollable;
@@ -48,6 +52,7 @@ class TunEditor extends StatefulWidget {
     this.imageStyle = const {},
     this.videoStyle = const {},
     this.placeholder = '',
+    this.placeHolderStyle,
     this.readOnly = false,
     this.scrollable = true,
     this.padding = const EdgeInsets.symmetric(
@@ -75,6 +80,35 @@ class TunEditorState extends State<TunEditor> with TunEditorHandler {
   Map<String, dynamic> get imageStyle => widget.imageStyle;
   Map<String, dynamic> get videoStyle => widget.videoStyle;
   String get placeholder => widget.placeholder;
+  TextStyle? get placeholderStyle => widget.placeHolderStyle;
+  Map<String, String> get placeholderStyleMap {
+    if (placeholderStyle == null) {
+      return {};
+    }
+    final color = placeholderStyle!.color ?? Color(0x99363940);
+    final colorHex = '#${color.red.toRadixString(16).padLeft(2, '0')}'
+        '${color.green.toRadixString(16).padLeft(2, '0')}'
+        '${color.blue.toRadixString(16).padLeft(2, '0')}'
+        '${color.alpha.toRadixString(16).padLeft(2, '0')}';
+
+    final decoration = placeholderStyle!.decoration ?? TextDecoration.none;
+    final List<String> decorationList = [];
+    if (decoration.contains(TextDecoration.underline)) {
+      decorationList.add('underline');
+    }
+    if (decoration.contains(TextDecoration.lineThrough)) {
+      decorationList.add('line-through');
+    }
+
+    final fontWeight = placeholderStyle!.fontWeight ?? FontWeight.normal;
+
+    return {
+      'color': colorHex,
+      'text-decoration': decorationList.join(' '),
+      'font-weight': '${(fontWeight.index + 1) * 100}',
+      'font-style': placeholderStyle!.fontStyle == FontStyle.italic ? 'italic' : 'normal',
+    };
+  }
   bool get readOnly => widget.readOnly;
   bool get scrollable => widget.scrollable;
   EdgeInsets get padding => widget.padding;
@@ -142,6 +176,13 @@ class TunEditorState extends State<TunEditor> with TunEditorHandler {
         _tunEditorApi?.setVideoStyle(videoStyle);
         creationParams['videoStyle'] = videoStyle;
       }
+      if (creationParams.containsKey('placeholderStyle')
+          && !mapEquals(creationParams['placeholderStyle'], placeholderStyleMap)) {
+        if (placeholderStyle != null) {
+          _tunEditorApi?.setPlaceholderStyle(placeholderStyle!);
+          creationParams['placeholderStyle'] = placeholderStyleMap;
+        }
+      }
     } else {
       creationParams = {
         'fileBasePath': fileBasePath,
@@ -153,6 +194,7 @@ class TunEditorState extends State<TunEditor> with TunEditorHandler {
         'delta': controller.document.toDelta().toFormalJson(),
         'imageStyle': imageStyle,
         'videoStyle': videoStyle,
+        'placeholderStyle': placeholderStyleMap,
       };
     }
 

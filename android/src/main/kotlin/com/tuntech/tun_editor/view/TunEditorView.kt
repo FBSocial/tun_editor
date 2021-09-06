@@ -50,6 +50,7 @@ internal class TunEditorView(
         const val HANDLE_SET_FILE_BASE_PATH = "setFileBasePath"
         const val HANDLE_SET_IMAGE_STYLE = "setImageStyle"
         const val HANDLE_SET_VIDEO_STYLE = "setVideoStyle"
+        const val HANDLE_SET_PLACEHOLDER_STYLE = "setPlaceholderStyle"
     }
 
     // View.
@@ -81,6 +82,7 @@ internal class TunEditorView(
         var delta: List<*> = listOf<Map<String, Any>>()
         val imageStyle: HashMap<String, Any> = hashMapOf()
         val videoStyle: HashMap<String, Any> = hashMapOf()
+        val placeholderStyle: HashMap<String, Any> = hashMapOf()
         if (creationParams?.containsKey("placeholder") == true) {
             placeholder = (creationParams["placeholder"] as? String) ?: ""
         }
@@ -120,9 +122,17 @@ internal class TunEditorView(
                 }
             }
         }
+        if (creationParams?.containsKey("placeholderStyle") == true) {
+            val styleParam = (creationParams["placeholderStyle"] as? Map<*, *>) ?: mapOf<String, Any>()
+            for ((k, v) in styleParam) {
+                if (k is String && v != null) {
+                    placeholderStyle[k] = v
+                }
+            }
+        }
 
-        quillEditor = QuillEditor(context, placeholder, padding, readOnly,
-            scrollable, autoFocus, delta, fileBasePath, imageStyle, videoStyle)
+        quillEditor = QuillEditor(context, placeholder, padding, readOnly, scrollable, autoFocus,
+            delta, fileBasePath, imageStyle, videoStyle, placeholderStyle)
         quillEditor.setOnTextChangeListener { changeDelta, oldDelta ->
             val text = HashMap<String, String>()
             text["delta"] = changeDelta
@@ -296,6 +306,16 @@ internal class TunEditorView(
                     }
                 }
                 quillEditor.setVideoStyle(style)
+            }
+            HANDLE_SET_PLACEHOLDER_STYLE -> {
+                val args = call.arguments as? Map<*, *> ?: return
+                val style = HashMap<String, Any>()
+                for ((k, v) in args) {
+                    if (k is String && v != null) {
+                        style[k] = v
+                    }
+                }
+                quillEditor.setPlaceholderStyle(style)
             }
 
             else -> {

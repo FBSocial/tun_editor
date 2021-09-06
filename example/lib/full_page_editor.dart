@@ -144,7 +144,9 @@ class FullPageEditorState extends State<FullPageEditor> {
                               vertical: 12,
                               horizontal: 15,
                             ),
+
                             placeholder: 'Hello World!',
+
                             focusNode: _editorFocusNode,
                             autoFocus: false,
                             readOnly: _readOnly,
