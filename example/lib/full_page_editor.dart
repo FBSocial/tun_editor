@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_keyboard_size/flutter_keyboard_size.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
 import 'package:tun_editor/iconfont.dart';
@@ -29,6 +28,7 @@ class FullPageEditorState extends State<FullPageEditor> {
 
   bool _isLoading = true;
   late TunEditorController _controller;
+  late TunEditorController _dialogEditorController;
 
   late String _fileBasePath;
 
@@ -100,6 +100,16 @@ class FullPageEditorState extends State<FullPageEditor> {
               }
             },
           ),
+          actions: [
+            IconButton(
+              onPressed: () {
+                _showEditorDialog();
+              },
+              icon: Icon(
+                Icons.keyboard,
+              ),
+            ),
+          ],
         ),
         body: SafeArea(
           child: Container(
@@ -261,6 +271,7 @@ class FullPageEditorState extends State<FullPageEditor> {
   @override
   void dispose() {
     _controller.dispose();
+    _dialogEditorController.dispose();
   
     super.dispose();
   }
@@ -347,9 +358,9 @@ class FullPageEditorState extends State<FullPageEditor> {
   }
 
   Future<void> _loadDocument() async {
-    final result = await rootBundle.loadString('assets/sample_data.json');
-    final doc = Document.fromJson(jsonDecode(result));
-    // final doc = Document();
+    // final result = await rootBundle.loadString('assets/sample_data.json');
+    // final doc = Document.fromJson(jsonDecode(result));
+    final doc = Document();
 
     final list = doc.toDelta().toJson();
     for (final i in list) {
@@ -381,6 +392,11 @@ class FullPageEditorState extends State<FullPageEditor> {
         });
       }
     });
+
+    _dialogEditorController = TunEditorController(
+      document: Document(),
+      selection: TextSelection.collapsed(offset: 0),
+    );
 
     if (Platform.isIOS) {
       final appDocPath = await getApplicationDocumentsDirectory();
@@ -468,6 +484,48 @@ class FullPageEditorState extends State<FullPageEditor> {
     //   //   height: 200,
     //   // );
     // }
+  }
+
+  Future<void> _showEditorDialog() async {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: false,
+      enableDrag: false,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(20),
+          topRight: Radius.circular(20),
+        ),
+      ),
+      backgroundColor: Colors.white,
+      builder: (BuildContext context) {
+        return Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(20),
+              topRight: Radius.circular(20),
+            ),
+          ),
+          child: Column(
+            children: [
+              SizedBox(height: 8),
+              Text(
+                'Dialog Editor',
+                style: Theme.of(context).textTheme.headline6,
+              ),
+              SizedBox(height: 8),
+
+              Expanded(
+                child: TunEditor(
+                  controller: _dialogEditorController,
+                  fileBasePath: _fileBasePath,
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
 }
