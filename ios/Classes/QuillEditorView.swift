@@ -28,6 +28,8 @@ class QuillEditorView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler {
     var videoStyle: [String: Any] = [:]
     var placeholderStyle: [String: Any] = [:]
     
+    var viewId: Int = 0
+    
     var onSelectionChangeHandler: (([String: AnyObject]) -> Void)? = nil
     var onTextChangeHandler: (([String: AnyObject]) -> Void)? = nil
     var onMentionClickHandler: (([String: AnyObject]) -> Void)? = nil
@@ -35,6 +37,9 @@ class QuillEditorView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler {
     var onFocusChangeHandler: (([String: AnyObject]) -> Void)? = nil
         
     public override init(frame: CGRect, configuration: WKWebViewConfiguration) {
+        if #available(iOS 10.0, *) {
+            configuration.dataDetectorTypes = WKDataDetectorTypes()
+        }
         super.init(frame: frame, configuration: configuration)
         setup()
     }
@@ -69,6 +74,9 @@ class QuillEditorView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler {
         self.videoStyle = videoStyle
         self.placeholderStyle = placeholderStyle
         
+        if #available(iOS 10.0, *) {
+            configuration.dataDetectorTypes = WKDataDetectorTypes()
+        }
         super.init(frame: frame, configuration: configuration)
         setup()
     }
@@ -79,6 +87,37 @@ class QuillEditorView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler {
         onMentionClickHandler = nil
         onLinkClickHandler = nil
         onFocusChangeHandler = nil
+    }
+    
+    func configureEditor(
+        frame: CGRect,
+        placeholder: String,
+        readOnly: Bool,
+        scrollable: Bool,
+        padding: [Int],
+        autoFocus: Bool,
+        delta: [Any],
+        fileBasePath: String,
+        imageStyle: [String: Any],
+        videoStyle: [String: Any],
+        placeholderStyle: [String: Any]
+    ) {
+        self.frame = frame
+        setPlaceholder(placeholder)
+        setReadOnly(readOnly)
+        setScrollable(scrollable)
+        setPadding(padding)
+        setImageStyle(imageStyle)
+        setVideoStyle(videoStyle)
+        setPlaceholderStyle(placeholderStyle)
+        setContents(delta)
+        setKeyboardRequiresUserInteraction(false)
+
+        if (autoFocus) {
+            focus()
+        } else {
+            blur()
+        }
     }
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
@@ -346,10 +385,8 @@ class QuillEditorView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler {
         self.configuration.userContentController.add(self, name: "loadImage")
         self.configuration.userContentController.add(self, name: "loadVideoThumb")
 
-        if let filePath = Bundle.main.path(forResource: "index", ofType: "html") {
-            let url = URL(fileURLWithPath: filePath, isDirectory: false)
-            let request = URLRequest(url: url)
-            self.load(request)
+        if let url = Bundle.main.url(forResource: "index", withExtension: "html") {
+            self.loadFileURL(url, allowingReadAccessTo: url.deletingLastPathComponent())
         }
     }
     

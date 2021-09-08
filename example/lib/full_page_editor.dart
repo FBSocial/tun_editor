@@ -529,6 +529,7 @@ class FullPageEditorState extends State<FullPageEditor> {
                 child: TunEditor(
                   controller: _dialogEditorController,
                   fileBasePath: _fileBasePath,
+                  placeholder: 'placeholder on dialog editor'
                 ),
               ),
             ],
