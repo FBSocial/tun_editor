@@ -4,16 +4,10 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,user-scalable=no,minimum-scale=1.0,maximum-scale=1.0"/>
     <title>Tun Editor</title>
-    <link rel="stylesheet" href="normalize.css" type="text/css" charset="utf-8">
-    <link rel="stylesheet" href="snow.css" type="text/css" charset="utf-8">
-    <link rel="stylesheet" href="quill.custom.css" type="text/css" charset="utf-8">
+
     <script src="quill.min.js" charset="utf-8"></script>
     <script src="quill.mention.min.js" charset="utf-8"></script>
     <script src="quill.markdown.min.js" charset="utf-8"></script>
-  </head>
-  <body>
-    <div id="editor"></div>
-
     <script>
       let u = navigator.userAgent;
       let isAndroid = u.indexOf('Android') > -1 || u.indexOf('Adr') > -1;
@@ -519,7 +513,6 @@
         var options = {
           readOnly: false,
           theme: 'snow',
-          placeholder: '',
           modules: {
             syntax: false,
             toolbar: false,
@@ -734,5 +727,12 @@
         // }, false, true);
       })
     </script>
+
+    <link rel="stylesheet" href="normalize.css" type="text/css" charset="utf-8">
+    <link rel="stylesheet" href="snow.css" type="text/css" charset="utf-8">
+    <link rel="stylesheet" href="quill.custom.css" type="text/css" charset="utf-8">
+  </head>
+  <body>
+    <div id="editor"></div>
   </body>
 </html>

@@ -6,9 +6,13 @@ import WebKit
 class TunEditorViewFactory: NSObject, FlutterPlatformViewFactory {
 
     private var messenger: FlutterBinaryMessenger
+    private var nextEditor: QuillEditorView
 
     init(messenger: FlutterBinaryMessenger) {
         self.messenger = messenger
+        
+        let configuration = WKWebViewConfiguration()
+        self.nextEditor = QuillEditorView(frame: CGRect.zero, configuration: configuration)
         super.init()
     }
 
@@ -17,11 +21,17 @@ class TunEditorViewFactory: NSObject, FlutterPlatformViewFactory {
         viewIdentifier viewId: Int64,
         arguments args: Any?
     ) -> FlutterPlatformView {
-        return TunEditorView(
+        let tunEditrView = TunEditorView(
             frame: frame,
             viewIdentifier: viewId,
             arguments: args,
-            binaryMessenger: messenger)
+            binaryMessenger: messenger,
+            editorView: nextEditor
+        )
+        
+        let configuration = WKWebViewConfiguration()
+        self.nextEditor = QuillEditorView(frame: CGRect.zero, configuration: configuration)
+        return tunEditrView
     }
     
     func createArgsCodec() -> FlutterMessageCodec & NSObjectProtocol {
@@ -40,9 +50,10 @@ class TunEditorView: NSObject, FlutterPlatformView {
         frame: CGRect,
         viewIdentifier viewId: Int64,
         arguments args: Any?,
-        binaryMessenger messenger: FlutterBinaryMessenger
+        binaryMessenger messenger: FlutterBinaryMessenger,
+        editorView: QuillEditorView
     ) {
-        let configuration = WKWebViewConfiguration()
+        _editor = editorView
         
         var placeholder: String = ""
         var readOnly: Bool = false
@@ -87,9 +98,8 @@ class TunEditorView: NSObject, FlutterPlatformView {
                 placeholderStyle = optPlaceholderStyle
             }
         }
-        _editor = QuillEditorView(
+        _editor.configureEditor(
             frame: frame,
-            configuration: configuration,
             placeholder: placeholder,
             readOnly: readOnly,
             scrollable: scrollable,
