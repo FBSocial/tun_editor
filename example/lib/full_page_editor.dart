@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_keyboard_size/flutter_keyboard_size.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
 import 'package:tun_editor/iconfont.dart';
@@ -424,76 +425,76 @@ class FullPageEditorState extends State<FullPageEditor> {
   }
 
   Future<void> _pickImage() async {
-    _controller.batchInsertEmbed(
-      embeds: [
-        ImageEmbed(
-          name: "https://user-images.githubusercontent.com/122956/72955931-ccc07900-3d52-11ea-89b1-d468a6e2aa2b.png",
-          source: "https://user-images.githubusercontent.com/122956/72955931-ccc07900-3d52-11ea-89b1-d468a6e2aa2b.png",
-          checkPath: "https://user-images.githubusercontent.com/122956/72955931-ccc07900-3d52-11ea-89b1-d468a6e2aa2b.png",
-          width: 230,
-          height: 230,
-        ),
-        VideoEmbed(
-          source: 'https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_20mb.mp4',
-          duration: 100,
-          thumbUrl: 'https://user-images.githubusercontent.com/122956/72955931-ccc07900-3d52-11ea-89b1-d468a6e2aa2b.png',
-          thumbName: 'https://user-images.githubusercontent.com/122956/72955931-ccc07900-3d52-11ea-89b1-d468a6e2aa2b.png',
-          fileType: 'mp4',
-          width: 100,
-          height: 200,
-        ),
-        ImageEmbed(
-          name: "https://user-images.githubusercontent.com/122956/72955931-ccc07900-3d52-11ea-89b1-d468a6e2aa2b.png",
-          source: "https://user-images.githubusercontent.com/122956/72955931-ccc07900-3d52-11ea-89b1-d468a6e2aa2b.png",
-          checkPath: "https://user-images.githubusercontent.com/122956/72955931-ccc07900-3d52-11ea-89b1-d468a6e2aa2b.png",
-          width: 230,
-          height: 230,
-        ),
-        VideoEmbed(
-          source: 'https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_20mb.mp4',
-          duration: 100,
-          thumbUrl: 'https://user-images.githubusercontent.com/122956/72955931-ccc07900-3d52-11ea-89b1-d468a6e2aa2b.png',
-          thumbName: 'https://user-images.githubusercontent.com/122956/72955931-ccc07900-3d52-11ea-89b1-d468a6e2aa2b.png',
-          fileType: 'mp4',
-          width: 100,
-          height: 200,
-        ),
-        ImageEmbed(
-          name: "https://user-images.githubusercontent.com/122956/72955931-ccc07900-3d52-11ea-89b1-d468a6e2aa2b.png",
-          source: "https://user-images.githubusercontent.com/122956/72955931-ccc07900-3d52-11ea-89b1-d468a6e2aa2b.png",
-          checkPath: "https://user-images.githubusercontent.com/122956/72955931-ccc07900-3d52-11ea-89b1-d468a6e2aa2b.png",
-          width: 230,
-          height: 230,
-        ),
-        MentionEmbed(
-          denotationChar: '',
-          id: '1',
-          value: '#test',
-          prefixChar: '#',
-        ),
-      ]
-    );
-    // final picker = ImagePicker();
-    // final XFile? image = await picker.pickImage(source: ImageSource.gallery);
-    // if (image != null) {
-    //   _controller.insertImage(
-    //     // source: 'file://${image.name}',
-    //     name: image.name,
-    //     source: image.name,
-    //     checkPath: image.name,
-    //     width: 230,
-    //     height: 230,
-    //   );
-    //   // _controller.insertVideo(
-    //   //   source: 'https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_20mb.mp4',
-    //   //   duration: 100,
-    //   //   thumbUrl: 'file://${image.name}',
-    //   //   thumbName: image.name,
-    //   //   fileType: 'mp4',
-    //   //   width: 100,
-    //   //   height: 200,
-    //   // );
-    // }
+    // _controller.batchInsertEmbed(
+    //   embeds: [
+    //     ImageEmbed(
+    //       name: "https://user-images.githubusercontent.com/122956/72955931-ccc07900-3d52-11ea-89b1-d468a6e2aa2b.png",
+    //       source: "https://user-images.githubusercontent.com/122956/72955931-ccc07900-3d52-11ea-89b1-d468a6e2aa2b.png",
+    //       checkPath: "https://user-images.githubusercontent.com/122956/72955931-ccc07900-3d52-11ea-89b1-d468a6e2aa2b.png",
+    //       width: 230,
+    //       height: 230,
+    //     ),
+    //     VideoEmbed(
+    //       source: 'https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_20mb.mp4',
+    //       duration: 100,
+    //       thumbUrl: 'https://user-images.githubusercontent.com/122956/72955931-ccc07900-3d52-11ea-89b1-d468a6e2aa2b.png',
+    //       thumbName: 'https://user-images.githubusercontent.com/122956/72955931-ccc07900-3d52-11ea-89b1-d468a6e2aa2b.png',
+    //       fileType: 'mp4',
+    //       width: 100,
+    //       height: 200,
+    //     ),
+    //     ImageEmbed(
+    //       name: "https://user-images.githubusercontent.com/122956/72955931-ccc07900-3d52-11ea-89b1-d468a6e2aa2b.png",
+    //       source: "https://user-images.githubusercontent.com/122956/72955931-ccc07900-3d52-11ea-89b1-d468a6e2aa2b.png",
+    //       checkPath: "https://user-images.githubusercontent.com/122956/72955931-ccc07900-3d52-11ea-89b1-d468a6e2aa2b.png",
+    //       width: 230,
+    //       height: 230,
+    //     ),
+    //     VideoEmbed(
+    //       source: 'https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_20mb.mp4',
+    //       duration: 100,
+    //       thumbUrl: 'https://user-images.githubusercontent.com/122956/72955931-ccc07900-3d52-11ea-89b1-d468a6e2aa2b.png',
+    //       thumbName: 'https://user-images.githubusercontent.com/122956/72955931-ccc07900-3d52-11ea-89b1-d468a6e2aa2b.png',
+    //       fileType: 'mp4',
+    //       width: 100,
+    //       height: 200,
+    //     ),
+    //     ImageEmbed(
+    //       name: "https://user-images.githubusercontent.com/122956/72955931-ccc07900-3d52-11ea-89b1-d468a6e2aa2b.png",
+    //       source: "https://user-images.githubusercontent.com/122956/72955931-ccc07900-3d52-11ea-89b1-d468a6e2aa2b.png",
+    //       checkPath: "https://user-images.githubusercontent.com/122956/72955931-ccc07900-3d52-11ea-89b1-d468a6e2aa2b.png",
+    //       width: 230,
+    //       height: 230,
+    //     ),
+    //     MentionEmbed(
+    //       denotationChar: '',
+    //       id: '1',
+    //       value: '#test',
+    //       prefixChar: '#',
+    //     ),
+    //   ]
+    // );
+    final picker = ImagePicker();
+    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+    if (image != null) {
+      // _controller.insertImage(
+      //   // source: 'file://${image.name}',
+      //   name: image.name,
+      //   source: image.name,
+      //   checkPath: image.name,
+      //   width: 230,
+      //   height: 230,
+      // );
+      _controller.insertVideo(
+        source: 'https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_20mb.mp4',
+        duration: 100,
+        thumbUrl: 'file://${image.name}',
+        thumbName: image.name,
+        fileType: 'mp4',
+        width: 100,
+        height: 200,
+      );
+    }
   }
 
   Future<void> _showEditorDialog() async {
