@@ -103,6 +103,9 @@ class QuillEditorView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler {
         placeholderStyle: [String: Any]
     ) {
         self.frame = frame
+        self.autoFocus = autoFocus
+        self.fileBasePath = fileBasePath
+        
         setPlaceholder(placeholder)
         setReadOnly(readOnly)
         setScrollable(scrollable)
