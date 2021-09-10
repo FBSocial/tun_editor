@@ -127,9 +127,7 @@ class TunEditorState extends State<TunEditor> with TunEditorHandler {
   void initState() {
     super.initState();
   
-    if (autoFocus) {
-      focusNode?.requestFocus();
-    }
+    _isFocused = autoFocus;
   }
 
   @override
@@ -299,6 +297,17 @@ class TunEditorState extends State<TunEditor> with TunEditorHandler {
       focusNode?.requestFocus();
     } else {
       focusNode?.unfocus();
+    }
+  }
+
+  @override
+  void onPageLoaded() {
+    if (_isFocused) {
+      _tunEditorApi?.focus();
+      _tunEditorApi?.updateSelection(controller.selection);
+    } else {
+      _tunEditorApi?.updateSelection(controller.selection);
+      _tunEditorApi?.blur();
     }
   }
 

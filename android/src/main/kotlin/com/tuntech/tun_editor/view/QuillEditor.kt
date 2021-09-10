@@ -16,6 +16,7 @@ import android.webkit.WebViewClient
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
+import java.net.URLClassLoader
 import java.net.URLEncoder
 
 
@@ -67,6 +68,7 @@ class QuillEditor: WebView {
     private var onMentionClickListener: ((String, String, String) -> Unit)? = null
     private var onLinkClickListener: ((String) -> Unit)? = null
     private var onFocusChangeListener: ((Boolean) -> Unit)? = null
+    private var onPageLoadedListener: (() -> Unit)? = null
 
     init {
         isVerticalScrollBarEnabled = false
@@ -86,11 +88,12 @@ class QuillEditor: WebView {
                 setPlaceholderStyle(placeholderStyle)
                 setContents(delta)
 
-                if (autoFocus) {
-                    focus()
-                } else {
-                    blur()
-                }
+                // if (autoFocus) {
+                //     focus()
+                // } else {
+                //     blur()
+                // }
+                onPageLoadedListener?.invoke()
             }
         )
 
@@ -267,6 +270,10 @@ class QuillEditor: WebView {
 
     fun setOnQuillFocusChangeListener(onFocusChangeListener: ((Boolean) -> Unit)?) {
         this.onFocusChangeListener = onFocusChangeListener
+    }
+
+    fun setOnPageLoadedListener(onPageLoadedListener: (() -> Unit)?) {
+        this.onPageLoadedListener = onPageLoadedListener
     }
 
     private fun setContents(delta: List<*>) {
