@@ -61,6 +61,10 @@ class TunEditorApi {
         _handler.onFocusChange(hasFocus);
         break;
 
+      case 'onPageLoaded':
+        _handler.onPageLoaded();
+        break;
+
       default:
         print('missing method handler in tun editor');
         throw MissingPluginException(
@@ -195,4 +199,5 @@ mixin TunEditorHandler {
   void onMentionClick(String id, String prefixChar, String text);
   void onLinkClick(String url);
   void onFocusChange(bool hasFocus);
+  void onPageLoaded();
 }

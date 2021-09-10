@@ -157,7 +157,7 @@ class FullPageEditorState extends State<FullPageEditor> {
                             ),
 
                             focusNode: _editorFocusNode,
-                            autoFocus: false,
+                            autoFocus: true,
                             readOnly: _readOnly,
                             scrollable: true,
 
@@ -369,18 +369,18 @@ class FullPageEditorState extends State<FullPageEditor> {
   }
 
   Future<void> _loadDocument() async {
-    // final result = await rootBundle.loadString('assets/sample_data.json');
-    // final doc = Document.fromJson(jsonDecode(result));
-    final doc = Document();
+    final result = await rootBundle.loadString('assets/sample_data.json');
+    final doc = Document.fromJson(jsonDecode(result));
+    // final doc = Document();
 
     final list = doc.toDelta().toJson();
     for (final i in list) {
       debugPrint('delta item $i');
     }
 
-    _controller = TunEditorController(
+   _controller = TunEditorController(
         document: doc,
-        selection: TextSelection.collapsed(offset: 0),
+        selection: TextSelection.collapsed(offset: 2),
     );
     _controller.document.changes.listen((event) {
       // final delta1 = json.encode(event.item1.toJson());

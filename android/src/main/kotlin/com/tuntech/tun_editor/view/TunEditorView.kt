@@ -26,6 +26,7 @@ internal class TunEditorView(
         const val INVOKE_METHOD_ON_MENTION_CLICK = "onMentionClick"
         const val INVOKE_METHOD_ON_LINK_CLICK = "onLinkClick"
         const val INVOKE_METHOD_ON_FOCUS_CHANGE = "onFocusChange"
+        const val INVOKE_METHOD_ON_PAGE_LOADED = "onPageLoaded"
 
         // Content related.
         const val HANDLE_METHOD_REPLACE_TEXT = "replaceText"
@@ -69,6 +70,7 @@ internal class TunEditorView(
         quillEditor.setOnMentionClickListener(null)
         quillEditor.setOnLinkClickListener(null)
         quillEditor.setOnQuillFocusChangeListener(null)
+        quillEditor.setOnPageLoadedListener(null)
         methodChannel.setMethodCallHandler(null)
     }
 
@@ -152,6 +154,9 @@ internal class TunEditorView(
             args["prefixChar"] = prefixChar
             args["text"] = text
             methodChannel.invokeMethod(INVOKE_METHOD_ON_MENTION_CLICK, args)
+        }
+        quillEditor.setOnPageLoadedListener {
+            methodChannel.invokeMethod(INVOKE_METHOD_ON_PAGE_LOADED, null)
         }
         quillEditor.setOnLinkClickListener { url ->
             methodChannel.invokeMethod(INVOKE_METHOD_ON_LINK_CLICK, url)

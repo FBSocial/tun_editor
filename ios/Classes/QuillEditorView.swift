@@ -17,6 +17,8 @@ class QuillEditorView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler {
     
     weak var scriptDelegate: WKScriptMessageHandler?
     
+    var accessoryView: UIView?
+    
     var placeholder: String = ""
     var readOnly: Bool = false
     var scrollable: Bool = true
@@ -46,38 +48,6 @@ class QuillEditorView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler {
     
     required public init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
-        setup()
-    }
-    
-    public init(
-        frame: CGRect,
-        configuration: WKWebViewConfiguration,
-        placeholder: String,
-        readOnly: Bool,
-        scrollable: Bool,
-        padding: [Int],
-        autoFocus: Bool,
-        delta: [Any],
-        fileBasePath: String,
-        imageStyle: [String: Any],
-        videoStyle: [String: Any],
-        placeholderStyle: [String: Any]
-    ) {
-        self.placeholder = placeholder
-        self.readOnly = readOnly
-        self.scrollable = scrollable
-        self.padding = padding
-        self.autoFocus = autoFocus
-        self.delta = delta
-        self.fileBasePath = fileBasePath
-        self.imageStyle = imageStyle
-        self.videoStyle = videoStyle
-        self.placeholderStyle = placeholderStyle
-        
-        if #available(iOS 10.0, *) {
-            configuration.dataDetectorTypes = WKDataDetectorTypes()
-        }
-        super.init(frame: frame, configuration: configuration)
         setup()
     }
     
@@ -114,31 +84,22 @@ class QuillEditorView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler {
         setVideoStyle(videoStyle)
         setPlaceholderStyle(placeholderStyle)
         setContents(delta)
-        setKeyboardRequiresUserInteraction(false)
-
-        if (autoFocus) {
-            focus()
-        } else {
-            blur()
-        }
     }
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        setPlaceholder(placeholder)
-        setReadOnly(readOnly)
-        setScrollable(scrollable)
-        setPadding(padding)
-        setImageStyle(imageStyle)
-        setVideoStyle(videoStyle)
-        setPlaceholderStyle(placeholderStyle)
-        setContents(delta)
+//        setPlaceholder(placeholder)
+//        setReadOnly(readOnly)
+//        setScrollable(scrollable)
+//        setPadding(padding)
+//        setImageStyle(imageStyle)
+//        setVideoStyle(videoStyle)
+//        setPlaceholderStyle(placeholderStyle)
+//        setContents(delta)
         setKeyboardRequiresUserInteraction(false)
-
-        if (autoFocus) {
-            focus()
-        } else {
-            blur()
-        }
+    }
+    
+    override var inputAccessoryView: UIView? {
+        return accessoryView
     }
     
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {

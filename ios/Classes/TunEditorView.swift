@@ -135,6 +135,8 @@ class TunEditorView: NSObject, FlutterPlatformView {
             }
         }
         methodChannel.setMethodCallHandler(handle)
+        
+        methodChannel.invokeMethod("onPageLoaded", arguments: nil)
     }
 
     func view() -> UIView {
