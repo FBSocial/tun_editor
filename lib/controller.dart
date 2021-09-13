@@ -6,7 +6,6 @@ import 'package:tun_editor/models/quill_delta.dart';
 import 'package:tun_editor/tun_editor_api.dart';
 
 class TunEditorController {
-
   TunEditorApi? _tunEditorApi;
 
   // Document.
@@ -19,7 +18,7 @@ class TunEditorController {
   TunEditorController({
     required this.document,
     required TextSelection selection,
-  }): _selection = selection;
+  }) : _selection = selection;
 
   factory TunEditorController.basic() {
     return TunEditorController(
@@ -40,22 +39,29 @@ class TunEditorController {
   /// Insert [data] at the given [index].
   /// And delete some words with [len] size.
   /// It will update selection, if [textSelection] is not null.
-  void replaceText(int index, int len, Object? data, TextSelection? textSelection, {
+  void replaceText(
+    int index,
+    int len,
+    Object? data,
+    TextSelection? textSelection, {
     bool ignoreFocus = false,
     bool autoAppendNewlineAfterImage = true,
     List<Attribute> attributes = const [],
   }) {
     assert(data is String || data is Embeddable);
     _tunEditorApi?.replaceText(
-      index, len, data,
+      index,
+      len,
+      data,
       autoAppendNewlineAfterImage: autoAppendNewlineAfterImage,
       attributes: attributes,
     );
 
     if (textSelection == null) {
       updateSelection(
-          TextSelection.collapsed(offset: index + (data is String ? data.length : 1)),
-          ChangeSource.LOCAL,
+        TextSelection.collapsed(
+            offset: index + (data is String ? data.length : 1)),
+        ChangeSource.LOCAL,
       );
     } else {
       updateSelection(textSelection, ChangeSource.LOCAL);
@@ -68,10 +74,13 @@ class TunEditorController {
   void compose(Delta delta, TextSelection? textSelection, ChangeSource source) {
     _tunEditorApi?.updateContents(delta, source);
     if (textSelection == null) {
-      updateSelection(selection.copyWith(
-        baseOffset: delta.transformPosition(selection.baseOffset, force: false),
-        extentOffset: delta.transformPosition(selection.extentOffset, force: false)
-      ), source);
+      updateSelection(
+          selection.copyWith(
+              baseOffset:
+                  delta.transformPosition(selection.baseOffset, force: false),
+              extentOffset: delta.transformPosition(selection.extentOffset,
+                  force: false)),
+          source);
     } else {
       updateSelection(textSelection, source);
     }
@@ -79,7 +88,9 @@ class TunEditorController {
 
   /// Insert mention with [id], [text] and [prefixChar], [id] should be unqiue, [id] and [prefixChar] will be used on click event.
   /// If [replaceLength] is given, it will delete some words before insert.
-  void insertMention(String id, String text, {
+  void insertMention(
+    String id,
+    String text, {
     String prefixChar = '@',
     int replaceLength = 0,
     bool ignoreFocus = false,
@@ -90,22 +101,22 @@ class TunEditorController {
       insertIndex = insertIndex - replaceLength;
     }
     final deleteDelta = new Delta()
-        ..retain(insertIndex)
-        ..delete(replaceLength);
+      ..retain(insertIndex)
+      ..delete(replaceLength);
     compose(deleteDelta, null, ChangeSource.LOCAL);
 
     final mentionDelta = new Delta()
-        ..retain(insertIndex)
-        ..insert({
-          'mention': {
-            'denotationChar': '',
-            'id': id,
-            'value': text,
-            'prefixChar': prefixChar,
-          },
-        });
+      ..retain(insertIndex)
+      ..insert({
+        'mention': {
+          'denotationChar': '',
+          'id': id,
+          'value': text,
+          'prefixChar': prefixChar,
+        },
+      });
     if (appendSpace) {
-        mentionDelta.insert(' ');
+      mentionDelta.insert(' ');
     }
     compose(mentionDelta, null, ChangeSource.LOCAL);
 
@@ -122,7 +133,9 @@ class TunEditorController {
 
   /// Insert [data] at the given [index].
   /// This is a shortcut of [replaceText].
-  void insert(int index, Object? data, {
+  void insert(
+    int index,
+    Object? data, {
     bool ignoreFocus = false,
   }) {
     replaceText(index, 0, data, null, ignoreFocus: ignoreFocus);
@@ -148,8 +161,7 @@ class TunEditorController {
       }
     }
 
-    final delta = new Delta()
-      ..retain(insertOffset);
+    final delta = new Delta()..retain(insertOffset);
     for (final embed in embeds) {
       delta.insert(embed.toFormalJson());
       newOffset = newOffset + 1;
@@ -221,7 +233,7 @@ class TunEditorController {
     // Insert image.
     final delta = new Delta()
       ..retain(insertOffset)
-      ..insert({ 'image': imageBlot }, attrMap);
+      ..insert({'image': imageBlot}, attrMap);
     if (appendNewLine) {
       delta.insert('\n');
       newOffset = newOffset + 1;
@@ -284,7 +296,7 @@ class TunEditorController {
 
     final delta = new Delta()
       ..retain(insertOffset)
-      ..insert({ 'video': videoBlot }, attrMap);
+      ..insert({'video': videoBlot}, attrMap);
     compose(delta, null, ChangeSource.LOCAL);
     updateSelection(
       TextSelection.collapsed(offset: newOffset),
@@ -296,9 +308,7 @@ class TunEditorController {
   }
 
   /// Insert divider to current [selection].
-  void insertDivider({
-    bool ignoreFocus = false
-  }) {
+  void insertDivider({bool ignoreFocus = false}) {
     final newLineOffset = _insertNewLine();
     if (newLineOffset == null) {
       return;
@@ -306,12 +316,12 @@ class TunEditorController {
 
     // Insert divider.
     final dividerDelta = new Delta()
-        ..retain(newLineOffset)
-        ..insert({ 'divider': 'hr' });
+      ..retain(newLineOffset)
+      ..insert({'divider': 'hr'});
     compose(dividerDelta, null, ChangeSource.LOCAL);
 
-    updateSelection(TextSelection.collapsed(
-      offset: newLineOffset + 1), ChangeSource.LOCAL);
+    updateSelection(
+        TextSelection.collapsed(offset: newLineOffset + 1), ChangeSource.LOCAL);
 
     if (!ignoreFocus) {
       focus();
@@ -319,15 +329,14 @@ class TunEditorController {
   }
 
   /// Insert [text] with [link] format to current [selection].
-  void insertLink(String text, String url, {
-    bool ignoreFocus = false
-  }) {
+  void insertLink(String text, String url, {bool ignoreFocus = false}) {
     final delta = new Delta()
-        ..retain(selection.extentOffset)
-        ..insert(text, LinkAttribute(url).toJson());
+      ..retain(selection.extentOffset)
+      ..insert(text, LinkAttribute(url).toJson());
     compose(delta, null, ChangeSource.LOCAL);
-    updateSelection(TextSelection.collapsed(
-      offset: selection.extentOffset + text.length), ChangeSource.LOCAL);
+    updateSelection(
+        TextSelection.collapsed(offset: selection.extentOffset + text.length),
+        ChangeSource.LOCAL);
 
     if (!ignoreFocus) {
       focus();
@@ -343,7 +352,7 @@ class TunEditorController {
   }
 
   /// Format current [selection] with text style.
-  /// Text style will affects inline text. 
+  /// Text style will affects inline text.
   /// And all text style support integration.
   void setTextStyle(List<dynamic> textStyle) {
     _tunEditorApi?.setTextStyle(textStyle);
@@ -373,6 +382,7 @@ class TunEditorController {
   void focus() {
     _tunEditorApi?.focus();
   }
+
   /// Request unfocus to editor.
   void blur() {
     _tunEditorApi?.blur();
@@ -444,22 +454,33 @@ class TunEditorController {
 
     // Insert new line below current line.
     if (child.node!.style.attributes.containsKey(Attribute.header.key)) {
-      delta.insert('\n', child.node!.style.attributes[Attribute.header.key]!.toJson());
+      delta.insert(
+          '\n', child.node!.style.attributes[Attribute.header.key]!.toJson());
       delta.retain(1, Attribute.header.toJson());
     } else if (child.node!.style.attributes.containsKey(Attribute.list.key)) {
-      delta.insert('\n', child.node!.style.attributes[Attribute.list.key]!.toJson());
+      delta.insert(
+          '\n', child.node!.style.attributes[Attribute.list.key]!.toJson());
       delta.retain(1, Attribute.list.toJson());
-    } else if (child.node!.style.attributes.containsKey(Attribute.codeBlock.key)) {
-      delta.insert('\n', child.node!.style.attributes[Attribute.codeBlock.key]!.toJson());
-      delta.retain(1, Attribute(Attribute.codeBlock.key, AttributeScope.BLOCK, null).toJson());
-    } else if (child.node!.style.attributes.containsKey(Attribute.blockQuote.key)) {
-      delta.insert('\n', child.node!.style.attributes[Attribute.blockQuote.key]!.toJson());
-      delta.retain(1, Attribute(Attribute.blockQuote.key, AttributeScope.BLOCK, null).toJson());
+    } else if (child.node!.style.attributes
+        .containsKey(Attribute.codeBlock.key)) {
+      delta.insert('\n',
+          child.node!.style.attributes[Attribute.codeBlock.key]!.toJson());
+      delta.retain(
+          1,
+          Attribute(Attribute.codeBlock.key, AttributeScope.BLOCK, null)
+              .toJson());
+    } else if (child.node!.style.attributes
+        .containsKey(Attribute.blockQuote.key)) {
+      delta.insert('\n',
+          child.node!.style.attributes[Attribute.blockQuote.key]!.toJson());
+      delta.retain(
+          1,
+          Attribute(Attribute.blockQuote.key, AttributeScope.BLOCK, null)
+              .toJson());
     } else {
       delta.insert('\n');
     }
     compose(delta, null, ChangeSource.LOCAL);
     return lineEndOffset + 1;
   }
-
 }

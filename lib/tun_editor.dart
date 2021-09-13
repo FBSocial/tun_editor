@@ -16,11 +16,11 @@ typedef MentionClickCallback = Function(String, String, String);
 typedef LinkClickCallback = Function(String);
 
 class TunEditor extends StatefulWidget {
-
   final TunEditorController controller;
 
   /// [placehodler] will show if document is empty.
   final String placeholder;
+
   /// [placeholderStyle] custom [placeholder] text style.
   final TextStyle? placeholderStyle;
 
@@ -67,11 +67,9 @@ class TunEditor extends StatefulWidget {
 
   @override
   State<StatefulWidget> createState() => TunEditorState();
-
 }
 
 class TunEditorState extends State<TunEditor> with TunEditorHandler {
-
   static const String VIEW_TYPE_TUN_EDITOR = 'tun_editor';
 
   // Widget fields.
@@ -106,9 +104,11 @@ class TunEditorState extends State<TunEditor> with TunEditorHandler {
       'color': colorHex,
       'text-decoration': decorationList.join(' '),
       'font-weight': '${(fontWeight.index + 1) * 100}',
-      'font-style': placeholderStyle!.fontStyle == FontStyle.italic ? 'italic' : 'normal',
+      'font-style':
+          placeholderStyle!.fontStyle == FontStyle.italic ? 'italic' : 'normal',
     };
   }
+
   bool get readOnly => widget.readOnly;
   bool get scrollable => widget.scrollable;
   EdgeInsets get padding => widget.padding;
@@ -126,7 +126,7 @@ class TunEditorState extends State<TunEditor> with TunEditorHandler {
   @override
   void initState() {
     super.initState();
-  
+
     _isFocused = autoFocus;
   }
 
@@ -139,43 +139,43 @@ class TunEditorState extends State<TunEditor> with TunEditorHandler {
       padding.left.toInt(),
     ];
     if (_tunEditorApi != null) {
-      if (creationParams.containsKey('placeholder')
-          && creationParams['placeholder'] != placeholder) {
+      if (creationParams.containsKey('placeholder') &&
+          creationParams['placeholder'] != placeholder) {
         _tunEditorApi?.setPlaceholder(placeholder);
         creationParams['placeholder'] = placeholder;
       }
-      if (creationParams.containsKey('readOnly')
-          && creationParams['readOnly'] != readOnly) {
+      if (creationParams.containsKey('readOnly') &&
+          creationParams['readOnly'] != readOnly) {
         _tunEditorApi?.setReadOnly(readOnly);
         creationParams['readOnly'] = readOnly;
       }
-      if (creationParams.containsKey('scrollable')
-          && creationParams['scrollable'] != scrollable) {
+      if (creationParams.containsKey('scrollable') &&
+          creationParams['scrollable'] != scrollable) {
         _tunEditorApi?.setScrollable(scrollable);
         creationParams['scrollable'] = scrollable;
       }
-      if (creationParams.containsKey('padding')
-          && !listEquals(creationParams['padding'], paddingList)) {
+      if (creationParams.containsKey('padding') &&
+          !listEquals(creationParams['padding'], paddingList)) {
         _tunEditorApi?.setPadding(paddingList);
         creationParams['padding'] = paddingList;
       }
-      if (creationParams.containsKey('fileBasePath')
-          && creationParams['fileBasePath'] != fileBasePath) {
+      if (creationParams.containsKey('fileBasePath') &&
+          creationParams['fileBasePath'] != fileBasePath) {
         _tunEditorApi?.setFileBasePath(fileBasePath);
         creationParams['fileBasePath'] = fileBasePath;
       }
-      if (creationParams.containsKey('imageStyle')
-          && !mapEquals(creationParams['imageStyle'], imageStyle)) {
+      if (creationParams.containsKey('imageStyle') &&
+          !mapEquals(creationParams['imageStyle'], imageStyle)) {
         _tunEditorApi?.setImageStyle(imageStyle);
         creationParams['imageStyle'] = imageStyle;
       }
-      if (creationParams.containsKey('videoStyle')
-          && !mapEquals(creationParams['videoStyle'], videoStyle)) {
+      if (creationParams.containsKey('videoStyle') &&
+          !mapEquals(creationParams['videoStyle'], videoStyle)) {
         _tunEditorApi?.setVideoStyle(videoStyle);
         creationParams['videoStyle'] = videoStyle;
       }
-      if (creationParams.containsKey('placeholderStyle')
-          && !mapEquals(creationParams['placeholderStyle'], placeholderStyleMap)) {
+      if (creationParams.containsKey('placeholderStyle') &&
+          !mapEquals(creationParams['placeholderStyle'], placeholderStyleMap)) {
         if (placeholderStyle != null) {
           _tunEditorApi?.setPlaceholderStyle(placeholderStyle!);
           creationParams['placeholderStyle'] = placeholderStyleMap;
@@ -201,7 +201,8 @@ class TunEditorState extends State<TunEditor> with TunEditorHandler {
       // Android platform.
       child = PlatformViewLink(
         viewType: VIEW_TYPE_TUN_EDITOR,
-        surfaceFactory: (BuildContext context, PlatformViewController controller) {
+        surfaceFactory:
+            (BuildContext context, PlatformViewController controller) {
           return AndroidViewSurface(
             controller: controller as AndroidViewController,
             gestureRecognizers: {},
@@ -224,7 +225,6 @@ class TunEditorState extends State<TunEditor> with TunEditorHandler {
             ..create();
         },
       );
-
     } else if (Platform.isIOS) {
       // IOS platform.
       child = UiKitView(
@@ -253,24 +253,27 @@ class TunEditorState extends State<TunEditor> with TunEditorHandler {
     focusNode?.dispose();
     controller.setTunEditorApi(null);
     controller.dispose();
-  
+
     super.dispose();
   }
 
   @override
   Future<void> onTextChange(
-    String delta, String oldDelta,
+    String delta,
+    String oldDelta,
   ) async {
     final deltaMap = json.decode(delta) as Map;
     final oldDeltaMap = json.decode(oldDelta) as Map;
-    if (deltaMap['ops'] is List<dynamic> && oldDeltaMap['ops'] is List<dynamic>) {
+    if (deltaMap['ops'] is List<dynamic> &&
+        oldDeltaMap['ops'] is List<dynamic>) {
       final deltaList = deltaMap['ops'] as List<dynamic>;
       final deltaObj = Delta.fromJson(deltaList);
       final oldDeltaList = oldDeltaMap['ops'] as List<dynamic>;
       final oldDeltaObj = Delta.fromJson(oldDeltaList);
 
       if (deltaObj.isNotEmpty) {
-        controller.document.refreshDocument(deltaObj, oldDeltaObj, ChangeSource.LOCAL);
+        controller.document
+            .refreshDocument(deltaObj, oldDeltaObj, ChangeSource.LOCAL);
       }
     }
   }
@@ -322,5 +325,4 @@ class TunEditorState extends State<TunEditor> with TunEditorHandler {
       }
     }
   }
-
 }

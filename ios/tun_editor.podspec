@@ -29,5 +29,4 @@ A new flutter plugin project.
   s.static_framework = true
 
   # Dependencies
-  s.dependency 'RichEditorView'
 end

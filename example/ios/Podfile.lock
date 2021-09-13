@@ -4,20 +4,14 @@ PODS:
     - Flutter
   - path_provider (0.0.1):
     - Flutter
-  - RichEditorView (5.0.0)
   - tun_editor (0.0.1):
     - Flutter
-    - RichEditorView
 
 DEPENDENCIES:
   - Flutter (from `Flutter`)
   - image_picker (from `.symlinks/plugins/image_picker/ios`)
   - path_provider (from `.symlinks/plugins/path_provider/ios`)
   - tun_editor (from `.symlinks/plugins/tun_editor/ios`)
-
-SPEC REPOS:
-  trunk:
-    - RichEditorView
 
 EXTERNAL SOURCES:
   Flutter:
@@ -33,8 +27,7 @@ SPEC CHECKSUMS:
   Flutter: 50d75fe2f02b26cc09d224853bb45737f8b3214a
   image_picker: e06f7a68f000bd36f552c1847e33cda96ed31f1f
   path_provider: abfe2b5c733d04e238b0d8691db0cfd63a27a93c
-  RichEditorView: 1bbb07b87ca2d479ac29a6877014b38b8df233ef
-  tun_editor: a21324e4825cc6f4892792e682fb0b38435ade25
+  tun_editor: ea4f36fdbb5b290d3fda17da42db50673d5dfeea
 
 PODFILE CHECKSUM: aafe91acc616949ddb318b77800a7f51bffa2a4c
 
