@@ -316,6 +316,7 @@ class TunEditorState extends State<TunEditor> with TunEditorHandler {
 
   void _handleFocusChange(bool hasFocus) {
     debugPrint('handle focus change $hasFocus');
+    controller.syncFocus(hasFocus);
     if (hasFocus != _isFocused) {
       _isFocused = hasFocus;
       if (hasFocus) {

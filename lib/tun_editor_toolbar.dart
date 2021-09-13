@@ -65,7 +65,8 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
   void initState() {
     super.initState();
 
-    controller.addFormatListener(syncFormat);
+    controller.addFormatListener(_syncFormat);
+    controller.addFocusListener(_syncFocus);
   }
 
   @override
@@ -98,7 +99,8 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
 
   @override
   void dispose() {
-    controller.removeFormatListener(syncFormat);
+    controller.removeFormatListener(_syncFormat);
+    controller.removeFocusListener(_syncFocus);
   
     super.dispose();
   }
@@ -576,7 +578,7 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
   }
 
   // Sync toolbar' status with format.
-  void syncFormat(Map<String, dynamic> format) {
+  void _syncFormat(Map<String, dynamic> format) {
     // Check text type.
     if (format.containsKey(Attribute.header.key)) {
       if (format[Attribute.header.key] is int) {
@@ -642,6 +644,14 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
       ]);
     }
     setState(() {});
+  }
+
+  void _syncFocus(bool hasFocus) {
+    final bool isTypeOrStyle = showingSubToolbar == SubToolbar.textType
+        || showingSubToolbar == SubToolbar.textStyle;
+    if (!hasFocus && isTypeOrStyle) {
+      toggleSubToolbar(SubToolbar.none);
+    }
   }
 
   TextSelection? _getLinkNode(TextSelection cursorSelection) {

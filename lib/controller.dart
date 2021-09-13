@@ -30,9 +30,12 @@ class TunEditorController {
   List<ValueChanged<TextSelection>> _selectionListeners = [];
   List<ValueChanged<Map<String, dynamic>>> _formatListeners = [];
 
+  List<ValueChanged<bool>> _focusListeners = [];
+
   void dispose() {
     _selectionListeners.clear();
     _formatListeners.clear();
+    _focusListeners.clear();
     _tunEditorApi = null;
   }
 
@@ -422,6 +425,14 @@ class TunEditorController {
     _formatListeners.remove(listener);
   }
 
+  void addFocusListener(ValueChanged<bool> listener) {
+    _focusListeners.add(listener);
+  }
+
+  void removeFocusListener(ValueChanged<bool> listener) {
+    _focusListeners.remove(listener);
+  }
+
   void syncSelection(int index, int length, Map<String, dynamic> format) {
     _selection = TextSelection(baseOffset: index, extentOffset: index + length);
 
@@ -430,6 +441,12 @@ class TunEditorController {
     }
     for (final listener in _selectionListeners) {
       listener(_selection);
+    }
+  }
+
+  void syncFocus(bool hasFocus) {
+    for (final listener in _focusListeners) {
+      listener(hasFocus);
     }
   }
 
