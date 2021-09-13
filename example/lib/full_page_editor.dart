@@ -303,21 +303,22 @@ class FullPageEditorState extends State<FullPageEditor> {
         color: Colors.white,
       ),
       child: ListView.builder(
-          itemCount: 10,
-          itemBuilder: (BuildContext context, int index) {
-            return ListTile(
-              title: Text('People $index'),
-              onTap: () {
-                if (index % 2 == 0) {
-                  _controller.insertMention('$index', '@People $index',
-                      replaceLength: 1);
-                } else {
-                  _controller.insertMention('$index', '#Topic $index',
-                      prefixChar: '#');
-                }
-              },
-            );
-          }),
+        itemCount: 10,
+        itemBuilder: (BuildContext context, int index) {
+          return ListTile(
+            title: Text('People $index'),
+            onTap: () {
+              if (index % 2 == 0) {
+                _controller.insertMention('$index', '@People $index',
+                    replaceLength: 1);
+              } else {
+                _controller.insertMention('$index', '#Topic $index',
+                    prefixChar: '#');
+              }
+            },
+          );
+        },
+      ),
     );
   }
 
