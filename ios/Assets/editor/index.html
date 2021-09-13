@@ -600,6 +600,25 @@
         quill.root.addEventListener('focus', function() {
           bridge.onFocusChange(true);
         });
+        let lastScrollTop = 0;
+        let isSkipScrollEvent = false;
+        quill.root.addEventListener('scroll', function(event) {
+          if (isSkipScrollEvent) {
+            return;
+          }
+          if (lastScrollTop - event.target.scrollTop > 10 && quill.hasFocus()) {
+            quill.blur();
+            console.log('hide', lastScrollTop, event.target.scrollTop);
+          }
+          lastScrollTop = event.target.scrollTop;
+        });
+        window.addEventListener('resize', function() {
+          isSkipScrollEvent = true;
+          quill.scrollIntoView();
+          setTimeout(function() {
+            isSkipScrollEvent = false;
+          }, 300);
+        });
 
         var markdownOptions = {
           ignoreTags: [ 'h4', 'h5', 'h6' ], // @option - if you need to ignore some tags.
@@ -705,9 +724,6 @@
             sheet.addRule('.ql-editor.ql-blank::before', `${k}: ${style[k]}`);
           }
         }
-        window.addEventListener('resize', function() {
-          quill.scrollIntoView();
-        });
         // replaceText(0, 0, {
         //   image: {
         //     "name": "72955931-ccc07900-3d52-11ea-89b1-d468a6e2aa2b.png",
