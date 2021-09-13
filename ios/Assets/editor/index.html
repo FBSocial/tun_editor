@@ -260,8 +260,15 @@
             if (value.duration) {
               let minute = parseInt(value.duration / 60);
               let second = parseInt(value.duration % 60);
+              if (minute > 99) {
+                minute = 99;
+              }
+              if (second > 99) {
+                second = 99;
+              }
+              let timeFormat = `${minute.toString().padStart(2, '0')}:${second.toString().padStart(2, '0')}`
               durationSpan.innerHTML = `<svg t="1629367052116" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="9336" xmlns:xlink="http://www.w3.org/1999/xlink" width="15" height="15"><defs><style type="text/css">@font-face { font-family: element-icons; src: url("chrome-extension://moombeodfomdpjnpocobemoiaemednkg/fonts/element-icons.woff") format("woff"), url("chrome-extension://moombeodfomdpjnpocobemoiaemednkg/fonts/element-icons.ttf ") format("truetype"); }
-</style></defs><path d="M896 305.066667a72.533333 72.533333 0 0 0-78.933333 12.8l-91.733334 85.333333V341.333333a128 128 0 0 0-128-128H213.333333a128 128 0 0 0-128 128v341.333334a128 128 0 0 0 128 128h384a128 128 0 0 0 128-128v-61.866667l92.16 85.333333a74.24 74.24 0 0 0 49.493334 19.2 71.68 71.68 0 0 0 29.44-6.4 68.266667 68.266667 0 0 0 42.666666-63.146666V368.213333A68.266667 68.266667 0 0 0 896 305.066667z" fill="#FFFFFF" p-id="9337"></path></svg> ${minute}:${second}`;
+</style></defs><path d="M896 305.066667a72.533333 72.533333 0 0 0-78.933333 12.8l-91.733334 85.333333V341.333333a128 128 0 0 0-128-128H213.333333a128 128 0 0 0-128 128v341.333334a128 128 0 0 0 128 128h384a128 128 0 0 0 128-128v-61.866667l92.16 85.333333a74.24 74.24 0 0 0 49.493334 19.2 71.68 71.68 0 0 0 29.44-6.4 68.266667 68.266667 0 0 0 42.666666-63.146666V368.213333A68.266667 68.266667 0 0 0 896 305.066667z" fill="#FFFFFF" p-id="9337"></path></svg> ${timeFormat}`;
             } else {
               durationSpan.innerHTML = '00:00';
             }
@@ -593,6 +600,25 @@
         quill.root.addEventListener('focus', function() {
           bridge.onFocusChange(true);
         });
+        let lastScrollTop = 0;
+        let isSkipScrollEvent = false;
+        quill.root.addEventListener('scroll', function(event) {
+          if (isSkipScrollEvent) {
+            return;
+          }
+          if (lastScrollTop - event.target.scrollTop > 10 && quill.hasFocus()) {
+            quill.blur();
+            console.log('hide', lastScrollTop, event.target.scrollTop);
+          }
+          lastScrollTop = event.target.scrollTop;
+        });
+        window.addEventListener('resize', function() {
+          isSkipScrollEvent = true;
+          quill.scrollIntoView();
+          setTimeout(function() {
+            isSkipScrollEvent = false;
+          }, 300);
+        });
 
         var markdownOptions = {
           ignoreTags: [ 'h4', 'h5', 'h6' ], // @option - if you need to ignore some tags.
@@ -698,9 +724,6 @@
             sheet.addRule('.ql-editor.ql-blank::before', `${k}: ${style[k]}`);
           }
         }
-        window.addEventListener('resize', function() {
-          quill.scrollIntoView();
-        });
         // replaceText(0, 0, {
         //   image: {
         //     "name": "72955931-ccc07900-3d52-11ea-89b1-d468a6e2aa2b.png",

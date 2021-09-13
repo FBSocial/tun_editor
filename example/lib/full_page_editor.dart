@@ -7,26 +7,24 @@ import 'package:flutter_keyboard_size/flutter_keyboard_size.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
+import 'package:tun_editor/edit_text.dart';
 import 'package:tun_editor/iconfont.dart';
 import 'package:tun_editor/models/documents/document.dart';
-import 'package:tun_editor/models/documents/nodes/embed.dart';
+
 import 'package:tun_editor/tun_editor.dart';
 import 'package:tun_editor/tun_editor_toolbar.dart';
 import 'package:tun_editor/controller.dart';
 
 class FullPageEditor extends StatefulWidget {
-
   const FullPageEditor({
     Key? key,
   }) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => FullPageEditorState();
-
 }
 
 class FullPageEditorState extends State<FullPageEditor> {
-
   bool _isLoading = true;
   late TunEditorController _controller;
   late TunEditorController _dialogEditorController;
@@ -38,12 +36,14 @@ class FullPageEditorState extends State<FullPageEditor> {
   bool _readOnly = false;
 
   SubToolbar _showingSubToolbar = SubToolbar.none;
-  bool get isShowingAIE => _showingSubToolbar == SubToolbar.at
-    || _showingSubToolbar == SubToolbar.image
-    || _showingSubToolbar == SubToolbar.emoji;
-  bool get isNotShowingAIE => _showingSubToolbar != SubToolbar.at
-    && _showingSubToolbar != SubToolbar.image
-    && _showingSubToolbar != SubToolbar.emoji;
+  bool get isShowingAIE =>
+      _showingSubToolbar == SubToolbar.at ||
+      _showingSubToolbar == SubToolbar.image ||
+      _showingSubToolbar == SubToolbar.emoji;
+  bool get isNotShowingAIE =>
+      _showingSubToolbar != SubToolbar.at &&
+      _showingSubToolbar != SubToolbar.image &&
+      _showingSubToolbar != SubToolbar.emoji;
   List<ToolbarMenu> _disabledMenu = [];
 
   double _keyboardMaxHeight = 0;
@@ -71,8 +71,8 @@ class FullPageEditorState extends State<FullPageEditor> {
     _editorFocusNode.addListener(() {
       if (_editorFocusNode.hasFocus) {
         debugPrint('on focus change ${_editorFocusNode.hasFocus}');
-        if (_showingSubToolbar != SubToolbar.none
-            && _showingSubToolbar != SubToolbar.emoji) {
+        if (_showingSubToolbar != SubToolbar.none &&
+            _showingSubToolbar != SubToolbar.emoji) {
           setState(() {
             _showingSubToolbar = SubToolbar.none;
           });
@@ -118,161 +118,169 @@ class FullPageEditorState extends State<FullPageEditor> {
             height: double.infinity,
             alignment: Alignment.center,
             child: Consumer<ScreenHeight>(
-              builder: (BuildContext context, ScreenHeight keyboard, child) {
-                if (keyboard.keyboardHeight > _keyboardMaxHeight) {
-                  _keyboardMaxHeight = keyboard.keyboardHeight;
-                }
-                return Stack(
-                  children: [
-                    Column(
-                      children: [
-                        Expanded(
-                          child: TunEditor(
-                            controller: _controller,
-                            fileBasePath: _fileBasePath,
-                            imageStyle: {
-                              'width': 100,
-                              'height': 100,
-                              'align': 'left',
-                            },
-                            videoStyle: {
-                              'width': 100,
-                              'height': 100,
-                              'align': 'left',
-                            },
-
-                            padding: EdgeInsets.symmetric(
-                              vertical: 12,
-                              horizontal: 15,
-                            ),
-
-                            placeholder: 'Hello World!',
-                            placeholderStyle: TextStyle(
+                builder: (BuildContext context, ScreenHeight keyboard, child) {
+              if (keyboard.keyboardHeight > _keyboardMaxHeight) {
+                _keyboardMaxHeight = keyboard.keyboardHeight;
+              }
+              return Stack(
+                children: [
+                  Column(
+                    children: [
+                      TextField(
+                        decoration: InputDecoration(
+                          hintText: 'Flutter text field',
+                        ),
+                      ),
+                      SizedBox(
+                        height: 50,
+                        child: EditText(),
+                      ),
+                      Expanded(
+                        child: TunEditor(
+                          controller: _controller,
+                          fileBasePath: _fileBasePath,
+                          imageStyle: {
+                            'width': 100,
+                            'height': 100,
+                            'align': 'left',
+                          },
+                          videoStyle: {
+                            'width': 100,
+                            'height': 100,
+                            'align': 'left',
+                          },
+                          padding: EdgeInsets.symmetric(
+                            vertical: 12,
+                            horizontal: 15,
+                          ),
+                          placeholder: 'Hello World!',
+                          placeholderStyle: TextStyle(
                               color: Colors.pink,
                               fontStyle: FontStyle.italic,
                               decoration: TextDecoration.combine([
                                 TextDecoration.underline,
                                 TextDecoration.lineThrough,
-                              ])
-                            ),
-
-                            focusNode: _editorFocusNode,
-                            autoFocus: true,
-                            readOnly: _readOnly,
-                            scrollable: true,
-
-                            onMentionClick: (String id, String prefixChar, String text) {
-                              debugPrint('metion click $id, $prefixChar, $text');
-                            },
-                            onLinkClick: (String url) {
-                              debugPrint('link click $url');
-                            },
-                          ),
+                              ])),
+                          focusNode: _editorFocusNode,
+                          autoFocus: true,
+                          readOnly: _readOnly,
+                          scrollable: true,
+                          onMentionClick:
+                              (String id, String prefixChar, String text) {
+                            debugPrint('metion click $id, $prefixChar, $text');
+                          },
+                          onLinkClick: (String url) {
+                            debugPrint('link click $url');
+                          },
                         ),
-                        Expanded(
-                          child: SingleChildScrollView(
-                            child: Text(_previewText),
-                          ),
+                      ),
+                      SizedBox(
+                        height: 100,
+                        child: SingleChildScrollView(
+                          child: Text(_previewText),
                         ),
-                        SizedBox(height: 48),
-                        keyboard.isOpen || isShowingAIE
-                            ? SizedBox(
-                              height: isShowingAIE ? _keyboardMaxHeight : keyboard.keyboardHeight,
+                      ),
+                      SizedBox(height: 48),
+                      keyboard.isOpen || isShowingAIE
+                          ? SizedBox(
+                              height: isShowingAIE
+                                  ? _keyboardMaxHeight
+                                  : keyboard.keyboardHeight,
                             )
+                          : SizedBox.shrink(),
+                    ],
+                  ),
+                  Positioned(
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        TunEditorToolbar(
+                          controller: _controller,
+
+                          // Sub toolbar control.
+                          showingSubToolbar: _showingSubToolbar,
+                          onSubToolbarChange: (SubToolbar subToolbar) {
+                            // Hide keyboard on panel showing.
+                            if (subToolbar == SubToolbar.at ||
+                                subToolbar == SubToolbar.image ||
+                                subToolbar == SubToolbar.emoji) {
+                              _controller.blur();
+                              // _controller.toggleKeyboard(false);
+                            }
+                            setState(() {
+                              _showingSubToolbar = subToolbar;
+                              // _readOnly = _showingSubToolbar == SubToolbar.emoji;
+                            });
+                          },
+
+                          // menu: [
+                          //   ToolbarMenu.textType,
+                          //   ToolbarMenu.textTypeHeadline1,
+                          //   ToolbarMenu.textTypeHeadline2,
+                          //   ToolbarMenu.textTypeHeadline3,
+
+                          //   ToolbarMenu.textStyle,
+                          //   ToolbarMenu.textStyleBold,
+                          //   ToolbarMenu.textStyleItalic,
+
+                          //   ToolbarMenu.link,
+                          // ],
+
+                          disabledMenu: _disabledMenu,
+                          onDisabledMenuChange: (disabledMenu) {
+                            setState(() {
+                              _disabledMenu = disabledMenu;
+                            });
+                          },
+
+                          children: [
+                            Spacer(),
+
+                            // Send button.
+                            GestureDetector(
+                              onTap: () {},
+                              child: Container(
+                                width: 48,
+                                height: 36,
+                                decoration: BoxDecoration(
+                                  color: Color(0x268F959E),
+                                  borderRadius: BorderRadius.circular(18),
+                                ),
+                                child: Icon(
+                                  IconFont.send,
+                                  size: 24,
+                                  color: Color(0xA6363940),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        _showingSubToolbar == SubToolbar.at
+                            ? _buildAtPicker()
+                            : SizedBox.shrink(),
+                        _showingSubToolbar == SubToolbar.image
+                            ? _buildImagePicker()
+                            : SizedBox.shrink(),
+                        _showingSubToolbar == SubToolbar.emoji
+                            ? _buildbEmojiPicker()
+                            : SizedBox.shrink(),
+                        keyboard.isOpen &&
+                                _showingSubToolbar != SubToolbar.at &&
+                                _showingSubToolbar != SubToolbar.image &&
+                                _showingSubToolbar != SubToolbar.emoji
+                            ? SizedBox(
+                                height: keyboard.keyboardHeight,
+                              )
                             : SizedBox.shrink(),
                       ],
                     ),
-
-                    Positioned(
-                      left: 0,
-                      right: 0,
-                      bottom: 0,
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          TunEditorToolbar(
-                            controller: _controller,
-
-                            // Sub toolbar control.
-                            showingSubToolbar: _showingSubToolbar,
-                            onSubToolbarChange: (SubToolbar subToolbar) {
-                              // Hide keyboard on panel showing.
-                              if (subToolbar == SubToolbar.at || subToolbar == SubToolbar.image
-                                  || subToolbar == SubToolbar.emoji) {
-                                _controller.blur();
-                                // _controller.toggleKeyboard(false);
-                              }
-                              setState(() {
-                                _showingSubToolbar = subToolbar;
-                                // _readOnly = _showingSubToolbar == SubToolbar.emoji;
-                              });
-                            },
-
-                            // menu: [
-                            //   ToolbarMenu.textType,
-                            //   ToolbarMenu.textTypeHeadline1,
-                            //   ToolbarMenu.textTypeHeadline2,
-                            //   ToolbarMenu.textTypeHeadline3,
-
-                            //   ToolbarMenu.textStyle,
-                            //   ToolbarMenu.textStyleBold,
-                            //   ToolbarMenu.textStyleItalic,
-
-                            //   ToolbarMenu.link,
-                            // ],
-
-                            disabledMenu: _disabledMenu,
-                            onDisabledMenuChange: (disabledMenu) {
-                              setState(() {
-                                _disabledMenu = disabledMenu;
-                              });
-                            },
-
-                            children: [
-                              Spacer(),
-
-                              // Send button.
-                              GestureDetector(
-                                onTap: () {},
-                                child: Container(
-                                  width: 48,
-                                  height: 36,
-                                  decoration: BoxDecoration(
-                                    color: Color(0x268F959E),
-                                    borderRadius: BorderRadius.circular(18),
-                                  ),
-                                  child: Icon(
-                                    IconFont.send,
-                                    size: 24,
-                                    color: Color(0xA6363940),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-
-                          _showingSubToolbar == SubToolbar.at
-                              ? _buildAtPicker() : SizedBox.shrink(),
-                          _showingSubToolbar == SubToolbar.image
-                              ? _buildImagePicker() : SizedBox.shrink(),
-                          _showingSubToolbar == SubToolbar.emoji
-                              ? _buildbEmojiPicker() : SizedBox.shrink(),
-
-                          keyboard.isOpen && _showingSubToolbar != SubToolbar.at
-                              && _showingSubToolbar != SubToolbar.image
-                              && _showingSubToolbar != SubToolbar.emoji
-                              ? SizedBox(
-                                height: keyboard.keyboardHeight,
-                              )
-                              : SizedBox.shrink(),
-
-                        ],
-                      ),
-                    ),
-                  ],
-                );
-              }
-            ),
+                  ),
+                ],
+              );
+            }),
           ),
         ),
       ),
@@ -283,7 +291,7 @@ class FullPageEditorState extends State<FullPageEditor> {
   void dispose() {
     _controller.dispose();
     _dialogEditorController.dispose();
-  
+
     super.dispose();
   }
 
@@ -301,13 +309,15 @@ class FullPageEditorState extends State<FullPageEditor> {
             title: Text('People $index'),
             onTap: () {
               if (index % 2 == 0) {
-                _controller.insertMention('$index', '@People $index', replaceLength: 1);
+                _controller.insertMention('$index', '@People $index',
+                    replaceLength: 1);
               } else {
-                _controller.insertMention('$index', '#Topic $index', prefixChar: '#');
+                _controller.insertMention('$index', '#Topic $index',
+                    prefixChar: '#');
               }
             },
           );
-        }
+        },
       ),
     );
   }
@@ -378,9 +388,9 @@ class FullPageEditorState extends State<FullPageEditor> {
       debugPrint('delta item $i');
     }
 
-   _controller = TunEditorController(
-        document: doc,
-        selection: TextSelection.collapsed(offset: 2),
+    _controller = TunEditorController(
+      document: doc,
+      selection: TextSelection.collapsed(offset: 2),
     );
     _controller.document.changes.listen((event) {
       // final delta1 = json.encode(event.item1.toJson());
@@ -396,8 +406,10 @@ class FullPageEditorState extends State<FullPageEditor> {
       });
     });
     _controller.addSelectionListener((selection) {
-      debugPrint('selection changed ${selection.baseOffset} ${selection.extentOffset}');
-      if (_showingSubToolbar == SubToolbar.at || _showingSubToolbar == SubToolbar.image) {
+      debugPrint(
+          'selection changed ${selection.baseOffset} ${selection.extentOffset}');
+      if (_showingSubToolbar == SubToolbar.at ||
+          _showingSubToolbar == SubToolbar.image) {
         setState(() {
           _showingSubToolbar = SubToolbar.none;
         });
@@ -486,7 +498,8 @@ class FullPageEditorState extends State<FullPageEditor> {
       //   height: 230,
       // );
       _controller.insertVideo(
-        source: 'https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_20mb.mp4',
+        source:
+            'https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_20mb.mp4',
         duration: 100,
         thumbUrl: 'file://${image.name}',
         thumbName: image.name,
@@ -525,12 +538,11 @@ class FullPageEditorState extends State<FullPageEditor> {
                 style: Theme.of(context).textTheme.headline6,
               ),
               SizedBox(height: 8),
-
               Expanded(
                 child: TunEditor(
                   controller: _dialogEditorController,
                   fileBasePath: _fileBasePath,
-                  placeholder: 'placeholder on dialog editor'
+                  placeholder: 'placeholder on dialog editor',
                 ),
               ),
             ],
@@ -539,5 +551,4 @@ class FullPageEditorState extends State<FullPageEditor> {
       },
     );
   }
-
 }
