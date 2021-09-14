@@ -178,14 +178,18 @@ internal class TunEditorView(
                 val data = args["data"] ?: return
                 val attributes = args["attributes"] as? Map<*, *> ?: return
                 val newLineAfterImage = args["newLineAfterImage"] as? Boolean ?: return
-                quillEditor.replaceText(index, len, data, attributes, newLineAfterImage)
+                val ignoreFocus = args["ignoreFocus"] as? Boolean ?: return
+                val selection = args["selection"] as? Map<*, *> ?: return
+                quillEditor.replaceText(index, len, data, attributes, newLineAfterImage, ignoreFocus, selection)
                 result.success(null)
             }
             HANDLE_METHOD_UPDATE_CONTENTS -> {
                 val args = call.arguments as? Map<*, *> ?: return
                 val delta = args["delta"] as? List<*> ?: return
                 val source = args["source"] as? String ?: return
-                quillEditor.updateContents(delta, source)
+                val ignoreFocus = args["ignoreFocus"] as? Boolean ?: return
+                val selection = args["selection"] as? Map<*, *> ?: return
+                quillEditor.updateContents(delta, source, ignoreFocus, selection)
             }
             // Format related.
             HANDLE_METHOD_SET_TEXT_TYPE -> {
@@ -236,10 +240,11 @@ internal class TunEditorView(
                 val args = call.arguments as? Map<*, *> ?: return
                 val selStart = args["selStart"] as? Int ?: 0
                 val selEnd = args["selEnd"] as? Int ?: 0
+                val ignoreFocus = args["ignoreFocus"] as? Boolean ?: return
                 if (selEnd > selStart) {
-                    quillEditor.setSelection(selStart, selEnd - selStart)
+                    quillEditor.setSelection(selStart, selEnd - selStart, ignoreFocus)
                 } else {
-                    quillEditor.setSelection(selEnd, selStart - selEnd)
+                    quillEditor.setSelection(selEnd, selStart - selEnd, ignoreFocus)
                 }
                 result.success(null)
             }

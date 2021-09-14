@@ -138,12 +138,18 @@ class QuillEditor: WebView {
         loadUrl(URL)
     }
 
-    fun replaceText(index: Int, length: Int, data: Any,
-                    attributes: Map<*, *>, newLineAfterImage: Boolean) {
+    fun replaceText(index: Int, length: Int, data: Any, attributes: Map<*, *>,
+                    newLineAfterImage: Boolean, ignoreFocus: Boolean, selection: Map<*, *>) {
         val attrJsonObject = JSONObject()
         for ((k, v) in attributes) {
             if (k is String) {
                 attrJsonObject.put(k, v)
+            }
+        }
+        val selectionJsonObject = JSONObject()
+        for ((k, v) in selection) {
+            if (k is String) {
+                selectionJsonObject.put(k, v)
             }
         }
         if (data is Map<*, *>) {
@@ -153,14 +159,20 @@ class QuillEditor: WebView {
                     dataJsonObject.put(k, v)
                 }
             }
-            exec("javascript:replaceText($index, $length, $dataJsonObject, $attrJsonObject, $newLineAfterImage, true)")
+            exec("javascript:replaceText($index, $length, $dataJsonObject, $attrJsonObject, $newLineAfterImage, true, $ignoreFocus, $selectionJsonObject)")
         } else {
-            exec("javascript:replaceText($index, $length, \"$data\", $attrJsonObject, $newLineAfterImage, false)")
+            exec("javascript:replaceText($index, $length, \"$data\", $attrJsonObject, $newLineAfterImage, false, $ignoreFocus, $selectionJsonObject)")
         }
     }
 
-    fun updateContents(delta: List<*>, source: String) {
-        exec("javascript:updateContents(${JSONArray(delta)}, \"$source\")")
+    fun updateContents(delta: List<*>, source: String, ignoreFocus: Boolean, selection: Map<*, *>) {
+        val selectionJsonObject = JSONObject()
+        for ((k, v) in selection) {
+            if (k is String) {
+                selectionJsonObject.put(k, v)
+            }
+        }
+        exec("javascript:updateContents(${JSONArray(delta)}, \"$source\", $ignoreFocus, $selectionJsonObject)")
     }
 
     fun format(name: String, value: Any) {
@@ -179,8 +191,8 @@ class QuillEditor: WebView {
         }
     }
 
-    fun setSelection(index: Int, length: Int) {
-        exec("javascript:setSelection($index, $length)")
+    fun setSelection(index: Int, length: Int, ignoreFocus: Boolean) {
+        exec("javascript:setSelection($index, $length, $ignoreFocus)")
     }
 
     fun focus() {

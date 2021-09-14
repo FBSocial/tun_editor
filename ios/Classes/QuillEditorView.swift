@@ -145,34 +145,47 @@ class QuillEditorView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler {
         }
     }
     
-    func replaceText(index: Int, length: Int, data: Any, attributes: [String: Any], newLineAfterImage: Bool) {
+    func replaceText(index: Int, length: Int, data: Any, attributes: [String: Any], newLineAfterImage: Bool,
+                     ignoreFocus: Bool, selection: [String: Any]) {
         do {
             let attributesJson = try JSONSerialization.data(withJSONObject: attributes, options: JSONSerialization.WritingOptions(rawValue: 0))
             let attributesJsonStr = String(data: attributesJson, encoding: .utf8)
             if attributesJsonStr == nil {
                 return
             }
+
+            let selectionJson = try JSONSerialization.data(withJSONObject: selection, options: JSONSerialization.WritingOptions(rawValue: 0))
+            let selectionJsonStr = String(data: selectionJson, encoding: .utf8)
+            if selectionJsonStr == nil {
+                return
+            }
          
             if data is String {
-                exec("replaceText(\(index), \(length), \"\(data)\", \(attributesJsonStr!), \(newLineAfterImage), false)")
+                exec("replaceText(\(index), \(length), \"\(data)\", \(attributesJsonStr!), \(newLineAfterImage), false, \(ignoreFocus), \(selectionJsonStr!))")
             } else {
                 let dataJson = try JSONSerialization.data(withJSONObject: data, options: JSONSerialization.WritingOptions(rawValue: 0))
                 let dataJsonStr = String(data: dataJson, encoding: .utf8)
                 if dataJsonStr == nil {
                     return
                 }
-                exec("replaceText(\(index), \(length), \(dataJsonStr!), \(attributesJsonStr!), \(newLineAfterImage), true)")
+                exec("replaceText(\(index), \(length), \(dataJsonStr!), \(attributesJsonStr!), \(newLineAfterImage), true, \(ignoreFocus), \(selectionJsonStr!))")
             }
         } catch {
             print("replace text failed: \(error)")
         }
     }
     
-    func updateContents(delta: [Any], source: String) {
+    func updateContents(delta: [Any], source: String, ignoreFocus: Bool, selection: [String: Any]) {
         do {
+            let selectionJson = try JSONSerialization.data(withJSONObject: selection, options: JSONSerialization.WritingOptions(rawValue: 0))
+            let selectionJsonStr = String(data: selectionJson, encoding: .utf8)
+            if selectionJsonStr == nil {
+                return
+            }
+
             let deltaJson = try JSONSerialization.data(withJSONObject: delta, options: JSONSerialization.WritingOptions(rawValue: 0))
             if let deltaJsonStr = String(data: deltaJson, encoding: .utf8) {
-               exec("updateContents(\(deltaJsonStr), \"\(source)\")")
+               exec("updateContents(\(deltaJsonStr), \"\(source)\", \(ignoreFocus), \(selectionJsonStr!))")
             }
         } catch {
             print("update contents failed: \(error)")
@@ -195,8 +208,8 @@ class QuillEditorView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler {
         }
     }
     
-    func setSelection(index: Int, length: Int) {
-        exec("setSelection(\(index), \(length))")
+    func setSelection(index: Int, length: Int, ignoreFocus: Bool) {
+        exec("setSelection(\(index), \(length), \(ignoreFocus))")
     }
     
     func focus() {
