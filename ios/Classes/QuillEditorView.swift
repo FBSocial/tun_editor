@@ -340,6 +340,10 @@ class QuillEditorView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler {
     private func setup() {
         self.backgroundColor = .white
         self.navigationDelegate = self
+
+        self.scrollView.showsHorizontalScrollIndicator = false
+        self.scrollView.bounces = false
+        self.scrollView.clipsToBounds = false
         
         self.configuration.userContentController.add(self, name: "onTextChange")
         self.configuration.userContentController.add(self, name: "onSelectionChange")

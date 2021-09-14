@@ -309,10 +309,10 @@ class FullPageEditorState extends State<FullPageEditor> {
             title: Text('People $index'),
             onTap: () {
               if (index % 2 == 0) {
-                _controller.insertMention('$index', '@People $index',
-                    replaceLength: 1);
+                _controller.insertMention('$index', '@个GV不@~、😃😄',
+                    replaceLength: 1, appendSpace: true);
               } else {
-                _controller.insertMention('$index', '#Topic $index',
+                _controller.insertMention('$index', '#Topic $index #test~',
                     prefixChar: '#');
               }
             },

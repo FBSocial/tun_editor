@@ -575,6 +575,9 @@
         });
 
         quill.on('text-change', function(delta, oldDelta, source) {
+          const now = new Date();
+          lastTextChangeTime = now.getTime();
+
           if (source === Quill.sources.SILENT) {
             return;
           }
@@ -600,24 +603,24 @@
         quill.root.addEventListener('focus', function() {
           bridge.onFocusChange(true);
         });
+        let lastSizeChangeTime = 0;
+        let lastTextChangeTime = 0;
         let lastScrollTop = 0;
-        let isSkipScrollEvent = false;
         quill.root.addEventListener('scroll', function(event) {
-          if (isSkipScrollEvent) {
+          const now = new Date();
+          if (now.getTime() - lastSizeChangeTime < 500
+                || now.getTime() - lastTextChangeTime < 500) {
             return;
           }
           if (lastScrollTop - event.target.scrollTop > 10 && quill.hasFocus()) {
             quill.blur();
-            console.log('hide', lastScrollTop, event.target.scrollTop);
           }
           lastScrollTop = event.target.scrollTop;
         });
         window.addEventListener('resize', function() {
-          isSkipScrollEvent = true;
+          const now = new Date();
+          lastSizeChangeTime = now.getTime();
           quill.scrollIntoView();
-          setTimeout(function() {
-            isSkipScrollEvent = false;
-          }, 300);
         });
 
         var markdownOptions = {
