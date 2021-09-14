@@ -543,6 +543,7 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
       defaultUrl: defaultUrl,
       isUrlAutofocus: !selection.isCollapsed,
     );
+    FocusScope.of(context).requestFocus(FocusNode());
     if (res != null && res.length >= 2) {
       final text = res[0];
       final url = res[1];
@@ -574,7 +575,7 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
         );
       }
     }
-    Future.delayed(Duration(milliseconds: 200), () => controller.focus());
+    // Future.delayed(Duration(milliseconds: 200), () => controller.focus());
   }
 
   // Sync toolbar' status with format.
