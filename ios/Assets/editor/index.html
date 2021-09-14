@@ -107,6 +107,13 @@
       var imageStyle = {};
       var videoStyle = {};
 
+      const messages = [];
+      let isRunning = false;
+      let processMessage;
+      let sleep;
+      let pushMessage;
+      let startMessageHandler;
+
       document.addEventListener('DOMContentLoaded', () => {
         let Parchment = Quill.import('parchment');
         let Delta = Quill.import('delta');
@@ -628,7 +635,8 @@
         };
         new QuillMarkdown(quill, markdownOptions);
 
-        replaceText = function(index, length, data, attributes, newLineAfterImage, isEmbeddable) {
+        replaceText = function(index, length, data, attributes,
+            newLineAfterImage, isEmbeddable, ignoreFocus, selection) {
           if (isEmbeddable) {
             var delta = new Delta().retain(index).delete(length).insert(data, attributes)
             if (Object.keys(data).length > 0
@@ -636,17 +644,23 @@
                     && newLineAfterImage) {
               delta = delta.insert('\n');
             }
-            quill.updateContents(delta);
+            updateContents(delta, Quill.sources.API, ignoreFocus, selection);
           } else {
             let delta = new Delta().retain(index).delete(length).insert(data, attributes)
-            quill.updateContents(delta);
+            updateContents(delta, Quill.sources.API, ignoreFocus, selection);
           }
         }
         setContents = function(delta) {
           quill.setContents(delta, Quill.sources.SILENT);
         }
-        updateContents = function(delta, source) {
-          quill.updateContents(delta, source);
+        updateContents = function(delta, source, ignoreFocus, selection) {
+          pushMessage({
+            name: 'updateContents',
+            delta: delta,
+            source: source,
+            ignoreFocus: ignoreFocus,
+            selection: selection,
+          })
         }
         format = function(name, value) {
           quill.format(name, value, 'user');
@@ -654,8 +668,15 @@
         formatText = function(index, length, format, value) {
           quill.formatText(index, length, format, value, Quill.sources.USER);
         }
-        setSelection = function(index, length) {
-          quill.setSelection(index, length, Quill.sources.API)
+        setSelection = function(index, length, ignoreFocus) {
+          if (!quill.hasFocus() && ignoreFocus) {
+            let isEnable = quill.root.getAttribute('contenteditable') === 'true'
+            quill.disable();
+            quill.setSelection(index, length, Quill.sources.API)
+            quill.enable(isEnable);
+          } else {
+            quill.setSelection(index, length, Quill.sources.API)
+          }
         }
         focus = function() {
           quill.focus();
@@ -751,6 +772,57 @@
         //     "_inline": false
         //   }
         // }, false, true);
+
+        processMessage = function(message) {
+          return new Promise(function(resolve, reject) {
+            if (message.name === 'updateContents') {
+              if (!quill.hasFocus() && message.ignoreFocus) {
+                let isEnable = quill.root.getAttribute('contenteditable') === 'true'
+                quill.disable();
+                quill.updateContents(message.delta, message.source)
+                if (message.selection.index >= 0) {
+                  quill.setSelection(message.selection.index, message.selection.length);
+                }
+                setTimeout(function() {
+                  quill.enable(isEnable)
+                  resolve();
+                }, 300);
+              } else {
+                quill.updateContents(message.delta, message.source)
+                const range = quill.getSelection();
+                if (message.selection.index >= 0) {
+                  quill.setSelection(message.selection.index, message.selection.length);
+                }
+                resolve();
+              }
+            }
+          });
+        }
+        sleep = function(time) {
+          return new Promise(function(resolve, reject) {
+            console.log('sleep');
+            setTimeout(function() {
+              resolve();
+            }, time);
+          });
+        }
+        pushMessage = function(message) {
+          messages.push(message)
+          if (!isRunning) {
+            startMessageHandler();
+          }
+        }
+        startMessageHandler = async function() {
+          isRunning = true;
+          while (isRunning) {
+            if (messages.length > 0) {
+              const message = messages.shift();
+              await processMessage(message);
+            } else {
+              isRunning = false;
+            }
+          }
+        }
       })
     </script>
 

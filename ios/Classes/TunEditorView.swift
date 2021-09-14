@@ -154,19 +154,26 @@ class TunEditorView: NSObject, FlutterPlatformView {
                 let data = args["data"]
                 let attributes = args["attributes"] as? [String: Any]
                 let newLineAfterImage = args["newLineAfterImage"] as? Bool
-                if index == nil || length == nil || data == nil || newLineAfterImage == nil || attributes == nil {
+                let ignoreFocus = args["ignoreFocus"] as? Bool
+                let selection = args["selection"] as? [String: Any]
+                if index == nil || length == nil || data == nil || newLineAfterImage == nil || attributes == nil
+                    || ignoreFocus == nil || selection == nil{
                     return
                 }
-                _editor.replaceText(index: index!, length: length!, data: data!, attributes: attributes!, newLineAfterImage: newLineAfterImage!)
+                _editor.replaceText(index: index!, length: length!, data: data!,
+                    attributes: attributes!, newLineAfterImage: newLineAfterImage!,
+                    ignoreFocus: ignoreFocus!, selection: selection!)
             }
         case "updateContents":
             if let args = call.arguments as? [String: Any] {
                 let delta = args["delta"] as? [Any]
                 let source = args["source"] as? String
-                if delta == nil || source == nil {
+                let ignoreFocus = args["ignoreFocus"] as? Bool
+                let selection = args["selection"] as? [String: Any]
+                if delta == nil || source == nil || ignoreFocus == nil || selection == nil {
                     return
                 }
-                _editor.updateContents(delta: delta!, source: source!)
+                _editor.updateContents(delta: delta!, source: source!, ignoreFocus: ignoreFocus!, selection: selection!)
             }
 
         // Format related.
@@ -230,13 +237,14 @@ class TunEditorView: NSObject, FlutterPlatformView {
             if let args = call.arguments as? Dictionary<String, Any> {
                 let selStart = args["selStart"] as? Int
                 let selEnd = args["selEnd"] as? Int
-                if selStart == nil || selEnd == nil {
+                let ignoreFocus = args["ignoreFocus"] as? Bool
+                if selStart == nil || selEnd == nil || ignoreFocus == nil {
                     return
                 }
                 if selEnd! > selStart! {
-                    _editor.setSelection(index: selStart!, length: selEnd! - selStart!)
+                    _editor.setSelection(index: selStart!, length: selEnd! - selStart!, ignoreFocus: ignoreFocus!)
                 } else {
-                    _editor.setSelection(index: selEnd!, length: selStart! - selEnd!)
+                    _editor.setSelection(index: selEnd!, length: selStart! - selEnd!, ignoreFocus: ignoreFocus!)
                 }
             }
 
