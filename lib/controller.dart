@@ -52,41 +52,30 @@ class TunEditorController {
     List<Attribute> attributes = const [],
   }) {
     assert(data is String || data is Embeddable);
+
+    TextSelection newSelection;
+    if (textSelection == null) {
+      newSelection = TextSelection.collapsed(
+        offset: index + (data is String ? data.length : 1));
+    } else {
+      newSelection = textSelection;
+    }
+
     _tunEditorApi?.replaceText(
       index,
       len,
       data,
       autoAppendNewlineAfterImage: autoAppendNewlineAfterImage,
       attributes: attributes,
+      ignoreFocus: ignoreFocus,
+      selection: newSelection,
     );
-
-    if (textSelection == null) {
-      updateSelection(
-        TextSelection.collapsed(
-            offset: index + (data is String ? data.length : 1)),
-        ChangeSource.LOCAL,
-      );
-    } else {
-      updateSelection(textSelection, ChangeSource.LOCAL);
-    }
-    if (!ignoreFocus) {
-      focus();
-    }
   }
 
-  void compose(Delta delta, TextSelection? textSelection, ChangeSource source) {
-    _tunEditorApi?.updateContents(delta, source);
-    if (textSelection == null) {
-      updateSelection(
-          selection.copyWith(
-              baseOffset:
-                  delta.transformPosition(selection.baseOffset, force: false),
-              extentOffset: delta.transformPosition(selection.extentOffset,
-                  force: false)),
-          source);
-    } else {
-      updateSelection(textSelection, source);
-    }
+  void compose(Delta delta, TextSelection? textSelection, ChangeSource source, {
+    bool ignoreFocus = false
+  }) {
+    _tunEditorApi?.updateContents(delta, source, ignoreFocus: ignoreFocus, selection: textSelection);
   }
 
   /// Insert mention with [id], [text] and [prefixChar], [id] should be unqiue, [id] and [prefixChar] will be used on click event.
@@ -102,11 +91,15 @@ class TunEditorController {
     int insertIndex = selection.extentOffset;
     if (replaceLength > 0 && insertIndex - replaceLength >= 0) {
       insertIndex = insertIndex - replaceLength;
+
+      final deleteDelta = new Delta()
+        ..retain(insertIndex)
+        ..delete(replaceLength);
+      compose(deleteDelta, null, ChangeSource.LOCAL, ignoreFocus: ignoreFocus);
     }
-    final deleteDelta = new Delta()
-      ..retain(insertIndex)
-      ..delete(replaceLength);
-    compose(deleteDelta, null, ChangeSource.LOCAL);
+
+    final newIndex = appendSpace ? insertIndex + 2 : insertIndex + 1;
+    final newSelection = TextSelection.collapsed(offset: newIndex);
 
     final mentionDelta = new Delta()
       ..retain(insertIndex)
@@ -121,17 +114,7 @@ class TunEditorController {
     if (appendSpace) {
       mentionDelta.insert(' ');
     }
-    compose(mentionDelta, null, ChangeSource.LOCAL);
-
-    final newIndex = appendSpace ? insertIndex + 2 : insertIndex + 1;
-    updateSelection(
-      TextSelection.collapsed(offset: newIndex),
-      ChangeSource.LOCAL,
-    );
-
-    if (!ignoreFocus) {
-      focus();
-    }
+    compose(mentionDelta, newSelection, ChangeSource.LOCAL, ignoreFocus: ignoreFocus);
   }
 
   /// Insert [data] at the given [index].
@@ -142,9 +125,6 @@ class TunEditorController {
     bool ignoreFocus = false,
   }) {
     replaceText(index, 0, data, null, ignoreFocus: ignoreFocus);
-    if (!ignoreFocus) {
-      focus();
-    }
   }
 
   void batchInsertEmbed({
@@ -181,16 +161,8 @@ class TunEditorController {
       delta.insert('\n');
       newOffset = newOffset + 1;
     }
-    compose(delta, null, ChangeSource.LOCAL);
-
-    updateSelection(
-      TextSelection.collapsed(offset: newOffset),
-      ChangeSource.LOCAL,
-    );
-
-    if (!ignoreFocus) {
-      focus();
-    }
+    final newSelection = TextSelection.collapsed(offset: newOffset);
+    compose(delta, newSelection, ChangeSource.LOCAL, ignoreFocus: ignoreFocus);
   }
 
   /// Insert image with given [url] to current [selection].
@@ -241,16 +213,8 @@ class TunEditorController {
       delta.insert('\n');
       newOffset = newOffset + 1;
     }
-    compose(delta, null, ChangeSource.LOCAL);
-
-    updateSelection(
-      TextSelection.collapsed(offset: newOffset),
-      ChangeSource.LOCAL,
-    );
-
-    if (!ignoreFocus) {
-      focus();
-    }
+    final newSelection = TextSelection.collapsed(offset: newOffset);
+    compose(delta, newSelection, ChangeSource.LOCAL, ignoreFocus: ignoreFocus);
   }
 
   void insertVideo({
@@ -300,14 +264,8 @@ class TunEditorController {
     final delta = new Delta()
       ..retain(insertOffset)
       ..insert({'video': videoBlot}, attrMap);
-    compose(delta, null, ChangeSource.LOCAL);
-    updateSelection(
-      TextSelection.collapsed(offset: newOffset),
-      ChangeSource.LOCAL,
-    );
-    if (!ignoreFocus) {
-      focus();
-    }
+    final newSelection = TextSelection.collapsed(offset: newOffset);
+    compose(delta, newSelection, ChangeSource.LOCAL, ignoreFocus: ignoreFocus);
   }
 
   /// Insert divider to current [selection].
@@ -321,29 +279,17 @@ class TunEditorController {
     final dividerDelta = new Delta()
       ..retain(newLineOffset)
       ..insert({'divider': 'hr'});
-    compose(dividerDelta, null, ChangeSource.LOCAL);
-
-    updateSelection(
-        TextSelection.collapsed(offset: newLineOffset + 1), ChangeSource.LOCAL);
-
-    if (!ignoreFocus) {
-      focus();
-    }
+    final newSelection =TextSelection.collapsed(offset: newLineOffset + 1); 
+    compose(dividerDelta, newSelection, ChangeSource.LOCAL, ignoreFocus: ignoreFocus);
   }
 
   /// Insert [text] with [link] format to current [selection].
   void insertLink(String text, String url, {bool ignoreFocus = false}) {
+    final newSelection = TextSelection.collapsed(offset: selection.extentOffset + text.length);
     final delta = new Delta()
       ..retain(selection.extentOffset)
       ..insert(text, LinkAttribute(url).toJson());
-    compose(delta, null, ChangeSource.LOCAL);
-    updateSelection(
-        TextSelection.collapsed(offset: selection.extentOffset + text.length),
-        ChangeSource.LOCAL);
-
-    if (!ignoreFocus) {
-      focus();
-    }
+    compose(delta, newSelection, ChangeSource.LOCAL, ignoreFocus: ignoreFocus);
   }
 
   /// Format current [selection] with text type.
@@ -373,12 +319,14 @@ class TunEditorController {
 
   /// Update [_selection] with given new [textSelection].
   /// Nothing will happen if invalid [textSelection] is provided.
-  void updateSelection(TextSelection textSelection, ChangeSource source) {
+  void updateSelection(TextSelection textSelection, ChangeSource source, {
+    bool ignoreFocus = false,
+  }) {
     if (textSelection.baseOffset < 0 || textSelection.extentOffset < 0) {
       return;
     }
     _selection = textSelection;
-    _tunEditorApi?.updateSelection(textSelection);
+    _tunEditorApi?.updateSelection(textSelection, ignoreFocus: ignoreFocus);
   }
 
   /// Request focus to editor.

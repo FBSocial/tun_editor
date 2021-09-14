@@ -76,6 +76,8 @@ class TunEditorApi {
   void replaceText(int index, int len, Object? data, {
     List<Attribute> attributes = const [],
     bool autoAppendNewlineAfterImage = true,
+    bool ignoreFocus = false,
+    TextSelection? selection,
   }) {
     final Map<String, dynamic> attrMap = {};
     for (final attr in attributes) {
@@ -87,12 +89,29 @@ class TunEditorApi {
       'data': data is Embeddable ? data.toFormalJson() : data,
       'attributes': attrMap,
       'newLineAfterImage': autoAppendNewlineAfterImage,
+      'ignoreFocus': ignoreFocus,
+      'selection': {
+        'index': selection?.baseOffset ?? -1,
+        'length': selection == null
+            ? -1
+            : selection.extentOffset - selection.baseOffset,
+      },
     });
   }
-  void updateContents(Delta delta, ChangeSource source) {
+  void updateContents(Delta delta, ChangeSource source, {
+    bool ignoreFocus = false,
+    TextSelection? selection,
+  }) {
     _channel.invokeMethod('updateContents', {
       'delta': delta.toFormalJson(),
       'source': source == ChangeSource.LOCAL ? 'user' : 'api',
+      'ignoreFocus': ignoreFocus,
+      'selection': {
+        'index': selection?.baseOffset ?? -1,
+        'length': selection == null
+            ? -1
+            : selection.extentOffset - selection.baseOffset,
+      },
     });
   }
 
@@ -119,10 +138,13 @@ class TunEditorApi {
   }
 
   // Selection related.
-  void updateSelection(TextSelection selection) {
+  void updateSelection(TextSelection selection, {
+    bool ignoreFocus = false,
+  }) {
     _channel.invokeMethod('updateSelection', {
       'selStart': selection.baseOffset,
       'selEnd': selection.extentOffset,
+      'ignoreFocus': ignoreFocus,
     });
   }
 
