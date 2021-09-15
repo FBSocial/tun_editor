@@ -69,15 +69,7 @@ class FullPageEditorState extends State<FullPageEditor> {
 
     _loadDocument();
     _editorFocusNode.addListener(() {
-      if (_editorFocusNode.hasFocus) {
-        debugPrint('on focus change ${_editorFocusNode.hasFocus}');
-        if (_showingSubToolbar != SubToolbar.none &&
-            _showingSubToolbar != SubToolbar.emoji) {
-          setState(() {
-            _showingSubToolbar = SubToolbar.none;
-          });
-        }
-      }
+      debugPrint('on focus change ${_editorFocusNode.hasFocus}');
     });
   }
 

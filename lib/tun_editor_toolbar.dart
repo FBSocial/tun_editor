@@ -649,10 +649,16 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
   }
 
   void _syncFocus(bool hasFocus) {
-    final bool isTypeOrStyle = showingSubToolbar == SubToolbar.textType
-        || showingSubToolbar == SubToolbar.textStyle;
-    if (!hasFocus && isTypeOrStyle) {
-      toggleSubToolbar(SubToolbar.none);
+    if (hasFocus) {
+      if (showingSubToolbar != SubToolbar.none) {
+        toggleSubToolbar(SubToolbar.none);
+      }
+    } else {
+      final bool isTypeOrStyle = showingSubToolbar == SubToolbar.textType
+          || showingSubToolbar == SubToolbar.textStyle;
+      if (isTypeOrStyle) {
+        toggleSubToolbar(SubToolbar.none);
+      }
     }
   }
 
