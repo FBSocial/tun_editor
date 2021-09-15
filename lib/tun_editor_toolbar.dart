@@ -537,13 +537,13 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
       defaultText = controller.document.toPlainText().substring(textStartIndex, textEndIndex);
     }
 
+    controller.focus();
     final res = await LinkFomratDialog.show(
       context,
       defaultText: defaultText.replaceAll('\n', ' '),
       defaultUrl: defaultUrl,
       isUrlAutofocus: !selection.isCollapsed,
     );
-    FocusScope.of(context).requestFocus(FocusNode());
     if (res != null && res.length >= 2) {
       final text = res[0];
       final url = res[1];

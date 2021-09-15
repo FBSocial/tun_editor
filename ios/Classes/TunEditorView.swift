@@ -171,7 +171,6 @@ class TunEditorView: NSObject, FlutterPlatformView {
                 let ignoreFocus = args["ignoreFocus"] as? Bool
                 let selection = args["selection"] as? [String: Any]
                 if delta == nil || source == nil || ignoreFocus == nil || selection == nil {
-                    print("update contents with invalid args")
                     return
                 }
                 _editor.updateContents(delta: delta!, source: source!, ignoreFocus: ignoreFocus!, selection: selection!)
