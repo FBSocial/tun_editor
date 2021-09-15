@@ -355,7 +355,63 @@ class Delta {
   List<Operation> toList() => List.from(_operations);
 
   /// Returns JSON-serializable version of this delta.
-  List toJson() => toList().map((operation) => operation.toJson()).toList();
+  /// List toJson() => toList().map((operation) => operation.toJson()).toList();
+  List toJson() {
+    final operationList = toList();
+    final List<Map<String, dynamic>> jsonList = [];
+    for (final operation in operationList) {
+      if (operation.key == Operation.insertKey) {
+        if (operation.value is Map) {
+          // Embeddable
+          final embedType = Embeddable.fromJson(operation.value).type;
+          final isBlockEmbed = embedType == 'image' || embedType == 'video' || embedType == 'divider';
+          final index = operationList.indexOf(operation);
+          final next = index < length - 1 ? operationList[index + 1] : null;
+          if (isBlockEmbed && next != null && next.value is Map) {
+            final nextEmbedType = Embeddable.fromJson(next.value).type;
+            final isNextBlockEmbed = nextEmbedType == 'image' || nextEmbedType == 'video' || nextEmbedType == 'divider';
+            if (isNextBlockEmbed) {
+              jsonList.add(operation.toJson());
+              jsonList.add({Operation.insertKey: '\n'});
+              continue;
+            }
+          }
+
+        } else {
+          // Text
+          final index = operationList.indexOf(operation);
+          final prev = index > 0 ? operationList[index - 1] : null;
+          // final next = index < length - 1 ? operationList[index + 1] : null;
+
+          // If prev is image.
+          if (prev != null && prev.value is Map) {
+            final embedType = Embeddable.fromJson(prev.value).type;
+            final isBlockEmbed = embedType == 'image' || embedType == 'video' || embedType == 'divider';
+            if (isBlockEmbed) {
+              final operationJson = operation.toJson();
+              operationJson[Operation.insertKey] = '\n${operation.value}';
+              jsonList.add(operationJson);
+              continue;
+            }
+          }
+          // // If next is image.
+          // if (next != null && next.value is Map) {
+          //   final embedType = Embeddable.fromJson(next.value).type;
+          //   final isBlockEmbed = embedType == 'image' || embedType == 'video' || embedType == 'divider';
+          //   if (isBlockEmbed) {
+          //     final operationJson = operation.toJson();
+          //     operationJson[Operation.insertKey] = '${operation.value}\n';
+          //     jsonList.add(operationJson);
+          //     print('next is block embed, $operationJson');
+          //     continue;
+          //   }
+          // }
+        }
+      }
+      jsonList.add(operation.toJson());
+    }
+    return jsonList;
+  }
 
   /// Returns JSON-serializable version of this delta.
   List toFormalJson() => toList().map((operation) => operation.toFormalJson()).toList();

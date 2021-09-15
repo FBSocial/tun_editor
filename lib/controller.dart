@@ -129,8 +129,8 @@ class TunEditorController {
 
   void batchInsertEmbed({
     required List<Embeddable> embeds,
-    bool appendNewLineAfterImage = true,
-    bool appendNewLineAfterVideo = true,
+    bool appendNewLineAfterImage = false,
+    bool appendNewLineAfterVideo = false,
     bool appendNewLine = false,
     bool ignoreFocus = false,
   }) {
@@ -198,10 +198,10 @@ class TunEditorController {
     int insertOffset = selection.extentOffset;
     int newOffset = selection.extentOffset + 1;
     if (!_isEmptyLine()) {
-      final newLineOffset = _insertNewLine(ignoreFocus: ignoreFocus);
-      if (newLineOffset != null) {
-        insertOffset = newLineOffset;
-        newOffset = newLineOffset + 1;
+      final lineEndOffset = _getLineEndOffset();
+      if (lineEndOffset != null) {
+        insertOffset = lineEndOffset;
+        newOffset = lineEndOffset + 1;
       }
     }
 
@@ -404,6 +404,14 @@ class TunEditorController {
       return true;
     }
     return child.node!.length == 1 && child.node!.toPlainText() == '\n';
+  }
+
+  int? _getLineEndOffset() {
+    final child = document.queryChild(selection.extentOffset);
+    if (child.node == null) {
+      return null;
+    }
+    return child.node!.documentOffset + child.node!.length - 1;
   }
 
   // Insert new line and return new line's offset.
