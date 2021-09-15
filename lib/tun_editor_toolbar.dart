@@ -91,6 +91,7 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
           buildSubToolbar(),
           showingSubToolbar == SubToolbar.textType
             || showingSubToolbar == SubToolbar.textStyle ? SizedBox(height: 4) : SizedBox.shrink(),
+          Divider(),
           buildMainToolbar(),
         ],
       ),

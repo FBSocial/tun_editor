@@ -19,6 +19,11 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       title: "Tun editor example",
       home: FullPageEditor(),
+      theme: ThemeData(
+        dividerTheme: DividerThemeData(
+          space: 0,
+        ),
+      ),
     );
   }
 }
