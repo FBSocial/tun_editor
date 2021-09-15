@@ -17,6 +17,26 @@ class QuillEditorView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler {
     
     weak var scriptDelegate: WKScriptMessageHandler?
     
+    override var frame: CGRect {
+        didSet {
+            print("set content inset to zero")
+            self.scrollView.contentInset = .zero
+            if #available(iOS 11.0, *) {
+                if self.scrollView.adjustedContentInset != .zero {
+                    print("set content inset to zero with adjust")
+
+                    let insetToAdjust = self.scrollView.adjustedContentInset
+                    self.scrollView.contentInset = UIEdgeInsets(
+                        top: -insetToAdjust.top,
+                        left: -insetToAdjust.left,
+                        bottom: -insetToAdjust.bottom,
+                        right: -insetToAdjust.right
+                    )
+                }
+            }
+        }
+    }
+    
     var accessoryView: UIView?
     
     var placeholder: String = ""
@@ -39,9 +59,6 @@ class QuillEditorView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler {
     var onFocusChangeHandler: (([String: AnyObject]) -> Void)? = nil
         
     public override init(frame: CGRect, configuration: WKWebViewConfiguration) {
-        if #available(iOS 10.0, *) {
-            configuration.dataDetectorTypes = WKDataDetectorTypes()
-        }
         super.init(frame: frame, configuration: configuration)
         setup()
     }
@@ -353,11 +370,21 @@ class QuillEditorView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler {
     private func setup() {
         self.backgroundColor = .white
         self.navigationDelegate = self
+        self.autoresizingMask = [.flexibleWidth, .flexibleHeight]
 
         self.scrollView.showsHorizontalScrollIndicator = false
         self.scrollView.bounces = false
         self.scrollView.clipsToBounds = false
+        if #available(iOS 11.0, *) {
+            self.scrollView.contentInsetAdjustmentBehavior = .never
+            if #available(iOS 13.0, *) {
+                self.scrollView.automaticallyAdjustsScrollIndicatorInsets = false
+            }
+        }
         
+        if #available(iOS 10.0, *) {
+            configuration.dataDetectorTypes = WKDataDetectorTypes()
+        }
         self.configuration.userContentController.add(self, name: "onTextChange")
         self.configuration.userContentController.add(self, name: "onSelectionChange")
         self.configuration.userContentController.add(self, name: "onMentionClick")
