@@ -83,7 +83,7 @@ class TunEditorState extends State<TunEditor> with TunEditorHandler {
     if (placeholderStyle == null) {
       return {};
     }
-    final color = placeholderStyle!.color ?? Color(0x99363940);
+    final color = placeholderStyle!.color ?? Color(0xA58F959E);
     final colorHex = '#${color.red.toRadixString(16).padLeft(2, '0')}'
         '${color.green.toRadixString(16).padLeft(2, '0')}'
         '${color.blue.toRadixString(16).padLeft(2, '0')}'
