@@ -104,7 +104,7 @@ class TunEditorApi {
   }) {
     _channel.invokeMethod('updateContents', {
       'delta': delta.toFormalJson(),
-      'source': source == ChangeSource.LOCAL ? 'user' : 'api',
+      'source': 'api',
       'ignoreFocus': ignoreFocus,
       'selection': {
         'index': selection?.baseOffset ?? -1,

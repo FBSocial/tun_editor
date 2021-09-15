@@ -461,7 +461,7 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
   }
 
   void onDividerClick() {
-    controller.insertDivider();
+    controller.insertDivider(ignoreFocus: true);
   }
 
   void toggleTextType(String textType) {

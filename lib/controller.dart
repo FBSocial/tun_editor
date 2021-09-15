@@ -137,7 +137,7 @@ class TunEditorController {
     int insertOffset = selection.extentOffset;
     int newOffset = selection.extentOffset + 1;
     if (!_isEmptyLine()) {
-      final newLineOffset = _insertNewLine();
+      final newLineOffset = _insertNewLine(ignoreFocus: ignoreFocus);
       if (newLineOffset != null) {
         insertOffset = newLineOffset;
         newOffset = newLineOffset + 1;
@@ -198,7 +198,7 @@ class TunEditorController {
     int insertOffset = selection.extentOffset;
     int newOffset = selection.extentOffset + 1;
     if (!_isEmptyLine()) {
-      final newLineOffset = _insertNewLine();
+      final newLineOffset = _insertNewLine(ignoreFocus: ignoreFocus);
       if (newLineOffset != null) {
         insertOffset = newLineOffset;
         newOffset = newLineOffset + 1;
@@ -254,7 +254,7 @@ class TunEditorController {
     int insertOffset = selection.extentOffset;
     int newOffset = selection.extentOffset + 1;
     if (!_isEmptyLine()) {
-      final newLineOffset = _insertNewLine();
+      final newLineOffset = _insertNewLine(ignoreFocus: ignoreFocus);
       if (newLineOffset != null) {
         insertOffset = newLineOffset;
         newOffset = newLineOffset + 1;
@@ -270,7 +270,7 @@ class TunEditorController {
 
   /// Insert divider to current [selection].
   void insertDivider({bool ignoreFocus = false}) {
-    final newLineOffset = _insertNewLine();
+    final newLineOffset = _insertNewLine(ignoreFocus: ignoreFocus);
     if (newLineOffset == null) {
       return;
     }
@@ -407,7 +407,9 @@ class TunEditorController {
   }
 
   // Insert new line and return new line's offset.
-  int? _insertNewLine() {
+  int? _insertNewLine({
+    bool ignoreFocus = false,
+  }) {
     final child = document.queryChild(selection.extentOffset);
     if (child.node == null) {
       return null;
@@ -445,7 +447,7 @@ class TunEditorController {
     } else {
       delta.insert('\n');
     }
-    compose(delta, null, ChangeSource.LOCAL);
+    compose(delta, null, ChangeSource.LOCAL, ignoreFocus: ignoreFocus);
     return lineEndOffset + 1;
   }
 }

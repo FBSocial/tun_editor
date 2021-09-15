@@ -180,12 +180,14 @@ class QuillEditorView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler {
             let selectionJson = try JSONSerialization.data(withJSONObject: selection, options: JSONSerialization.WritingOptions(rawValue: 0))
             let selectionJsonStr = String(data: selectionJson, encoding: .utf8)
             if selectionJsonStr == nil {
+                print("invalid selection json str")
                 return
             }
 
             let deltaJson = try JSONSerialization.data(withJSONObject: delta, options: JSONSerialization.WritingOptions(rawValue: 0))
             if let deltaJsonStr = String(data: deltaJson, encoding: .utf8) {
                exec("updateContents(\(deltaJsonStr), \"\(source)\", \(ignoreFocus), \(selectionJsonStr!))")
+                print("updateContents(\(deltaJsonStr), \"\(source)\", \(ignoreFocus), \(selectionJsonStr!))")
             }
         } catch {
             print("update contents failed: \(error)")
