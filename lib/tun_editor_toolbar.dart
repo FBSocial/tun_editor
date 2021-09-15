@@ -462,7 +462,7 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
   }
 
   void onDividerClick() {
-    controller.insertDivider();
+    controller.insertDivider(ignoreFocus: true);
   }
 
   void toggleTextType(String textType) {
@@ -538,13 +538,13 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
       defaultText = controller.document.toPlainText().substring(textStartIndex, textEndIndex);
     }
 
+    controller.focus();
     final res = await LinkFomratDialog.show(
       context,
       defaultText: defaultText.replaceAll('\n', ' '),
       defaultUrl: defaultUrl,
       isUrlAutofocus: !selection.isCollapsed,
     );
-    FocusScope.of(context).requestFocus(FocusNode());
     if (res != null && res.length >= 2) {
       final text = res[0];
       final url = res[1];
@@ -650,10 +650,16 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
   }
 
   void _syncFocus(bool hasFocus) {
-    final bool isTypeOrStyle = showingSubToolbar == SubToolbar.textType
-        || showingSubToolbar == SubToolbar.textStyle;
-    if (!hasFocus && isTypeOrStyle) {
-      toggleSubToolbar(SubToolbar.none);
+    if (hasFocus) {
+      if (showingSubToolbar != SubToolbar.none) {
+        toggleSubToolbar(SubToolbar.none);
+      }
+    } else {
+      final bool isTypeOrStyle = showingSubToolbar == SubToolbar.textType
+          || showingSubToolbar == SubToolbar.textStyle;
+      if (isTypeOrStyle) {
+        toggleSubToolbar(SubToolbar.none);
+      }
     }
   }
 
