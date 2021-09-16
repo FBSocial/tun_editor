@@ -307,7 +307,7 @@ class FullPageEditorState extends State<FullPageEditor> {
               } else {
                 _controller.insertMention(
                   '$index',
-                  '#Topic $index #test~',
+                  '#*Topic*',
                   prefixChar: '#',
                   ignoreFocus: true,
                 );

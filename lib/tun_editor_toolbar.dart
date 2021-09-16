@@ -568,7 +568,6 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
           TextSelection.collapsed(
             offset: textStartIndex + text.length,
           ),
-          ignoreFocus: true,
         );
         // Format text with link.
         controller.formatText(
