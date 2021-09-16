@@ -7,7 +7,7 @@
 
     <script src="quill.min.js" charset="utf-8"></script>
     <script src="quill.mention.min.js" charset="utf-8"></script>
-    <script src="quill.markdown.min.js" charset="utf-8"></script>
+    <script src="quill.markdown2.min.js" charset="utf-8"></script>
     <script>
       let u = navigator.userAgent;
       let isAndroid = u.indexOf('Android') > -1 || u.indexOf('Adr') > -1;
@@ -784,31 +784,6 @@
             sheet.addRule('.ql-editor.ql-blank::before', `${k}: ${style[k]}`);
           }
         }
-        // replaceText(0, 0, {
-        //   image: {
-        //     "name": "72955931-ccc07900-3d52-11ea-89b1-d468a6e2aa2b.png",
-        //     "source": "https://user-images.githubusercontent.com/122956/72955931-ccc07900-3d52-11ea-89b1-d468a6e2aa2b.png",
-        //     "width": 330.0,
-        //     "height": 330.0,
-        //     "checkPath": "https://user-images.githubusercontent.com/122956/72955931-ccc07900-3d52-11ea-89b1-d468a6e2aa2b.png",
-        //     "_type": "image",
-        //     "_inline": false
-        //   }
-        // }, false, true);
-        // replaceText(1, 0, {
-        //   video: {
-        //     "source": "https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_20mb.mp4",
-        //     "width": 360.0,
-        //     "height": 720.0,
-        //     "fileType": "video",
-        //     "duration": 7,
-        //     "thumbUrl": "https://fb-cdn.fanbook.mobi/fanbook/app/files/chatroom/image/43789ea4452106628661d9014d45c873.jpg",
-        //     "thumbName": "43789ea4452106628661d9014d45c873.jpg",
-        //     "_type": "video",
-        //     "_inline": false
-        //   }
-        // }, false, true);
-
         processMessage = function(message) {
           return new Promise(function(resolve, reject) {
             if (message.name === 'updateContents') {
@@ -858,6 +833,39 @@
             }
           }
         }
+
+        // replaceText(0, 0, {
+        //   mention: {
+        //     'denotationChar': '',
+        //     'id': 'id xxx',
+        //     'value': '@Jeffrey **Wu**',
+        //     'prefixChar': '@',
+        //   },
+        // }, {}, false, true, false, { index: -1, length: -1 });
+        // replaceText(0, 0, {
+        //   image: {
+        //     "name": "72955931-ccc07900-3d52-11ea-89b1-d468a6e2aa2b.png",
+        //     "source": "https://user-images.githubusercontent.com/122956/72955931-ccc07900-3d52-11ea-89b1-d468a6e2aa2b.png",
+        //     "width": 330.0,
+        //     "height": 330.0,
+        //     "checkPath": "https://user-images.githubusercontent.com/122956/72955931-ccc07900-3d52-11ea-89b1-d468a6e2aa2b.png",
+        //     "_type": "image",
+        //     "_inline": false
+        //   }
+        // }, false, true);
+        // replaceText(1, 0, {
+        //   video: {
+        //     "source": "https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_20mb.mp4",
+        //     "width": 360.0,
+        //     "height": 720.0,
+        //     "fileType": "video",
+        //     "duration": 7,
+        //     "thumbUrl": "https://fb-cdn.fanbook.mobi/fanbook/app/files/chatroom/image/43789ea4452106628661d9014d45c873.jpg",
+        //     "thumbName": "43789ea4452106628661d9014d45c873.jpg",
+        //     "_type": "video",
+        //     "_inline": false
+        //   }
+        // }, false, true);
       })
     </script>
 
