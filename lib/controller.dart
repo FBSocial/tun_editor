@@ -137,13 +137,13 @@ class TunEditorController {
   }) {
     int insertOffset = selection.extentOffset;
     int newOffset = selection.extentOffset + 1;
-    if (!_isEmptyLine()) {
-      final newLineOffset = _insertNewLine(ignoreFocus: ignoreFocus);
-      if (newLineOffset != null) {
-        insertOffset = newLineOffset;
-        newOffset = newLineOffset + 1;
-      }
-    }
+    // if (!_isEmptyLine()) {
+    //   final newLineOffset = _insertNewLine(ignoreFocus: ignoreFocus);
+    //   if (newLineOffset != null) {
+    //     insertOffset = newLineOffset;
+    //     newOffset = newLineOffset + 1;
+    //   }
+    // }
 
     final delta = new Delta()..retain(insertOffset);
     for (final embed in embeds) {
@@ -198,13 +198,13 @@ class TunEditorController {
 
     int insertOffset = selection.extentOffset;
     int newOffset = selection.extentOffset + 1;
-    if (!_isEmptyLine()) {
-      final lineEndOffset = _getLineEndOffset();
-      if (lineEndOffset != null) {
-        insertOffset = lineEndOffset;
-        newOffset = lineEndOffset + 1;
-      }
-    }
+    // if (!_isEmptyLine()) {
+    //   final lineEndOffset = _getLineEndOffset();
+    //   if (lineEndOffset != null) {
+    //     insertOffset = lineEndOffset;
+    //     newOffset = lineEndOffset + 1;
+    //   }
+    // }
 
     // Insert image.
     final delta = new Delta()
@@ -254,13 +254,13 @@ class TunEditorController {
 
     int insertOffset = selection.extentOffset;
     int newOffset = selection.extentOffset + 1;
-    if (!_isEmptyLine()) {
-      final newLineOffset = _insertNewLine(ignoreFocus: ignoreFocus);
-      if (newLineOffset != null) {
-        insertOffset = newLineOffset;
-        newOffset = newLineOffset + 1;
-      }
-    }
+    // if (!_isEmptyLine()) {
+    //   final newLineOffset = _insertNewLine(ignoreFocus: ignoreFocus);
+    //   if (newLineOffset != null) {
+    //     insertOffset = newLineOffset;
+    //     newOffset = newLineOffset + 1;
+    //   }
+    // }
 
     final delta = new Delta()
       ..retain(insertOffset)
