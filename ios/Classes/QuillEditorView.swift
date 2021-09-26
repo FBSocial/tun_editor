@@ -19,12 +19,9 @@ class QuillEditorView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler {
     
     override var frame: CGRect {
         didSet {
-            print("set content inset to zero")
             self.scrollView.contentInset = .zero
             if #available(iOS 11.0, *) {
                 if self.scrollView.adjustedContentInset != .zero {
-                    print("set content inset to zero with adjust")
-
                     let insetToAdjust = self.scrollView.adjustedContentInset
                     self.scrollView.contentInset = UIEdgeInsets(
                         top: -insetToAdjust.top,
