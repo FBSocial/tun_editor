@@ -435,6 +435,9 @@ class FullPageEditorState extends State<FullPageEditor> {
 
   Future<void> _pickImage() async {
     _controller.batchInsertEmbed(
+      appendNewLineAfterImage: true,
+      appendNewLineAfterVideo: false,
+      appendNewLine: false,
       embeds: [
         ImageEmbed(
           name: "https://user-images.githubusercontent.com/122956/72955931-ccc07900-3d52-11ea-89b1-d468a6e2aa2b.png",
@@ -494,6 +497,7 @@ class FullPageEditorState extends State<FullPageEditor> {
     //     width: 230,
     //     height: 230,
     //     ignoreFocus: true,
+    //     appendNewLine: true,
     //   );
     //   // _controller.insertVideo(
     //   //   source:

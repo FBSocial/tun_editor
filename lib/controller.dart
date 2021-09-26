@@ -145,6 +145,9 @@ class TunEditorController {
     // }
 
     final delta = new Delta()..retain(insertOffset);
+    if (!_isEmptyLine()) {
+      delta.insert('\n');
+    }
     for (final embed in embeds) {
       delta.insert(embed.toFormalJson());
       newOffset = newOffset + 1;
@@ -206,9 +209,11 @@ class TunEditorController {
     // }
 
     // Insert image.
-    final delta = new Delta()
-      ..retain(insertOffset)
-      ..insert({'image': imageBlot}, attrMap);
+    final delta = new Delta()..retain(insertOffset);
+    if (!_isEmptyLine()) {
+      delta.insert('\n');
+    }
+    delta.insert({'image': imageBlot}, attrMap);
     if (appendNewLine) {
       delta.insert('\n');
       newOffset = newOffset + 1;
