@@ -146,6 +146,9 @@ class TunEditorController {
     // }
 
     final delta = new Delta()..retain(insertOffset);
+    if (!_isEmptyLine()) {
+      delta.insert('\n');
+    }
     for (final embed in embeds) {
       delta.insert(embed.toFormalJson());
       newOffset = newOffset + 1;
@@ -207,9 +210,11 @@ class TunEditorController {
     // }
 
     // Insert image.
-    final delta = new Delta()
-      ..retain(insertOffset)
-      ..insert({'image': imageBlot}, attrMap);
+    final delta = new Delta()..retain(insertOffset);
+    if (!_isEmptyLine()) {
+      delta.insert('\n');
+    }
+    delta.insert({'image': imageBlot}, attrMap);
     if (appendNewLine) {
       delta.insert('\n');
       newOffset = newOffset + 1;
@@ -271,16 +276,19 @@ class TunEditorController {
 
   /// Insert divider to current [selection].
   void insertDivider({bool ignoreFocus = false}) {
-    final newLineOffset = _insertNewLine(ignoreFocus: ignoreFocus);
-    if (newLineOffset == null) {
-      return;
+    int insertOffset = selection.extentOffset;
+    if (!_isEmptyLine()) {
+      final newLineOffset = _insertNewLine(ignoreFocus: ignoreFocus);
+      if (newLineOffset != null) {
+        insertOffset = newLineOffset;
+      }
     }
 
     // Insert divider.
     final dividerDelta = new Delta()
-      ..retain(newLineOffset)
+      ..retain(insertOffset)
       ..insert({'divider': 'hr'});
-    final newSelection =TextSelection.collapsed(offset: newLineOffset + 1); 
+    final newSelection =TextSelection.collapsed(offset: insertOffset + 1); 
     compose(dividerDelta, newSelection, ChangeSource.LOCAL, ignoreFocus: ignoreFocus);
   }
 
