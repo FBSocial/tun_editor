@@ -85,6 +85,7 @@ internal class TunEditorView(
         val imageStyle: HashMap<String, Any> = hashMapOf()
         val videoStyle: HashMap<String, Any> = hashMapOf()
         val placeholderStyle: HashMap<String, Any> = hashMapOf()
+        var enableMarkdownSyntax = false
         if (creationParams?.containsKey("placeholder") == true) {
             placeholder = (creationParams["placeholder"] as? String) ?: ""
         }
@@ -132,9 +133,12 @@ internal class TunEditorView(
                 }
             }
         }
+        if (creationParams?.containsKey("enableMarkdownSyntax") == true) {
+            enableMarkdownSyntax = (creationParams["enableMarkdownSyntax"] as? Boolean) ?: true
+        }
 
         quillEditor = QuillEditor(context, placeholder, padding, readOnly, scrollable, autoFocus,
-            delta, fileBasePath, imageStyle, videoStyle, placeholderStyle)
+            delta, fileBasePath, imageStyle, videoStyle, placeholderStyle, enableMarkdownSyntax)
         quillEditor.setOnTextChangeListener { changeDelta, oldDelta ->
             val text = HashMap<String, String>()
             text["delta"] = changeDelta

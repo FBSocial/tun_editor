@@ -103,6 +103,7 @@
       var setImageStyle;
       var setVideoStyle;
       var setPlaceholderStyle;
+      var setupMarkdownSyntax;
 
       var imageStyle = {};
       var videoStyle = {};
@@ -672,11 +673,6 @@
           }
         });
 
-        var markdownOptions = {
-          ignoreTags: [ 'h4', 'h5', 'h6' ], // @option - if you need to ignore some tags.
-        };
-        new QuillMarkdown(quill, markdownOptions);
-
         replaceText = function(index, length, data, attributes,
             newLineAfterImage, isEmbeddable, ignoreFocus, selection) {
           if (isEmbeddable) {
@@ -788,6 +784,14 @@
           let sheet = inlineStyle.sheet;
           for (k in style) {
             sheet.addRule('.ql-editor.ql-blank::before', `${k}: ${style[k]}`);
+          }
+        }
+        setupMarkdownSyntax = function(enableMarkdownSyntax) {
+          if (enableMarkdownSyntax) {
+            var markdownOptions = {
+              ignoreTags: [ 'h4', 'h5', 'h6' ],
+            };
+            new QuillMarkdown(quill, markdownOptions);
           }
         }
         processMessage = function(message) {

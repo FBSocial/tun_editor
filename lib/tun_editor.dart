@@ -45,6 +45,8 @@ class TunEditor extends StatefulWidget {
   final MentionClickCallback? onMentionClick;
   final LinkClickCallback? onLinkClick;
 
+  final bool enableMarkdownSyntax;
+
   const TunEditor({
     Key? key,
     required this.controller,
@@ -63,6 +65,7 @@ class TunEditor extends StatefulWidget {
     this.focusNode,
     this.onMentionClick,
     this.onLinkClick,
+    this.enableMarkdownSyntax = true,
   }) : super(key: key);
 
   @override
@@ -116,6 +119,7 @@ class TunEditorState extends State<TunEditor> with TunEditorHandler {
   FocusNode? get focusNode => widget.focusNode;
   MentionClickCallback? get mentionClickCallback => widget.onMentionClick;
   LinkClickCallback? get linkClickCallback => widget.onLinkClick;
+  bool get enableMarkdownSyntax => widget.enableMarkdownSyntax;
 
   TunEditorApi? _tunEditorApi;
 
@@ -181,6 +185,10 @@ class TunEditorState extends State<TunEditor> with TunEditorHandler {
           creationParams['placeholderStyle'] = placeholderStyleMap;
         }
       }
+      if (creationParams.containsKey('enableMarkdownSyntax') &&
+          creationParams['enableMarkdownSyntax'] != enableMarkdownSyntax) {
+        creationParams['enableMarkdownSyntax'] = enableMarkdownSyntax;
+      }
     } else {
       creationParams = {
         'fileBasePath': fileBasePath,
@@ -193,6 +201,7 @@ class TunEditorState extends State<TunEditor> with TunEditorHandler {
         'imageStyle': imageStyle,
         'videoStyle': videoStyle,
         'placeholderStyle': placeholderStyleMap,
+        'enableMarkdownSyntax': enableMarkdownSyntax,
       };
     }
 
