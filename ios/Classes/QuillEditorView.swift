@@ -46,6 +46,7 @@ class QuillEditorView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler {
     var imageStyle: [String: Any] = [:]
     var videoStyle: [String: Any] = [:]
     var placeholderStyle: [String: Any] = [:]
+    var enableMarkdownSyntax: Bool = true
     
     var viewId: Int = 0
     
@@ -84,7 +85,8 @@ class QuillEditorView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler {
         fileBasePath: String,
         imageStyle: [String: Any],
         videoStyle: [String: Any],
-        placeholderStyle: [String: Any]
+        placeholderStyle: [String: Any],
+        enableMarkdownSyntax: Bool
     ) {
         self.frame = frame
         self.autoFocus = autoFocus
@@ -98,6 +100,7 @@ class QuillEditorView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler {
         setVideoStyle(videoStyle)
         setPlaceholderStyle(placeholderStyle)
         setContents(delta)
+        setupMarkdownSyntax(enableMarkdownSyntax)
     }
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
@@ -336,6 +339,10 @@ class QuillEditorView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler {
         } catch {
             print("set contents failed: \(error)")
         }
+    }
+    
+    private func setupMarkdownSyntax(_ enableMarkdownSyntax: Bool) {
+        exec("setupMarkdownSyntax(\(enableMarkdownSyntax))")
     }
     
     private func refreshImage(_ filename: String) {

@@ -65,6 +65,7 @@ class TunEditorView: NSObject, FlutterPlatformView {
         var imageStyle: [String: Any] = [:]
         var videoStyle: [String: Any] = [:]
         var placeholderStyle: [String: Any] = [:]
+        var enableMarkdownSyntax: Bool = true
         
         if let argsMap = args as? [String: Any] {
             if let optPlaceholder = argsMap["placeholder"] as? String {
@@ -97,6 +98,9 @@ class TunEditorView: NSObject, FlutterPlatformView {
             if let optPlaceholderStyle = argsMap["placeholderStyle"] as? [String: Any] {
                 placeholderStyle = optPlaceholderStyle
             }
+            if let optEnableMarkdownSyntax = argsMap["enableMarkdownSyntax"] as? Bool {
+                enableMarkdownSyntax = optEnableMarkdownSyntax
+            }
         }
         _editor.configureEditor(
             frame: frame,
@@ -109,7 +113,8 @@ class TunEditorView: NSObject, FlutterPlatformView {
             fileBasePath: fileBasePath,
             imageStyle: imageStyle,
             videoStyle: videoStyle,
-            placeholderStyle: placeholderStyle
+            placeholderStyle: placeholderStyle,
+            enableMarkdownSyntax: enableMarkdownSyntax
         )
         methodChannel = FlutterMethodChannel(name: "tun/editor/\(viewId)", binaryMessenger: messenger)
         super.init()

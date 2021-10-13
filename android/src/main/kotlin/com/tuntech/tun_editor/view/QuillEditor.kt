@@ -38,7 +38,8 @@ class QuillEditor: WebView {
     constructor(
         context: Context, placeholder: String, padding: List<Int>, readOnly: Boolean,
         scrollable: Boolean, autoFocus: Boolean, delta: List<*>, fileBasePath: String,
-        imageStyle: Map<String, Any>, videoStyle: Map<String, Any>, placeholderStyle: Map<String, Any>
+        imageStyle: Map<String, Any>, videoStyle: Map<String, Any>, placeholderStyle: Map<String, Any>,
+        enableMarkdownSyntax: Boolean
     ): this(context) {
         this.placeholder = placeholder
         this.readOnly = readOnly
@@ -50,6 +51,7 @@ class QuillEditor: WebView {
         this.imageStyle = imageStyle
         this.videoStyle = videoStyle
         this.placeholderStyle = placeholderStyle
+        this.enableMarkdownSyntax = enableMarkdownSyntax
     }
 
     private var placeholder: String = ""
@@ -62,6 +64,7 @@ class QuillEditor: WebView {
     private var imageStyle: Map<String, Any> = mapOf()
     private var videoStyle: Map<String, Any> = mapOf()
     private var placeholderStyle: Map<String, Any> = mapOf()
+    private var enableMarkdownSyntax: Boolean = false
 
     private var onTextChangeListener: ((String, String) -> Unit)? = null
     private var onSelectionChangeListener: ((Int, Int, String) -> Unit)? = null
@@ -87,6 +90,7 @@ class QuillEditor: WebView {
                 setVideoStyle(videoStyle)
                 setPlaceholderStyle(placeholderStyle)
                 setContents(delta)
+                setupMarkdownSyntax(enableMarkdownSyntax)
 
                 // if (autoFocus) {
                 //     focus()
@@ -290,6 +294,10 @@ class QuillEditor: WebView {
 
     private fun setContents(delta: List<*>) {
         exec("javascript:setContents(${JSONArray(delta)})")
+    }
+
+    private fun setupMarkdownSyntax(enableMarkdownSyntax: Boolean) {
+        exec("javascript:setupMarkdownSyntax($enableMarkdownSyntax)")
     }
 
     private fun refreshImage(filename: String) {

@@ -103,6 +103,7 @@
       var setImageStyle;
       var setVideoStyle;
       var setPlaceholderStyle;
+      var setupMarkdownSyntax;
 
       var imageStyle = {};
       var videoStyle = {};
@@ -671,11 +672,18 @@
             bridge.onSelectionChange(range.index, range.length, JSON.stringify(format));
           }
         });
-
-        var markdownOptions = {
-          ignoreTags: [ 'h4', 'h5', 'h6' ], // @option - if you need to ignore some tags.
-        };
-        new QuillMarkdown(quill, markdownOptions);
+        quill.clipboard.addMatcher(Node.ELEMENT_NODE, (node, delta) => {
+          let ops = []
+          delta.ops.forEach(op => {
+            if (op.insert && typeof op.insert === 'string') {
+              ops.push({
+                insert: op.insert
+              })
+            }
+          })
+          delta.ops = ops
+          return delta
+        })
 
         replaceText = function(index, length, data, attributes,
             newLineAfterImage, isEmbeddable, ignoreFocus, selection) {
@@ -788,6 +796,14 @@
           let sheet = inlineStyle.sheet;
           for (k in style) {
             sheet.addRule('.ql-editor.ql-blank::before', `${k}: ${style[k]}`);
+          }
+        }
+        setupMarkdownSyntax = function(enableMarkdownSyntax) {
+          if (enableMarkdownSyntax) {
+            var markdownOptions = {
+              ignoreTags: [ 'h4', 'h5', 'h6' ],
+            };
+            new QuillMarkdown(quill, markdownOptions);
           }
         }
         processMessage = function(message) {

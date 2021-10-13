@@ -165,6 +165,7 @@ class FullPageEditorState extends State<FullPageEditor> {
                           onLinkClick: (String url) {
                             debugPrint('link click $url');
                           },
+                          enableMarkdownSyntax: false,
                         ),
                       ),
                       SizedBox(
