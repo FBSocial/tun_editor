@@ -46,21 +46,21 @@
   margin-right: 8px;
 }
 .ql-editor ul li:not(.ql-direction-rtl)::before {
-  color: #5562F2;
+  color: #363940;
   content: '\2022';
   width: 12px;
 }
 .ql-editor ol li:not(.ql-direction-rtl)::before {
-  color: #5562F2;
+  color: #363940;
   font-size: 16px;
 }
 .ql-editor ol li[data-list=bullet]::before {
-  color: #5562F2;
+  color: #363940;
   content: '\2022';
   width: 12px;
 }
 .ql-editor ol li[data-list=ordered]:before {
-  color: #5562F2;
+  color: #363940;
   font-size: 16px;
 }
 hr {
