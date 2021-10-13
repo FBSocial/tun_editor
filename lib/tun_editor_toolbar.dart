@@ -638,10 +638,10 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
       disabledMenu.addAll([
         ToolbarMenu.at,
         ToolbarMenu.image,
-        ToolbarMenu.textStyleBold,
-        ToolbarMenu.textStyleItalic,
-        ToolbarMenu.textStyleUnderline,
-        ToolbarMenu.textStyleStrikeThrough,
+        // ToolbarMenu.textStyleBold,
+        // ToolbarMenu.textStyleItalic,
+        // ToolbarMenu.textStyleUnderline,
+        // ToolbarMenu.textStyleStrikeThrough,
         ToolbarMenu.link,
       ]);
     }
