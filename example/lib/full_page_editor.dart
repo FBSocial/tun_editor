@@ -377,9 +377,9 @@ class FullPageEditorState extends State<FullPageEditor> {
   }
 
   Future<void> _loadDocument() async {
-    // final result = await rootBundle.loadString('assets/sample_data.json');
-    // final doc = Document.fromJson(jsonDecode(result));
-    final doc = Document();
+    final result = await rootBundle.loadString('assets/sample_data.json');
+    final doc = Document.fromJson(jsonDecode(result));
+    // final doc = Document();
 
     final list = doc.toDelta().toJson();
     for (final i in list) {

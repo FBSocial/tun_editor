@@ -632,7 +632,9 @@
                 || now.getTime() - lastTextChangeTime < 500) {
             return;
           }
-          if (lastScrollTop - event.target.scrollTop > 10 && quill.hasFocus()) {
+          if (lastScrollTop - event.target.scrollTop > 10
+                && quill.getSelection().length <= 0
+                && quill.hasFocus()) {
             quill.blur();
           }
           lastScrollTop = event.target.scrollTop;
