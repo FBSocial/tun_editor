@@ -497,8 +497,8 @@ class FullPageEditorState extends State<FullPageEditor> {
       //   checkPath: image.name,
       //   width: 230,
       //   height: 230,
-      //   ignoreFocus: true,
-      //   appendNewLine: true,
+      //   ignoreFocus: false,
+      //   appendNewLine: false,
       // );
       _controller.insertVideo(
         source:
@@ -509,7 +509,8 @@ class FullPageEditorState extends State<FullPageEditor> {
         fileType: 'mp4',
         width: 100,
         height: 200,
-        ignoreFocus: true,
+        ignoreFocus: false,
+        appendNewLine: true
       );
     }
   }

@@ -200,18 +200,19 @@ class TunEditorController {
 
     int insertOffset = selection.extentOffset;
     int newOffset = selection.extentOffset + 1;
-    // if (!_isEmptyLine()) {
-    //   final lineEndOffset = _getLineEndOffset();
-    //   if (lineEndOffset != null) {
-    //     insertOffset = lineEndOffset;
-    //     newOffset = lineEndOffset + 1;
-    //   }
-    // }
+    if (!_isEmptyLine()) {
+      final lineEndOffset = _getLineEndOffset();
+      if (lineEndOffset != null) {
+        insertOffset = lineEndOffset;
+        newOffset = lineEndOffset + 1;
+      }
+    }
 
     // Insert image.
     final delta = new Delta()..retain(insertOffset);
     if (!_isEmptyLine()) {
       delta.insert('\n');
+      newOffset = newOffset + 1;
     }
     delta.insert({'image': imageBlot}, attrMap);
     if (appendNewLine) {
@@ -234,6 +235,7 @@ class TunEditorController {
     bool inline = false,
     List<Attribute>? attributes = const [],
     bool ignoreFocus = false,
+    bool appendNewLine = false
   }) {
     // Wrap value.
     final Map<String, dynamic> videoBlot = {
@@ -258,17 +260,24 @@ class TunEditorController {
 
     int insertOffset = selection.extentOffset;
     int newOffset = selection.extentOffset + 1;
-    // if (!_isEmptyLine()) {
-    //   final newLineOffset = _insertNewLine(ignoreFocus: ignoreFocus);
-    //   if (newLineOffset != null) {
-    //     insertOffset = newLineOffset;
-    //     newOffset = newLineOffset + 1;
-    //   }
-    // }
+    if (!_isEmptyLine()) {
+      final lineEndOffset = _getLineEndOffset();
+      if (lineEndOffset != null) {
+        insertOffset = lineEndOffset;
+        newOffset = lineEndOffset + 1;
+      }
+    }
 
-    final delta = new Delta()
-      ..retain(insertOffset)
-      ..insert({'video': videoBlot}, attrMap);
+    final delta = new Delta()..retain(insertOffset);
+    if (!_isEmptyLine()) {
+      delta.insert('\n');
+      newOffset = newOffset + 1;
+    }
+    delta.insert({'video': videoBlot}, attrMap);
+    if (appendNewLine) {
+      delta.insert('\n');
+      newOffset = newOffset + 1;
+    }
     final newSelection = TextSelection.collapsed(offset: newOffset);
     compose(delta, newSelection, ChangeSource.LOCAL, ignoreFocus: ignoreFocus);
   }
