@@ -160,7 +160,7 @@
         Link.PROTOCOL_WHITELIST = ['http', 'https', 'mailto', 'tel'];
         Quill.register(Link, true);
 
-        class DividerBlot extends BlockEmbed {
+        class DividerBlot extends Embed {
 
           static create(type) {
             let node = super.create();
@@ -177,7 +177,7 @@
         DividerBlot.tagName = 'hr';
         Quill.register(DividerBlot, true);
 
-        class ImageExtend extends BlockEmbed {
+        class ImageExtend extends Embed {
           static create(value) {
             const node = super.create(value);
             let url = this.sanitize(value.source);
@@ -282,21 +282,21 @@
         ImageExtend.tagName = 'IMG';
         Quill.register(ImageExtend, true);
 
-        class VideoBlot extends BlockEmbed {
+        class VideoBlot extends Embed {
 
           static create(value) {
             const node = super.create(value);
 
-            const video = document.createElement("video");
-            video.innerHTML = node.duration;
-            video.setAttribute('src', this.sanitize(value.source));
-            video.controls = false;
+            const video = document.createElement("DIV");
+            video.className = 'ql-video-content'
+            video.setAttribute('contenteditable', false);
 
+            const poster = document.createElement("IMG");
             let posterUrl = this.sanitize(value.thumbUrl);
             if (posterUrl.startsWith('file')) {
               bridge.loadVideoThumb(posterUrl.replace('file://', ''));
             } else {
-              video.poster = posterUrl;
+              poster.setAttribute('src', posterUrl);
             }
 
             const durationSpan = document.createElement("div");
@@ -311,15 +311,15 @@
                 second = 99;
               }
               let timeFormat = `${minute.toString().padStart(2, '0')}:${second.toString().padStart(2, '0')}`
-              durationSpan.innerHTML = `<svg t="1629367052116" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="9336" xmlns:xlink="http://www.w3.org/1999/xlink" width="15" height="15"><defs><style type="text/css">@font-face { font-family: element-icons; src: url("chrome-extension://moombeodfomdpjnpocobemoiaemednkg/fonts/element-icons.woff") format("woff"), url("chrome-extension://moombeodfomdpjnpocobemoiaemednkg/fonts/element-icons.ttf ") format("truetype"); }
-</style></defs><path d="M896 305.066667a72.533333 72.533333 0 0 0-78.933333 12.8l-91.733334 85.333333V341.333333a128 128 0 0 0-128-128H213.333333a128 128 0 0 0-128 128v341.333334a128 128 0 0 0 128 128h384a128 128 0 0 0 128-128v-61.866667l92.16 85.333333a74.24 74.24 0 0 0 49.493334 19.2 71.68 71.68 0 0 0 29.44-6.4 68.266667 68.266667 0 0 0 42.666666-63.146666V368.213333A68.266667 68.266667 0 0 0 896 305.066667z" fill="#FFFFFF" p-id="9337"></path></svg> ${timeFormat}`;
+              durationSpan.innerHTML = `<svg t="1629367052116" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="9336" xmlns:xlink="http://www.w3.org/1999/xlink" width="15" height="15"><defs><style type="text/css">@font-face { font-family: element-icons; src: url("chrome-extension://moombeodfomdpjnpocobemoiaemednkg/fonts/element-icons.woff") format("woff"), url("chrome-extension://moombeodfomdpjnpocobemoiaemednkg/fonts/element-icons.ttf ") format("truetype"); }</style></defs><path d="M896 305.066667a72.533333 72.533333 0 0 0-78.933333 12.8l-91.733334 85.333333V341.333333a128 128 0 0 0-128-128H213.333333a128 128 0 0 0-128 128v341.333334a128 128 0 0 0 128 128h384a128 128 0 0 0 128-128v-61.866667l92.16 85.333333a74.24 74.24 0 0 0 49.493334 19.2 71.68 71.68 0 0 0 29.44-6.4 68.266667 68.266667 0 0 0 42.666666-63.146666V368.213333A68.266667 68.266667 0 0 0 896 305.066667z" fill="#FFFFFF" p-id="9337"></path></svg> <span>${timeFormat}</span>`;
             } else {
               durationSpan.innerHTML = '00:00';
             }
             durationSpan.setAttribute('contenteditable', false);
 
+            video.appendChild(poster);
+            video.appendChild(durationSpan);
             node.appendChild(video);
-            node.appendChild(durationSpan);
 
             if (videoStyle.width) {
               node.style.width = `${videoStyle.width}px`;
@@ -632,7 +632,9 @@
                 || now.getTime() - lastTextChangeTime < 500) {
             return;
           }
-          if (lastScrollTop - event.target.scrollTop > 10 && quill.hasFocus()) {
+          if (lastScrollTop - event.target.scrollTop > 10
+                && quill.getSelection().length <= 0
+                && quill.hasFocus()) {
             quill.blur();
           }
           lastScrollTop = event.target.scrollTop;
@@ -672,18 +674,18 @@
             bridge.onSelectionChange(range.index, range.length, JSON.stringify(format));
           }
         });
-        quill.clipboard.addMatcher(Node.ELEMENT_NODE, (node, delta) => {
-          let ops = []
-          delta.ops.forEach(op => {
-            if (op.insert && typeof op.insert === 'string') {
-              ops.push({
-                insert: op.insert
-              })
-            }
-          })
-          delta.ops = ops
-          return delta
-        })
+        // quill.clipboard.addMatcher(Node.ELEMENT_NODE, (node, delta) => {
+        //   let ops = []
+        //   delta.ops.forEach(op => {
+        //     if (op.insert && typeof op.insert === 'string') {
+        //       ops.push({
+        //         insert: op.insert
+        //       })
+        //     }
+        //   })
+        //   delta.ops = ops
+        //   return delta
+        // })
 
         replaceText = function(index, length, data, attributes,
             newLineAfterImage, isEmbeddable, ignoreFocus, selection) {
@@ -767,14 +769,18 @@
             return;
           }
 
-          fetch(data)
-            .then(response => response.blob())
-            .then(blob => {
-              for (const v of video) {
-                const videoNode = v.querySelector('video');
-                videoNode.poster = URL.createObjectURL(blob);
-              }
-            });
+          for (const v of video) {
+            const posterNode = v.querySelector('img');
+            posterNode.setAttribute('src', data)
+          }
+          // fetch(data)
+          //   .then(response => response.blob())
+          //   .then(blob => {
+          //     for (const v of video) {
+          //       const videoNode = v.querySelector('video');
+          //       videoNode.poster = URL.createObjectURL(blob);
+          //     }
+          //   });
         }
         setImageStyle = function(style) {
           imageStyle = style;
@@ -875,19 +881,19 @@
         //     "_inline": false
         //   }
         // }, false, true);
-        // replaceText(1, 0, {
-        //   video: {
-        //     "source": "https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_20mb.mp4",
-        //     "width": 360.0,
-        //     "height": 720.0,
-        //     "fileType": "video",
-        //     "duration": 7,
-        //     "thumbUrl": "https://fb-cdn.fanbook.mobi/fanbook/app/files/chatroom/image/43789ea4452106628661d9014d45c873.jpg",
-        //     "thumbName": "43789ea4452106628661d9014d45c873.jpg",
-        //     "_type": "video",
-        //     "_inline": false
-        //   }
-        // }, false, true);
+        replaceText(0, 0, {
+          video: {
+            "source": "https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_20mb.mp4",
+            "width": 360.0,
+            "height": 720.0,
+            "fileType": "video",
+            "duration": 7,
+            "thumbUrl": "https://fb-cdn.fanbook.mobi/fanbook/app/files/chatroom/image/43789ea4452106628661d9014d45c873.jpg",
+            "thumbName": "43789ea4452106628661d9014d45c873.jpg",
+            "_type": "video",
+            "_inline": false
+          }
+        }, { width: 230, height: 460 }, false, true, false, { index: -1, length: -1 });
       })
     </script>
 

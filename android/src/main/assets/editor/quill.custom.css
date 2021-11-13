@@ -14,7 +14,7 @@
   color: #8F959EA5;
 }
 .ql-snow .ql-editor img {
-  display: block;
+  display: inline-block;
 }
 .ql-snow .ql-editor h1 {
   font-size: 22px;
@@ -110,19 +110,24 @@ span.mention {
   margin: 0;
 }
 .ql-editor .ql-video {
-  position: relative;
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-  max-width: 100%;
-  width: auto;
-  height: auto;
+  display: inline-block;
 }
 .ql-editor .ql-video video {
   width: 100%;
   height: 100%;
   display: block;
   object-fit: cover;
+}
+.ql-editor .ql-video .ql-video-content {
+  display: inline-flex;
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+.ql-editor .ql-video .ql-video-content img {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 .ql-editor .ql-video .video-duration-mask {
   position: absolute;
@@ -131,12 +136,15 @@ span.mention {
   background: #0000008C;
   color: #FFFFFF;
   padding: 2px;
+  display: inline-flex;
+  align-items: center;
   width: 60px;
   height: 24px;
+  line-height: 24px;
   font-size: 13px;
   text-align: center;
   border-radius: 12px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+}
+.ql-editor .ql-video .ql-video-content .video-duration-mask span {
+  margin-left: 2px;
 }

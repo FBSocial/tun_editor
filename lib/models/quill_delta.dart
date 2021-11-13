@@ -387,7 +387,7 @@ class Delta {
           if (prev != null && prev.value is Map) {
             final embedType = Embeddable.fromJson(prev.value).type;
             final isBlockEmbed = embedType == 'image' || embedType == 'video' || embedType == 'divider';
-            if (isBlockEmbed) {
+            if (isBlockEmbed && !operation.value.startsWith('\n')) {
               final operationJson = operation.toJson();
               operationJson[Operation.insertKey] = '\n${operation.value}';
               jsonList.add(operationJson);
