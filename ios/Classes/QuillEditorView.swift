@@ -396,6 +396,7 @@ class QuillEditorView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler {
         self.configuration.userContentController.add(self, name: "onFocusChange")
         self.configuration.userContentController.add(self, name: "loadImage")
         self.configuration.userContentController.add(self, name: "loadVideoThumb")
+        self.configuration.userContentController.add(self, name: "debug")
 
         if let url = Bundle.main.url(forResource: "index", withExtension: "html") {
             self.loadFileURL(url, allowingReadAccessTo: url.deletingLastPathComponent())
