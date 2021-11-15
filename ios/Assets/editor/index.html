@@ -626,18 +626,18 @@
         let lastSizeChangeTime = 0;
         let lastTextChangeTime = 0;
         let lastScrollTop = 0;
-        quill.root.addEventListener('scroll', function(event) {
+        window.addEventListener('scroll', function(event) {
           const now = new Date();
-          if (now.getTime() - lastSizeChangeTime < 500
-                || now.getTime() - lastTextChangeTime < 500) {
+          if (now.getTime() - lastSizeChangeTime < 1000
+                || now.getTime() - lastTextChangeTime < 1000) {
             return;
           }
-          if (lastScrollTop - event.target.scrollTop > 10
+          if (lastScrollTop - window.scrollY > 20
                 && quill.getSelection().length <= 0
                 && quill.hasFocus()) {
             quill.blur();
           }
-          lastScrollTop = event.target.scrollTop;
+          lastScrollTop = window.scrollY;
         });
         quill.root.addEventListener('compositionstart', function() {
           quill.root.classList.toggle('ql-blank', false);
@@ -881,19 +881,19 @@
         //     "_inline": false
         //   }
         // }, false, true);
-        replaceText(0, 0, {
-          video: {
-            "source": "https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_20mb.mp4",
-            "width": 360.0,
-            "height": 720.0,
-            "fileType": "video",
-            "duration": 7,
-            "thumbUrl": "https://fb-cdn.fanbook.mobi/fanbook/app/files/chatroom/image/43789ea4452106628661d9014d45c873.jpg",
-            "thumbName": "43789ea4452106628661d9014d45c873.jpg",
-            "_type": "video",
-            "_inline": false
-          }
-        }, { width: 230, height: 460 }, false, true, false, { index: -1, length: -1 });
+        // replaceText(0, 0, {
+        //   video: {
+        //     "source": "https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_20mb.mp4",
+        //     "width": 360.0,
+        //     "height": 720.0,
+        //     "fileType": "video",
+        //     "duration": 7,
+        //     "thumbUrl": "https://fb-cdn.fanbook.mobi/fanbook/app/files/chatroom/image/43789ea4452106628661d9014d45c873.jpg",
+        //     "thumbName": "43789ea4452106628661d9014d45c873.jpg",
+        //     "_type": "video",
+        //     "_inline": false
+        //   }
+        // }, { width: 230, height: 460 }, false, true, false, { index: -1, length: -1 });
       })
     </script>
 

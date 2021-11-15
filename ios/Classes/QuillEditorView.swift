@@ -377,8 +377,8 @@ class QuillEditorView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler {
         self.autoresizingMask = [.flexibleWidth, .flexibleHeight]
 
         self.scrollView.showsHorizontalScrollIndicator = false
-        self.scrollView.bounces = false
-        self.scrollView.clipsToBounds = false
+//        self.scrollView.bounces = false
+//        self.scrollView.clipsToBounds = false
         if #available(iOS 11.0, *) {
             self.scrollView.contentInsetAdjustmentBehavior = .never
             if #available(iOS 13.0, *) {
@@ -411,7 +411,6 @@ class QuillEditorView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler {
     }
 
     func setKeyboardRequiresUserInteraction( _ value: Bool) {
-
         guard
             let WKContentViewClass: AnyClass = NSClassFromString("WKContentView") else {
                 print("Cannot find the WKContentView class")
