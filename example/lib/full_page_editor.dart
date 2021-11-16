@@ -169,7 +169,7 @@ class FullPageEditorState extends State<FullPageEditor> {
                         ),
                       ),
                       SizedBox(
-                        height: 100,
+                        height: 0,
                         child: SingleChildScrollView(
                           child: Text(_previewText),
                         ),

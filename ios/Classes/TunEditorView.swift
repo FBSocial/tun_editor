@@ -119,7 +119,6 @@ class TunEditorView: NSObject, FlutterPlatformView {
         methodChannel = FlutterMethodChannel(name: "tun/editor/\(viewId)", binaryMessenger: messenger)
         super.init()
 
-        _editor.frame = frame
         _editor.setOnTextChangeListener { args in
             self.methodChannel.invokeMethod("onTextChange", arguments: args)
         }

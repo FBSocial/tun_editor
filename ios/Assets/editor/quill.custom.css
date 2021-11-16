@@ -4,10 +4,10 @@
 }
 .ql-container.ql-snow {
    border: none !important;
-   height: 100vh;
  }
 .ql-editor {
   line-height: 1.5;
+  min-height: 100vh;
 }
 .ql-editor.ql-blank::before {
   font-style: normal;
