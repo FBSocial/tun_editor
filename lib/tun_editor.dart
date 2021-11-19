@@ -336,8 +336,8 @@ class TunEditorState extends State<TunEditor> with TunEditorHandler {
         focusNode?.unfocus();
       }
     } else {
-      if (widget.isEditorFocus != null) {
-        widget.isEditorFocus?.value = hasFocus;
+      if (isEditorFocus != null) {
+        isEditorFocus?.value = hasFocus;
       }
     }
   }
