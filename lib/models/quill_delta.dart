@@ -381,7 +381,7 @@ class Delta {
           // Text
           final index = operationList.indexOf(operation);
           final prev = index > 0 ? operationList[index - 1] : null;
-          // final next = index < length - 1 ? operationList[index + 1] : null;
+          final next = index < length - 1 ? operationList[index + 1] : null;
 
           // If prev is image.
           if (prev != null && prev.value is Map) {
@@ -394,18 +394,17 @@ class Delta {
               continue;
             }
           }
-          // // If next is image.
-          // if (next != null && next.value is Map) {
-          //   final embedType = Embeddable.fromJson(next.value).type;
-          //   final isBlockEmbed = embedType == 'image' || embedType == 'video' || embedType == 'divider';
-          //   if (isBlockEmbed) {
-          //     final operationJson = operation.toJson();
-          //     operationJson[Operation.insertKey] = '${operation.value}\n';
-          //     jsonList.add(operationJson);
-          //     print('next is block embed, $operationJson');
-          //     continue;
-          //   }
-          // }
+          // If next is image.
+          if (next != null && next.value is Map) {
+            final embedType = Embeddable.fromJson(next.value).type;
+            final isBlockEmbed = embedType == 'image' || embedType == 'video' || embedType == 'divider';
+            if (isBlockEmbed && !operation.value.endsWith('\n')) {
+              final operationJson = operation.toJson();
+              operationJson[Operation.insertKey] = '${operation.value}\n';
+              jsonList.add(operationJson);
+              continue;
+            }
+          }
         }
       }
       jsonList.add(operation.toJson());
