@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+
 // import 'package:tun_editor/models/documents/attribute.dart';
 // import 'package:tun_editor/models/documents/document.dart';
 // import 'package:tun_editor/models/quill_delta.dart';
@@ -32,6 +33,7 @@ class TunEditor extends StatefulWidget {
 
   final bool autoFocus;
   final FocusNode? focusNode;
+  final ValueNotifier<bool>? isEditorFocus;
 
   // File base path is used to load local image.
   final String fileBasePath;
@@ -64,6 +66,7 @@ class TunEditor extends StatefulWidget {
     ),
     this.autoFocus = false,
     this.focusNode,
+    this.isEditorFocus,
     this.onMentionClick,
     this.onLinkClick,
     this.enableMarkdownSyntax = true,
@@ -78,11 +81,17 @@ class TunEditorState extends State<TunEditor> with TunEditorHandler {
 
   // Widget fields.
   TunEditorController get controller => widget.controller;
+
   String get fileBasePath => widget.fileBasePath;
+
   Map<String, dynamic> get imageStyle => widget.imageStyle;
+
   Map<String, dynamic> get videoStyle => widget.videoStyle;
+
   String get placeholder => widget.placeholder;
+
   TextStyle? get placeholderStyle => widget.placeholderStyle;
+
   Map<String, String> get placeholderStyleMap {
     if (placeholderStyle == null) {
       return {};
@@ -114,12 +123,21 @@ class TunEditorState extends State<TunEditor> with TunEditorHandler {
   }
 
   bool get readOnly => widget.readOnly;
+
   bool get scrollable => widget.scrollable;
+
   EdgeInsets get padding => widget.padding;
+
   bool get autoFocus => widget.autoFocus;
+
   FocusNode? get focusNode => widget.focusNode;
+
+  ValueNotifier<bool>? get isEditorFocus => widget.isEditorFocus;
+
   MentionClickCallback? get mentionClickCallback => widget.onMentionClick;
+
   LinkClickCallback? get linkClickCallback => widget.onLinkClick;
+
   bool get enableMarkdownSyntax => widget.enableMarkdownSyntax;
 
   TunEditorApi? _tunEditorApi;
@@ -250,12 +268,17 @@ class TunEditorState extends State<TunEditor> with TunEditorHandler {
     } else {
       throw UnsupportedError('Unsupported platform view');
     }
-    return Focus(
-      focusNode: focusNode,
-      canRequestFocus: true,
-      onFocusChange: _handleFocusChange,
-      child: child,
-    );
+
+    if (focusNode != null) {
+      return Focus(
+        focusNode: focusNode,
+        canRequestFocus: true,
+        onFocusChange: _handleFocusChange,
+        child: child,
+      );
+    } else {
+      return child;
+    }
   }
 
   @override
@@ -306,10 +329,16 @@ class TunEditorState extends State<TunEditor> with TunEditorHandler {
   @override
   void onFocusChange(bool hasFocus) {
     _isFocused = hasFocus;
-    if (hasFocus) {
-      focusNode?.requestFocus();
+    if (focusNode != null) {
+      if (hasFocus) {
+        focusNode?.requestFocus();
+      } else {
+        focusNode?.unfocus();
+      }
     } else {
-      focusNode?.unfocus();
+      if (widget.isEditorFocus != null) {
+        widget.isEditorFocus?.value = hasFocus;
+      }
     }
   }
 
