@@ -87,26 +87,26 @@
         },
       }
 
-      var replaceText;
-      var setContents;
-      var updateContents;
-      var format;
-      var formatText;
-      var setSelection;
-      var focus;
-      var blur;
-      var setPlaceholder;
-      var setReadOnly;
-      var setPadding;
-      var refreshImage;
-      var refreshVideoThumb;
-      var setImageStyle;
-      var setVideoStyle;
-      var setPlaceholderStyle;
-      var setupMarkdownSyntax;
+      let replaceText;
+      let setContents;
+      let updateContents;
+      let format;
+      let formatText;
+      let setSelection;
+      let focus;
+      let blur;
+      let setPlaceholder;
+      let setReadOnly;
+      let setPadding;
+      let refreshImage;
+      let refreshVideoThumb;
+      let setImageStyle;
+      let setVideoStyle;
+      let setPlaceholderStyle;
+      let setupMarkdownSyntax;
 
-      var imageStyle = {};
-      var videoStyle = {};
+      let imageStyle = {};
+      let videoStyle = {};
 
       const messages = [];
       let isRunning = false;
@@ -679,18 +679,18 @@
             bridge.onSelectionChange(range.index, range.length, JSON.stringify(format));
           }
         });
-        // quill.clipboard.addMatcher(Node.ELEMENT_NODE, (node, delta) => {
-        //   let ops = []
-        //   delta.ops.forEach(op => {
-        //     if (op.insert && typeof op.insert === 'string') {
-        //       ops.push({
-        //         insert: op.insert
-        //       })
-        //     }
-        //   })
-        //   delta.ops = ops
-        //   return delta
-        // })
+        quill.clipboard.addMatcher(Node.ELEMENT_NODE, (node, delta) => {
+          let ops = []
+          delta.ops.forEach(op => {
+            if (op.insert && typeof op.insert === 'string') {
+              ops.push({
+                insert: op.insert
+              })
+            }
+          })
+          delta.ops = ops
+          return delta
+        })
 
         replaceText = function(index, length, data, attributes,
             newLineAfterImage, isEmbeddable, ignoreFocus, selection) {
