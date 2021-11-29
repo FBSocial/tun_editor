@@ -87,26 +87,26 @@
         },
       }
 
-      var replaceText;
-      var setContents;
-      var updateContents;
-      var format;
-      var formatText;
-      var setSelection;
-      var focus;
-      var blur;
-      var setPlaceholder;
-      var setReadOnly;
-      var setPadding;
-      var refreshImage;
-      var refreshVideoThumb;
-      var setImageStyle;
-      var setVideoStyle;
-      var setPlaceholderStyle;
-      var setupMarkdownSyntax;
+      let replaceText;
+      let setContents;
+      let updateContents;
+      let format;
+      let formatText;
+      let setSelection;
+      let focus;
+      let blur;
+      let setPlaceholder;
+      let setReadOnly;
+      let setPadding;
+      let refreshImage;
+      let refreshVideoThumb;
+      let setImageStyle;
+      let setVideoStyle;
+      let setPlaceholderStyle;
+      let setupMarkdownSyntax;
 
-      var imageStyle = {};
-      var videoStyle = {};
+      let imageStyle = {};
+      let videoStyle = {};
 
       const messages = [];
       let isRunning = false;
@@ -621,20 +621,21 @@
         let lastTextChangeTime = 0;
         let lastFocusTime = 0;
         let lastScrollTop = 0;
-        window.addEventListener('scroll', function(event) {
+        quill.root.addEventListener('scroll', function(event) {
           const now = new Date();
           if (now.getTime() - lastSizeChangeTime < 1000
                 || now.getTime() - lastTextChangeTime < 1000
                 || now.getTime() - lastFocusTime < 1000) {
             return;
           }
-          if (lastScrollTop - window.scrollY > 20
+          const scrollTop = event.target.scrollTop
+          if (lastScrollTop - scrollTop > 20
                 && quill.getSelection() !== null
                 && quill.getSelection().length <= 0
                 && quill.hasFocus()) {
             quill.blur();
           }
-          lastScrollTop = window.scrollY;
+          lastScrollTop = scrollTop;
         });
         quill.root.addEventListener('blur', function() {
           bridge.onFocusChange(false);
@@ -679,18 +680,18 @@
             bridge.onSelectionChange(range.index, range.length, JSON.stringify(format));
           }
         });
-        // quill.clipboard.addMatcher(Node.ELEMENT_NODE, (node, delta) => {
-        //   let ops = []
-        //   delta.ops.forEach(op => {
-        //     if (op.insert && typeof op.insert === 'string') {
-        //       ops.push({
-        //         insert: op.insert
-        //       })
-        //     }
-        //   })
-        //   delta.ops = ops
-        //   return delta
-        // })
+        quill.clipboard.addMatcher(Node.ELEMENT_NODE, (node, delta) => {
+          let ops = []
+          delta.ops.forEach(op => {
+            if (op.insert && typeof op.insert === 'string') {
+              ops.push({
+                insert: op.insert
+              })
+            }
+          })
+          delta.ops = ops
+          return delta
+        })
 
         replaceText = function(index, length, data, attributes,
             newLineAfterImage, isEmbeddable, ignoreFocus, selection) {
