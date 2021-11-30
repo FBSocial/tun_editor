@@ -1,10 +1,12 @@
 .ql-container {
   font-size: 16px;
   color: #363940;
+  font-family: auto;
+  height: 100vh;
 }
 .ql-container.ql-snow {
    border: none !important;
-   height: 100vh;
+   caret-color: #5562F2;
  }
 .ql-editor {
   line-height: 1.5;

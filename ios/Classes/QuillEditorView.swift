@@ -377,8 +377,8 @@ class QuillEditorView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler {
         self.autoresizingMask = [.flexibleWidth, .flexibleHeight]
 
         self.scrollView.showsHorizontalScrollIndicator = false
-        self.scrollView.bounces = false
-        self.scrollView.clipsToBounds = false
+//        self.scrollView.bounces = false
+//        self.scrollView.clipsToBounds = false
         if #available(iOS 11.0, *) {
             self.scrollView.contentInsetAdjustmentBehavior = .never
             if #available(iOS 13.0, *) {
@@ -396,6 +396,7 @@ class QuillEditorView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler {
         self.configuration.userContentController.add(self, name: "onFocusChange")
         self.configuration.userContentController.add(self, name: "loadImage")
         self.configuration.userContentController.add(self, name: "loadVideoThumb")
+        self.configuration.userContentController.add(self, name: "debug")
 
         if let url = Bundle.main.url(forResource: "index", withExtension: "html") {
             self.loadFileURL(url, allowingReadAccessTo: url.deletingLastPathComponent())
@@ -411,7 +412,6 @@ class QuillEditorView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler {
     }
 
     func setKeyboardRequiresUserInteraction( _ value: Bool) {
-
         guard
             let WKContentViewClass: AnyClass = NSClassFromString("WKContentView") else {
                 print("Cannot find the WKContentView class")
