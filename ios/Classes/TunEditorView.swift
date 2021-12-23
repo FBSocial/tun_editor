@@ -138,6 +138,9 @@ class TunEditorView: NSObject, FlutterPlatformView {
                 self.methodChannel.invokeMethod("onFocusChange", arguments: hasFocus)
             }
         }
+        _editor.setHideKeyboard { [weak self] in
+            self?._editor.endEditing(true)
+        }
         methodChannel.setMethodCallHandler(handle)
         
         methodChannel.invokeMethod("onPageLoaded", arguments: nil)

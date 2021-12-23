@@ -152,13 +152,11 @@ class TunEditorController {
     for (final embed in embeds) {
       delta.insert(embed.toFormalJson());
       newOffset = newOffset + 1;
-
-      bool isLast = embeds.indexOf(embed) == embeds.length - 1;
-      if (embed is ImageEmbed && appendNewLineAfterImage && !isLast) {
+      if (appendNewLineAfterImage && embed is ImageEmbed) {
         delta.insert('\n');
         newOffset = newOffset + 1;
       }
-      if (embed is VideoEmbed && appendNewLineAfterVideo && !isLast) {
+      if (appendNewLineAfterVideo && embed is VideoEmbed) {
         delta.insert('\n');
         newOffset = newOffset + 1;
       }

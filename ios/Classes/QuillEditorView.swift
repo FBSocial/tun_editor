@@ -55,6 +55,7 @@ class QuillEditorView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler {
     var onMentionClickHandler: (([String: AnyObject]) -> Void)? = nil
     var onLinkClickHandler: (([String: AnyObject]) -> Void)? = nil
     var onFocusChangeHandler: (([String: AnyObject]) -> Void)? = nil
+    var hideKeyboardHandler: (() -> ())? = nil
         
     public override init(frame: CGRect, configuration: WKWebViewConfiguration) {
         super.init(frame: frame, configuration: configuration)
@@ -120,7 +121,7 @@ class QuillEditorView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler {
     }
     
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
-        debugPrint("receive message: \(message.name) \(message.body)")
+        // debugPrint("receive message: \(message.name) \(message.body)")
         switch message.name {
         case "onTextChange":
 //            onTextChangeHandler?(message.body)
@@ -149,6 +150,8 @@ class QuillEditorView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler {
             if let args = message.body as? [String: AnyObject] {
                 onFocusChangeHandler?(args)
             }
+        case "hideKeyboard":
+            hideKeyboardHandler?()
         case "loadImage":
             if let filename = message.body as? String {
                 refreshImage(filename)
@@ -329,6 +332,10 @@ class QuillEditorView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler {
     func setOnFocusChangeListener(_ handler: @escaping (([String: AnyObject]) -> Void)) {
         self.onFocusChangeHandler = handler
     }
+
+    func setHideKeyboard(_ handler: @escaping (() -> ())) {
+        self.hideKeyboardHandler = handler
+    }
     
     private func setContents(_ delta: [Any]) {
         do {
@@ -397,6 +404,7 @@ class QuillEditorView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler {
         self.configuration.userContentController.add(self, name: "loadImage")
         self.configuration.userContentController.add(self, name: "loadVideoThumb")
         self.configuration.userContentController.add(self, name: "debug")
+        self.configuration.userContentController.add(self, name: "hideKeyboard")
 
         if let url = Bundle.main.url(forResource: "index", withExtension: "html") {
             self.loadFileURL(url, allowingReadAccessTo: url.deletingLastPathComponent())

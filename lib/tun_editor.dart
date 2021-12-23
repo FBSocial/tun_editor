@@ -14,6 +14,7 @@ import 'package:tun_editor/tun_editor_api.dart';
 import 'package:tun_editor/controller.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 
+
 typedef MentionClickCallback = Function(String, String, String);
 typedef LinkClickCallback = Function(String);
 
@@ -131,8 +132,6 @@ class TunEditorState extends State<TunEditor> with TunEditorHandler {
   bool get autoFocus => widget.autoFocus;
 
   FocusNode? get focusNode => widget.focusNode;
-
-  ValueNotifier<bool>? get isEditorFocus => widget.isEditorFocus;
 
   MentionClickCallback? get mentionClickCallback => widget.onMentionClick;
 
@@ -329,16 +328,10 @@ class TunEditorState extends State<TunEditor> with TunEditorHandler {
   @override
   void onFocusChange(bool hasFocus) {
     _isFocused = hasFocus;
-    if (focusNode != null) {
-      if (hasFocus) {
-        focusNode?.requestFocus();
-      } else {
-        focusNode?.unfocus();
-      }
+    if (hasFocus) {
+      focusNode?.requestFocus();
     } else {
-      if (isEditorFocus != null) {
-        isEditorFocus?.value = hasFocus;
-      }
+      focusNode?.unfocus();
     }
   }
 
@@ -359,9 +352,9 @@ class TunEditorState extends State<TunEditor> with TunEditorHandler {
     if (hasFocus != _isFocused) {
       _isFocused = hasFocus;
       if (hasFocus) {
-        _tunEditorApi?.focus();
+          _tunEditorApi?.focus();
       } else {
-        _tunEditorApi?.blur();
+          _tunEditorApi?.blur();
       }
     }
   }
