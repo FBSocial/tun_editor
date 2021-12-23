@@ -71,6 +71,10 @@
             });
           }
         },
+        hideKeyboard: function() {
+          if(isIOS) 
+            window.webkit.messageHandlers.hideKeyboard.postMessage({});
+        },
         loadImage: function(path) {
           if (isAndroid) {
             return tun.loadImage(path);
@@ -114,6 +118,8 @@
       let sleep;
       let pushMessage;
       let startMessageHandler;
+      let isCompositing = false;
+      let compositionendTime=0;
 
       document.addEventListener('DOMContentLoaded', () => {
         let Parchment = Quill.import('parchment');
@@ -577,6 +583,7 @@
           }
         };
         var quill = new Quill('#editor', options);
+        window.quill = quill;
         quill.root.addEventListener('click', (ev) => {
           if (ev.target.tagName === 'A') {
             // Link click.
@@ -620,6 +627,7 @@
         let lastSizeChangeTime = 0;
         let lastTextChangeTime = 0;
         let lastFocusTime = 0;
+        let lastBlurTime = 0;
         let lastScrollTop = 0;
         quill.root.addEventListener('scroll', function(event) {
           const now = new Date();
@@ -638,18 +646,29 @@
           lastScrollTop = scrollTop;
         });
         quill.root.addEventListener('blur', function() {
+          lastBlurTime = new Date().getTime();
           bridge.onFocusChange(false);
         });
         quill.root.addEventListener('focus', function() {
           const now = new Date();
           lastFocusTime = now.getTime();
-          bridge.onFocusChange(true);
+          if(isCompositing) {
+            if(new Date().getTime()-lastBlurTime<100) {
+              bridge.hideKeyboard();
+            }
+          } else {
+              bridge.onFocusChange(true);
+          }
+          
         });
         quill.root.addEventListener('compositionstart', function() {
           quill.root.classList.toggle('ql-blank', false);
+          isCompositing = true;
         });
         quill.root.addEventListener('compositionend', function() {
           quill.root.classList.toggle('ql-blank', quill.editor.isBlank());
+          isCompositing = false;
+          compositionendTime = new Date().getTime();
         });
         window.addEventListener('resize', function() {
           const now = new Date();
@@ -740,7 +759,13 @@
           quill.focus();
         }
         blur = function() {
-          quill.blur();
+          if(new Date().getTime()-compositionendTime<100) {
+            setTimeout(() => {
+              quill.blur();
+            }, 200);
+          } else {
+            quill.blur();
+          }
         }
         setPlaceholder = function(placeholder) {
           quill.root.dataset.placeholder = placeholder;

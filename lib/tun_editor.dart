@@ -6,11 +6,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
-import 'package:tun_editor/models/documents/attribute.dart';
-import 'package:tun_editor/models/documents/document.dart';
-import 'package:tun_editor/models/quill_delta.dart';
+
+// import 'package:tun_editor/models/documents/attribute.dart';
+// import 'package:tun_editor/models/documents/document.dart';
+// import 'package:tun_editor/models/quill_delta.dart';
 import 'package:tun_editor/tun_editor_api.dart';
 import 'package:tun_editor/controller.dart';
+import 'package:flutter_quill/flutter_quill.dart';
 
 typedef MentionClickCallback = Function(String, String, String);
 typedef LinkClickCallback = Function(String);
@@ -77,11 +79,17 @@ class TunEditorState extends State<TunEditor> with TunEditorHandler {
 
   // Widget fields.
   TunEditorController get controller => widget.controller;
+
   String get fileBasePath => widget.fileBasePath;
+
   Map<String, dynamic> get imageStyle => widget.imageStyle;
+
   Map<String, dynamic> get videoStyle => widget.videoStyle;
+
   String get placeholder => widget.placeholder;
+
   TextStyle? get placeholderStyle => widget.placeholderStyle;
+
   Map<String, String> get placeholderStyleMap {
     if (placeholderStyle == null) {
       return {};
@@ -113,12 +121,19 @@ class TunEditorState extends State<TunEditor> with TunEditorHandler {
   }
 
   bool get readOnly => widget.readOnly;
+
   bool get scrollable => widget.scrollable;
+
   EdgeInsets get padding => widget.padding;
+
   bool get autoFocus => widget.autoFocus;
+
   FocusNode? get focusNode => widget.focusNode;
+
   MentionClickCallback? get mentionClickCallback => widget.onMentionClick;
+
   LinkClickCallback? get linkClickCallback => widget.onLinkClick;
+
   bool get enableMarkdownSyntax => widget.enableMarkdownSyntax;
 
   TunEditorApi? _tunEditorApi;
@@ -249,12 +264,17 @@ class TunEditorState extends State<TunEditor> with TunEditorHandler {
     } else {
       throw UnsupportedError('Unsupported platform view');
     }
-    return Focus(
-      focusNode: focusNode,
-      canRequestFocus: true,
-      onFocusChange: _handleFocusChange,
-      child: child,
-    );
+
+    if (focusNode != null) {
+      return Focus(
+        focusNode: focusNode,
+        canRequestFocus: true,
+        onFocusChange: _handleFocusChange,
+        child: child,
+      );
+    } else {
+      return child;
+    }
   }
 
   @override
@@ -329,9 +349,9 @@ class TunEditorState extends State<TunEditor> with TunEditorHandler {
     if (hasFocus != _isFocused) {
       _isFocused = hasFocus;
       if (hasFocus) {
-        _tunEditorApi?.focus();
+          _tunEditorApi?.focus();
       } else {
-        _tunEditorApi?.blur();
+          _tunEditorApi?.blur();
       }
     }
   }

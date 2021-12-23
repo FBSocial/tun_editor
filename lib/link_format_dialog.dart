@@ -115,7 +115,8 @@ class LinkFomratDialogState extends State<LinkFomratDialog> {
                 ),
                 SizedBox(width: 12.w),
                 Expanded(
-                  child: SizedBox(
+                  child: Container(
+                    alignment: Alignment.center,
                     height: 40.w,
                     child: TextField(
                       style: fieldStyle,
@@ -142,7 +143,8 @@ class LinkFomratDialogState extends State<LinkFomratDialog> {
                 ),
                 SizedBox(width: 12.w),
                 Expanded(
-                  child: SizedBox(
+                  child: Container(
+                    alignment: Alignment.center,
                     height: 40.w,
                     child: TextField(
                       style: fieldStyle,

@@ -4,7 +4,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:tun_editor/iconfont.dart';
 import 'package:tun_editor/controller.dart';
 import 'package:tun_editor/link_format_dialog.dart';
-import 'package:tun_editor/models/documents/attribute.dart';
+// import 'package:tun_editor/models/documents/attribute.dart';
+import 'package:flutter_quill/flutter_quill.dart';
 
 class TunEditorToolbar extends StatefulWidget {
 

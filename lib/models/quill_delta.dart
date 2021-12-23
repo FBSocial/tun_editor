@@ -9,7 +9,7 @@ import 'dart:math' as math;
 
 import 'package:collection/collection.dart';
 import 'package:quiver/core.dart';
-import 'package:tun_editor/models/documents/nodes/embed.dart';
+import 'package:flutter_quill/flutter_quill.dart';
 
 const _attributeEquality = DeepCollectionEquality();
 const _valueEquality = DeepCollectionEquality();

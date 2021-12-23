@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:tun_editor/models/documents/attribute.dart';
-import 'package:tun_editor/models/documents/document.dart';
-import 'package:tun_editor/models/documents/nodes/embed.dart';
-import 'package:tun_editor/models/quill_delta.dart';
+// import 'package:tun_editor/models/documents/attribute.dart';
+// import 'package:tun_editor/models/documents/document.dart';
+// import 'package:tun_editor/models/documents/nodes/embed.dart';
+// import 'package:tun_editor/models/quill_delta.dart';
 import 'package:tun_editor/tun_editor_api.dart';
+import 'package:flutter_quill/flutter_quill.dart';
 
 class TunEditorController {
   TunEditorApi? _tunEditorApi;
@@ -151,13 +152,11 @@ class TunEditorController {
     for (final embed in embeds) {
       delta.insert(embed.toFormalJson());
       newOffset = newOffset + 1;
-
-      bool isLast = embeds.indexOf(embed) == embeds.length - 1;
-      if (embed is ImageEmbed && appendNewLineAfterImage && !isLast) {
+      if (appendNewLineAfterImage && embed is ImageEmbed) {
         delta.insert('\n');
         newOffset = newOffset + 1;
       }
-      if (embed is VideoEmbed && appendNewLineAfterVideo && !isLast) {
+      if (appendNewLineAfterVideo && embed is VideoEmbed) {
         delta.insert('\n');
         newOffset = newOffset + 1;
       }
