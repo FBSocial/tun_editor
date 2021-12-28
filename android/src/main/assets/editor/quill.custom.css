@@ -72,12 +72,12 @@ hr {
   background-color: #8f959e1e;
 }
 .ql-snow .ql-editor blockquote {
-  border-left: 2px solid #5562F2;
+  border-left: 2px solid #198CFE;
   padding-left: 12px;
   color: #646A73;
 }
 .ql-snow a {
-  color: #5562F2;
+  color: #198CFE;
 }
 .ql-editor .ql-code-block-container,
 .ql-snow .ql-editor pre.ql-syntax {
@@ -106,7 +106,7 @@ pre .hljs-line::before {
   margin-right: 16px;
 }
 span.mention {
-  color: #5562F2;
+  color: #198CFE;
 }
 .ql-snow .ql-editor blockquote {
   margin: 0;
