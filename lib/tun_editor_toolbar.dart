@@ -24,6 +24,10 @@ class TunEditorToolbar extends StatefulWidget {
   // Children is the custom tool menu.
   final List<Widget>? children;
 
+  // Primary color.
+  final Color? primaryColor;
+  final Color defaultPrimaryColor = const Color(0xFF198CFE);
+
   const TunEditorToolbar({
     Key? key,
     required this.controller,
@@ -33,6 +37,7 @@ class TunEditorToolbar extends StatefulWidget {
     this.disabledMenu,
     this.onDisabledMenuChange,
     this.children,
+    this.primaryColor
   }) : super(key: key);
 
   @override
@@ -445,7 +450,7 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
     if (isDisabled) {
       color = Color(0x80363940);
     } else if (isActive) {
-      color = Color(0xFF5562F2);
+      color = widget.primaryColor ?? widget.defaultPrimaryColor;
     }
     return GestureDetector(
       onTap: isDisabled ? null : onPressed,
@@ -539,11 +544,12 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
     }
 
     controller.focus();
-    final res = await LinkFomratDialog.show(
+    final res = await LinkFormatDialog.show(
       context,
       defaultText: defaultText.replaceAll('\n', ' '),
       defaultUrl: defaultUrl,
       isUrlAutofocus: !selection.isCollapsed,
+      primaryColor: widget.primaryColor,
     );
     if (res != null && res.length >= 2) {
       final text = res[0];

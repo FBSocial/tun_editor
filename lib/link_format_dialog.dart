@@ -1,43 +1,50 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-class LinkFomratDialog extends StatefulWidget {
+class LinkFormatDialog extends StatefulWidget {
 
   final String defaultText;
   final String defaultUrl;
   final bool isUrlAutofocus;
 
-  const LinkFomratDialog({
+  // Primary color.
+  final Color? primaryColor;
+  final Color defaultPrimaryColor = const Color(0xFF198CFE);
+
+  const LinkFormatDialog({
     Key? key,
     this.defaultText = '',
     this.defaultUrl = '',
     this.isUrlAutofocus = false,
+    this.primaryColor,
   }) : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => LinkFomratDialogState();
+  State<StatefulWidget> createState() => LinkFormatDialogState();
 
   static Future<List<String>?> show(
     BuildContext context, {
       String defaultText = '',
       String defaultUrl = '',
       bool isUrlAutofocus = false,
+      Color? primaryColor,
     }
   ) {
     return showDialog<List<String>?>(
       context: context,
       barrierDismissible: false,
-      builder: (BuildContext context) => LinkFomratDialog(
+      builder: (BuildContext context) => LinkFormatDialog(
         defaultText: defaultText,
         defaultUrl: defaultUrl,
         isUrlAutofocus: isUrlAutofocus,
+        primaryColor: primaryColor,
       ),
     );
   }
 
 }
 
-class LinkFomratDialogState extends State<LinkFomratDialog> {
+class LinkFormatDialogState extends State<LinkFormatDialog> {
 
   String get defaultText => widget.defaultText;
   String get defaultUrl => widget.defaultUrl;
@@ -119,7 +126,7 @@ class LinkFomratDialogState extends State<LinkFomratDialog> {
                     height: 40.w,
                     child: TextField(
                       style: fieldStyle,
-                      cursorColor: Color(0xFF5562F2),
+                      cursorColor: widget.primaryColor ?? widget.defaultPrimaryColor,
                       textInputAction: TextInputAction.next,
                       decoration: inputDecoration.copyWith(
                         hintText: "输入文本",
@@ -146,7 +153,7 @@ class LinkFomratDialogState extends State<LinkFomratDialog> {
                     height: 40.w,
                     child: TextField(
                       style: fieldStyle,
-                      cursorColor: Color(0xFF5562F2),
+                      cursorColor: widget.primaryColor ?? widget.defaultPrimaryColor,
                       decoration: inputDecoration.copyWith(
                         hintText: "粘贴或输入一个链接",
                       ),
@@ -208,9 +215,9 @@ class LinkFomratDialogState extends State<LinkFomratDialog> {
                       foregroundColor: MaterialStateProperty.all(Colors.white),
                       backgroundColor: MaterialStateProperty.resolveWith((Set<MaterialState> states) {
                         if (states.contains(MaterialState.disabled)) {
-                          return Color(0x806179F2);
+                          return (widget.primaryColor ?? widget.defaultPrimaryColor).withAlpha(128);
                         }
-                        return Color(0xFF6179F2);
+                        return widget.primaryColor ?? widget.defaultPrimaryColor;
                       }),
                       padding: MaterialStateProperty.all(EdgeInsets.zero),
                       side: MaterialStateProperty.all(BorderSide.none),
