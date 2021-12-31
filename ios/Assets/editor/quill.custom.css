@@ -1,7 +1,7 @@
 .ql-container {
   font-size: 16px;
   color: #363940;
-  font-family: auto;
+  font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, Ubuntu;
   height: 100vh;
 }
 .ql-container.ql-snow {
