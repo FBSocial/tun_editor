@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:tun_editor/iconfont.dart';
 import 'package:tun_editor/controller.dart';
@@ -26,8 +25,12 @@ class TunEditorToolbar extends StatefulWidget {
   final List<Widget>? children;
 
   // Primary color.
-  final Color? primaryColor;
-  final Color defaultPrimaryColor = const Color(0xFF198CFE);
+  final Color primaryColor;
+
+  // Primary icon color.
+  final Color primaryIconColor;
+  final Color iconOverlayColor;
+  final Color? disabledIconColor;
 
   const TunEditorToolbar({
     Key? key,
@@ -38,7 +41,10 @@ class TunEditorToolbar extends StatefulWidget {
     this.disabledMenu,
     this.onDisabledMenuChange,
     this.children,
-    this.primaryColor
+    this.primaryColor = const Color(0xFF198CFE),
+    this.primaryIconColor = const Color(0xFF5C6273),
+    this.disabledIconColor,
+    this.iconOverlayColor = const Color(0x268F959E)
   }) : super(key: key);
 
   @override
@@ -428,30 +434,31 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
   }
 
   Widget buildButton(IconData iconData, VoidCallback onPressed, bool isActive, bool isDisabled) {
+    final Color disabledIconColor = widget.disabledIconColor ?? widget.primaryIconColor.withAlpha(128);
     return GestureDetector(
       onTap: isDisabled ? null : onPressed,
       child: Container(
         width: 36.w,
         height: 36.w,
         decoration: BoxDecoration(
-          color: !isDisabled && isActive ? Color(0x268F959E) : Colors.transparent,
+          color: !isDisabled && isActive ? widget.iconOverlayColor : Colors.transparent,
           borderRadius: !isDisabled && isActive ? BorderRadius.circular(3.w) : BorderRadius.zero,
         ),
         child: Icon(
           iconData,
           size: 24.w,
-          color: isDisabled ? Color(0x80363940) : Color(0xFF363940),
+          color: isDisabled ? disabledIconColor : widget.primaryIconColor,
         ),
       ),
     );
   }
 
   Widget buildOutlineButton(IconData iconData, VoidCallback onPressed, bool isActive, bool isDisabled) {
-    Color color = Color(0xFF363940);
+    Color color = widget.primaryIconColor;
     if (isDisabled) {
-      color = Color(0x80363940);
+      color = widget.disabledIconColor ?? color.withAlpha(128);
     } else if (isActive) {
-      color = widget.primaryColor ?? widget.defaultPrimaryColor;
+      color = widget.primaryColor;
     }
     return GestureDetector(
       onTap: isDisabled ? null : onPressed,
