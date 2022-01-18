@@ -155,7 +155,7 @@ class FullPageEditorState extends State<FullPageEditor> {
                                 TextDecoration.lineThrough,
                               ])),
                           focusNode: _editorFocusNode,
-                          autoFocus: true,
+                          autoFocus: false,
                           readOnly: _readOnly,
                           scrollable: true,
                           onMentionClick:
