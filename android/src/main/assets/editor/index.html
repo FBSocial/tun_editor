@@ -311,14 +311,20 @@
                 second = 99;
               }
               let timeFormat = `${minute.toString().padStart(2, '0')}:${second.toString().padStart(2, '0')}`
-              durationSpan.innerHTML = `<svg t="1629367052116" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="9336" xmlns:xlink="http://www.w3.org/1999/xlink" width="15" height="15"><defs><style type="text/css">@font-face { font-family: element-icons; src: url("chrome-extension://moombeodfomdpjnpocobemoiaemednkg/fonts/element-icons.woff") format("woff"), url("chrome-extension://moombeodfomdpjnpocobemoiaemednkg/fonts/element-icons.ttf ") format("truetype"); }</style></defs><path d="M896 305.066667a72.533333 72.533333 0 0 0-78.933333 12.8l-91.733334 85.333333V341.333333a128 128 0 0 0-128-128H213.333333a128 128 0 0 0-128 128v341.333334a128 128 0 0 0 128 128h384a128 128 0 0 0 128-128v-61.866667l92.16 85.333333a74.24 74.24 0 0 0 49.493334 19.2 71.68 71.68 0 0 0 29.44-6.4 68.266667 68.266667 0 0 0 42.666666-63.146666V368.213333A68.266667 68.266667 0 0 0 896 305.066667z" fill="#FFFFFF" p-id="9337"></path></svg> <span>${timeFormat}</span>`;
+              durationSpan.innerHTML = `${timeFormat}`;
             } else {
               durationSpan.innerHTML = '00:00';
             }
             durationSpan.setAttribute('contenteditable', false);
 
+            const removeSpan = document.createElement("div");
+            removeSpan.className = 'video-remove-mask';
+            removeSpan.innerHTML = `<svg t="1642472221263" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="6896" width="12" height="12"><path d="M225.386667 165.056L512 451.626667 798.613333 165.056a21.333333 21.333333 0 0 1 28.16-1.792l2.005334 1.792 30.165333 30.165333a21.333333 21.333333 0 0 1 0 30.165334L572.330667 512l286.613333 286.613333a21.333333 21.333333 0 0 1 0 30.165334l-30.165333 30.165333a21.333333 21.333333 0 0 1-30.165334 0L512 572.330667 225.386667 858.944a21.333333 21.333333 0 0 1-28.16 1.792l-2.005334-1.792-30.165333-30.165333a21.333333 21.333333 0 0 1 0-30.165334L451.626667 512 165.056 225.386667a21.333333 21.333333 0 0 1 0-30.165334L195.2 165.056a21.333333 21.333333 0 0 1 30.165333 0z" fill="#ffffff" p-id="6897"></path></svg>`;
+            removeSpan.setAttribute('contenteditable', false);
+
             video.appendChild(poster);
             video.appendChild(durationSpan);
+            video.appendChild(removeSpan);
             node.appendChild(video);
 
             if (videoStyle.width) {
@@ -334,7 +340,17 @@
             Object.keys(value).forEach(function(key) {
               node.dataset[key] = value[key];
             });
+            removeSpan.addEventListener('click', function(event) {
+              let blot = Quill.find(node);
+              let index = blot.offset(quill.scroll);
+              quill.updateContents(new Delta()
+                .retain(index)
+                .delete(1)
+              );
+              event.stopPropagation();
+            });
             node.addEventListener('click', function(event) {
+              console.log('on click');
               let blot = Quill.find(node);
               let index = blot.offset(quill.scroll);
               quill.setSelection(index + 1, 0, Quill.sources.API)
@@ -680,18 +696,19 @@
             bridge.onSelectionChange(range.index, range.length, JSON.stringify(format));
           }
         });
-        quill.clipboard.addMatcher(Node.ELEMENT_NODE, (node, delta) => {
-          let ops = []
-          delta.ops.forEach(op => {
-            if (op.insert && typeof op.insert === 'string') {
-              ops.push({
-                insert: op.insert
-              })
-            }
-          })
-          delta.ops = ops
-          return delta
-        })
+        // quill.clipboard.addMatcher(Node.ELEMENT_NODE, (node, delta) => {
+        //   console.info(node, delta);
+        //   let ops = []
+        //   delta.ops.forEach(op => {
+        //     if (op.insert && typeof op.insert === 'string') {
+        //       ops.push({
+        //         insert: op.insert
+        //       })
+        //     }
+        //   })
+        //   delta.ops = ops
+        //   return delta;
+        // })
 
         replaceText = function(index, length, data, attributes,
             newLineAfterImage, isEmbeddable, ignoreFocus, selection) {

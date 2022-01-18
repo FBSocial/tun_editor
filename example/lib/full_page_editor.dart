@@ -155,7 +155,7 @@ class FullPageEditorState extends State<FullPageEditor> {
                                 TextDecoration.lineThrough,
                               ])),
                           focusNode: _editorFocusNode,
-                          autoFocus: true,
+                          autoFocus: false,
                           readOnly: _readOnly,
                           scrollable: true,
                           onMentionClick:
@@ -169,7 +169,8 @@ class FullPageEditorState extends State<FullPageEditor> {
                         ),
                       ),
                       SizedBox(
-                        height: 0,
+                        width: double.infinity,
+                        height: 100,
                         child: SingleChildScrollView(
                           child: Text(_previewText),
                         ),
