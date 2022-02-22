@@ -318,7 +318,7 @@ class TunEditorState extends State<TunEditor> with TunEditorHandler {
       _tunEditorApi?.focus();
       _tunEditorApi?.updateSelection(controller.selection);
     } else {
-      _tunEditorApi?.updateSelection(controller.selection);
+      _tunEditorApi?.updateSelection(controller.selection, ignoreFocus:true);
       _tunEditorApi?.blur();
     }
   }
