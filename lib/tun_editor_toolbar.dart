@@ -87,6 +87,7 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
       BoxConstraints(
           maxWidth: MediaQuery.of(context).size.width,
           maxHeight: MediaQuery.of(context).size.height),
+      context: context,
       designSize: Size(375, 812),
       orientation: Orientation.portrait,
     );
