@@ -9,6 +9,7 @@ class IconFont {
 
   static const IconData at = IconData(0xe622, fontFamily: fontFamily, fontPackage: fontPackage);
   static const IconData image = IconData(0xe623, fontFamily: fontFamily, fontPackage: fontPackage);
+  static const IconData channel = IconData(0xe64d, fontFamily: fontFamily, fontPackage: fontPackage);
   static const IconData emoji = IconData(0xe654, fontFamily: fontFamily, fontPackage: fontPackage);
   static const IconData textType = IconData(0xe642, fontFamily: fontFamily, fontPackage: fontPackage);
   static const IconData textStyle = IconData(0xe637, fontFamily: fontFamily, fontPackage: fontPackage);
