@@ -180,7 +180,8 @@
         class ImageExtend extends Embed {
           static create(value) {
             const node = super.create(value);
-            let url = this.sanitize(value.source);
+            const source = value.source || value.src;
+            let url = this.sanitize(source);
             if (url.startsWith('file')) {
               bridge.loadImage(url.replace('file://', ''));
             } else {
@@ -696,19 +697,20 @@
             bridge.onSelectionChange(range.index, range.length, JSON.stringify(format));
           }
         });
-        // quill.clipboard.addMatcher(Node.ELEMENT_NODE, (node, delta) => {
-        //   console.info(node, delta);
-        //   let ops = []
-        //   delta.ops.forEach(op => {
-        //     if (op.insert && typeof op.insert === 'string') {
-        //       ops.push({
-        //         insert: op.insert
-        //       })
-        //     }
-        //   })
-        //   delta.ops = ops
-        //   return delta;
-        // })
+        quill.clipboard.addMatcher(Node.ELEMENT_NODE, (node, delta) => {
+          console.info(node, delta);
+          let ops = []
+          delta.ops.forEach(op => {
+            if (op.insert && op.insert["video"] && typeof op.insert["video"] == 'object' && !op.insert["video"]["thumb_url"]) {
+              return;
+            } else if (op.insert && op.insert["image"] && typeof op.insert["image"] == 'object' && !op.insert["image"]["source"] && !op.insert["image"]["src"]) {
+              return;
+            }
+            ops.push(op)
+          })
+          delta.ops = ops
+          return delta;
+        })
 
         replaceText = function(index, length, data, attributes,
             newLineAfterImage, isEmbeddable, ignoreFocus, selection) {
@@ -757,7 +759,7 @@
           quill.focus();
         }
         blur = function() {
-          quill.blur();
+            quill.blur();
         }
         setPlaceholder = function(placeholder) {
           quill.root.dataset.placeholder = placeholder;
