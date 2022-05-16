@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:tun_editor/iconfont.dart';
-import 'package:tun_editor/controller.dart';
-import 'package:tun_editor/link_format_dialog.dart';
 // import 'package:tun_editor/models/documents/attribute.dart';
 import 'package:flutter_quill/flutter_quill.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:tun_editor/controller.dart';
+import 'package:tun_editor/iconfont.dart';
+import 'package:tun_editor/link_format_dialog.dart';
 
 class TunEditorToolbar extends StatefulWidget {
   final TunEditorController controller;
@@ -33,17 +33,17 @@ class TunEditorToolbar extends StatefulWidget {
 
   const TunEditorToolbar(
       {Key? key,
-        required this.controller,
-        this.showingSubToolbar = SubToolbar.none,
-        this.onSubToolbarChange,
-        this.menu = defaultToolbarMenu,
-        this.disabledMenu,
-        this.onDisabledMenuChange,
-        this.children,
-        this.primaryColor = const Color(0xFF198CFE),
-        this.primaryIconColor = const Color(0xFF5C6273),
-        this.disabledIconColor,
-        this.iconOverlayColor = const Color(0x268F959E)})
+      required this.controller,
+      this.showingSubToolbar = SubToolbar.none,
+      this.onSubToolbarChange,
+      this.menu = defaultToolbarMenu,
+      this.disabledMenu,
+      this.onDisabledMenuChange,
+      this.children,
+      this.primaryColor = const Color(0xFF198CFE),
+      this.primaryIconColor = const Color(0xFF5C6273),
+      this.disabledIconColor,
+      this.iconOverlayColor = const Color(0x268F959E)})
       : super(key: key);
 
   @override
@@ -101,7 +101,7 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
         children: [
           buildSubToolbar(),
           showingSubToolbar == SubToolbar.textType ||
-              showingSubToolbar == SubToolbar.textStyle
+                  showingSubToolbar == SubToolbar.textStyle
               ? SizedBox(height: 4)
               : SizedBox.shrink(),
           Divider(),
@@ -122,11 +122,22 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
   // Main toolbar.
   Widget buildMainToolbar() {
     final List<Widget> menuList = [];
+    if (menu.contains(ToolbarMenu.emoji)) {
+      menuList.addAll([
+        buildButton(
+          IconFont.emoji,
+          () => toggleSubToolbar(SubToolbar.emoji),
+          false,
+          disabledMenu.contains(ToolbarMenu.emoji),
+        ),
+        SizedBox(width: 8.w),
+      ]);
+    }
     if (menu.contains(ToolbarMenu.at)) {
       menuList.addAll([
         buildButton(
           IconFont.at,
-              () => toggleSubToolbar(SubToolbar.at),
+          () => toggleSubToolbar(SubToolbar.at),
           false,
           disabledMenu.contains(ToolbarMenu.at),
         ),
@@ -137,7 +148,7 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
       menuList.addAll([
         buildButton(
           IconFont.image,
-              () => toggleSubToolbar(SubToolbar.image),
+          () => toggleSubToolbar(SubToolbar.image),
           false,
           disabledMenu.contains(ToolbarMenu.image),
         ),
@@ -148,20 +159,9 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
       menuList.addAll([
         buildButton(
           IconFont.channel,
-              () => toggleSubToolbar(SubToolbar.channel),
+          () => toggleSubToolbar(SubToolbar.channel),
           false,
           disabledMenu.contains(ToolbarMenu.channel),
-        ),
-        SizedBox(width: 8.w),
-      ]);
-    }
-    if (menu.contains(ToolbarMenu.emoji)) {
-      menuList.addAll([
-        buildButton(
-          IconFont.emoji,
-              () => toggleSubToolbar(SubToolbar.emoji),
-          false,
-          disabledMenu.contains(ToolbarMenu.emoji),
         ),
         SizedBox(width: 8.w),
       ]);
@@ -170,7 +170,7 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
       menuList.addAll([
         buildButton(
           IconFont.textType,
-              () => toggleSubToolbar(SubToolbar.textType),
+          () => toggleSubToolbar(SubToolbar.textType),
           showingSubToolbar == SubToolbar.textType,
           disabledMenu.contains(ToolbarMenu.textType),
         ),
@@ -181,7 +181,7 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
       menuList.addAll([
         buildButton(
           IconFont.textStyle,
-              () => toggleSubToolbar(SubToolbar.textStyle),
+          () => toggleSubToolbar(SubToolbar.textStyle),
           showingSubToolbar == SubToolbar.textStyle,
           disabledMenu.contains(ToolbarMenu.textStyle),
         ),
@@ -192,7 +192,7 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
       menuList.addAll([
         buildOutlineButton(
           IconFont.link,
-              () => onLinkFormatClick(),
+          () => onLinkFormatClick(),
           currentTextStyleList.contains(Attribute.link.uniqueKey),
           disabledMenu.contains(ToolbarMenu.link),
         ),
@@ -242,7 +242,7 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
       textTypeMenuList.addAll([
         buildOutlineButton(
           IconFont.headline1,
-              () => toggleTextType(Attribute.h1.uniqueKey),
+          () => toggleTextType(Attribute.h1.uniqueKey),
           currentTextType == Attribute.h1.uniqueKey,
           disabledMenu.contains(ToolbarMenu.textTypeHeadline1),
         ),
@@ -253,7 +253,7 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
       textTypeMenuList.addAll([
         buildOutlineButton(
           IconFont.headline2,
-              () => toggleTextType(Attribute.h2.uniqueKey),
+          () => toggleTextType(Attribute.h2.uniqueKey),
           currentTextType == Attribute.h2.uniqueKey,
           disabledMenu.contains(ToolbarMenu.textTypeHeadline2),
         ),
@@ -264,7 +264,7 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
       textTypeMenuList.addAll([
         buildOutlineButton(
           IconFont.headline3,
-              () => toggleTextType(Attribute.h3.uniqueKey),
+          () => toggleTextType(Attribute.h3.uniqueKey),
           currentTextType == Attribute.h3.uniqueKey,
           disabledMenu.contains(ToolbarMenu.textTypeHeadline3),
         ),
@@ -275,7 +275,7 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
       textTypeMenuList.addAll([
         buildOutlineButton(
           IconFont.listBullet,
-              () => toggleTextType(Attribute.ul.uniqueKey),
+          () => toggleTextType(Attribute.ul.uniqueKey),
           currentTextType == Attribute.ul.uniqueKey,
           disabledMenu.contains(ToolbarMenu.textTypeListBullet),
         ),
@@ -286,7 +286,7 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
       textTypeMenuList.addAll([
         buildOutlineButton(
           IconFont.listOrdered,
-              () => toggleTextType(Attribute.ol.uniqueKey),
+          () => toggleTextType(Attribute.ol.uniqueKey),
           currentTextType == Attribute.ol.uniqueKey,
           disabledMenu.contains(ToolbarMenu.textTypeListOrdered),
         ),
@@ -308,7 +308,7 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
       textTypeMenuList.addAll([
         buildOutlineButton(
           IconFont.quote,
-              () => toggleTextType(Attribute.blockQuote.uniqueKey),
+          () => toggleTextType(Attribute.blockQuote.uniqueKey),
           currentTextType == Attribute.blockQuote.uniqueKey,
           disabledMenu.contains(ToolbarMenu.textTypeQuote),
         ),
@@ -319,7 +319,7 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
       textTypeMenuList.addAll([
         buildOutlineButton(
           IconFont.codeBlock,
-              () => toggleTextType(Attribute.codeBlock.uniqueKey),
+          () => toggleTextType(Attribute.codeBlock.uniqueKey),
           currentTextType == Attribute.codeBlock.uniqueKey,
           disabledMenu.contains(ToolbarMenu.textTypeCodeBlock),
         ),
@@ -369,7 +369,7 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
       textStyleMenuList.addAll([
         buildOutlineButton(
           IconFont.bold,
-              () => toggleTextStyle(Attribute.bold.uniqueKey),
+          () => toggleTextStyle(Attribute.bold.uniqueKey),
           currentTextStyleList.contains(Attribute.bold.uniqueKey),
           disabledMenu.contains(ToolbarMenu.textStyleBold),
         ),
@@ -380,7 +380,7 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
       textStyleMenuList.addAll([
         buildOutlineButton(
           IconFont.italic,
-              () => toggleTextStyle(Attribute.italic.uniqueKey),
+          () => toggleTextStyle(Attribute.italic.uniqueKey),
           currentTextStyleList.contains(Attribute.italic.uniqueKey),
           disabledMenu.contains(ToolbarMenu.textStyleItalic),
         ),
@@ -391,7 +391,7 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
       textStyleMenuList.addAll([
         buildOutlineButton(
           IconFont.underline,
-              () => toggleTextStyle(Attribute.underline.uniqueKey),
+          () => toggleTextStyle(Attribute.underline.uniqueKey),
           currentTextStyleList.contains(Attribute.underline.uniqueKey),
           disabledMenu.contains(ToolbarMenu.textStyleUnderline),
         ),
@@ -402,7 +402,7 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
       textStyleMenuList.addAll([
         buildOutlineButton(
           IconFont.strikeThrough,
-              () => toggleTextStyle(Attribute.strikeThrough.uniqueKey),
+          () => toggleTextStyle(Attribute.strikeThrough.uniqueKey),
           currentTextStyleList.contains(Attribute.strikeThrough.uniqueKey),
           disabledMenu.contains(ToolbarMenu.textStyleStrikeThrough),
         ),
