@@ -722,8 +722,12 @@
           delta.ops.forEach(op => {
             if (op.insert && op.insert["video"] && typeof op.insert["video"] == 'object' && !op.insert["video"]["thumb_url"]) {
               return;
-            } else if (op.insert && op.insert["image"] && typeof op.insert["image"] == 'object' && !op.insert["image"]["source"] && !op.insert["image"]["src"]) {
-              return;
+            } else if (op.insert && op.insert["image"] && typeof op.insert["image"] == 'object' && !op.insert["image"]["source"]) {
+              if (!op.insert["image"]["src"]) {
+                return;
+              } else {
+                op.insert["image"]["source"] = op.insert["image"]["src"];
+              }
             }
             ops.push(op)
           })
