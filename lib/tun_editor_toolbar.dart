@@ -669,7 +669,7 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
     }
 
     // Disable text style.
-    disabledMenu.clear();
+    // disabledMenu.clear();
     if (currentTextType == Attribute.codeBlock.uniqueKey) {
       disabledMenu.addAll([
         ToolbarMenu.at,
