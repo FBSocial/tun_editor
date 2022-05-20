@@ -6,12 +6,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_quill/flutter_quill.dart';
-import 'package:tun_editor/controller.dart';
+
 // import 'package:tun_editor/models/documents/attribute.dart';
 // import 'package:tun_editor/models/documents/document.dart';
 // import 'package:tun_editor/models/quill_delta.dart';
 import 'package:tun_editor/tun_editor_api.dart';
+import 'package:tun_editor/controller.dart';
+import 'package:flutter_quill/flutter_quill.dart';
+
 
 typedef MentionClickCallback = Function(String, String, String);
 typedef LinkClickCallback = Function(String);
@@ -339,7 +341,7 @@ class TunEditorState extends State<TunEditor> with TunEditorHandler {
       _tunEditorApi?.focus();
       _tunEditorApi?.updateSelection(controller.selection);
     } else {
-      _tunEditorApi?.updateSelection(controller.selection, ignoreFocus: true);
+      _tunEditorApi?.updateSelection(controller.selection, ignoreFocus:true);
       _tunEditorApi?.blur();
     }
   }
@@ -347,11 +349,13 @@ class TunEditorState extends State<TunEditor> with TunEditorHandler {
   void _handleFocusChange(bool hasFocus) {
     debugPrint('handle focus change $hasFocus');
     controller.syncFocus(hasFocus);
-    _isFocused = hasFocus;
-    if (hasFocus) {
-      _tunEditorApi?.focus();
-    } else {
-      _tunEditorApi?.blur();
+    if (hasFocus != _isFocused) {
+      _isFocused = hasFocus;
+      if (hasFocus) {
+          _tunEditorApi?.focus();
+      } else {
+          _tunEditorApi?.blur();
+      }
     }
   }
 }
