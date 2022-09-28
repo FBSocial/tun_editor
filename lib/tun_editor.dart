@@ -14,7 +14,6 @@ import 'package:tun_editor/tun_editor_api.dart';
 import 'package:tun_editor/controller.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 
-
 typedef MentionClickCallback = Function(String, String, String);
 typedef LinkClickCallback = Function(String);
 
@@ -31,6 +30,8 @@ class TunEditor extends StatefulWidget {
   final bool scrollable;
 
   final EdgeInsets padding;
+
+  final bool useHybridComposition;
 
   final bool autoFocus;
   final FocusNode? focusNode;
@@ -71,6 +72,7 @@ class TunEditor extends StatefulWidget {
     this.onMentionClick,
     this.onLinkClick,
     this.enableMarkdownSyntax = true,
+    this.useHybridComposition = true,
   }) : super(key: key);
 
   @override
@@ -226,32 +228,41 @@ class TunEditorState extends State<TunEditor> with TunEditorHandler {
     Widget child;
     if (Platform.isAndroid) {
       // Android platform.
-      child = PlatformViewLink(
-        viewType: VIEW_TYPE_TUN_EDITOR,
-        surfaceFactory:
-            (BuildContext context, PlatformViewController controller) {
-          return AndroidViewSurface(
-            controller: controller as AndroidViewController,
-            gestureRecognizers: {},
-            hitTestBehavior: PlatformViewHitTestBehavior.translucent,
-          );
-        },
-        onCreatePlatformView: (PlatformViewCreationParams params) {
-          return PlatformViewsService.initSurfaceAndroidView(
-            id: params.id,
-            viewType: VIEW_TYPE_TUN_EDITOR,
-            layoutDirection: TextDirection.ltr,
-            creationParams: creationParams,
-            creationParamsCodec: StandardMessageCodec(),
-          )
-            ..addOnPlatformViewCreatedListener(params.onPlatformViewCreated)
-            ..addOnPlatformViewCreatedListener((int id) {
-              _tunEditorApi = TunEditorApi(id, this);
-              controller.setTunEditorApi(_tunEditorApi);
-            })
-            ..create();
-        },
-      );
+      child = widget.useHybridComposition
+          ? PlatformViewLink(
+              viewType: VIEW_TYPE_TUN_EDITOR,
+              surfaceFactory:
+                  (BuildContext context, PlatformViewController controller) {
+                return AndroidViewSurface(
+                  controller: controller as AndroidViewController,
+                  gestureRecognizers: {},
+                  hitTestBehavior: PlatformViewHitTestBehavior.translucent,
+                );
+              },
+              onCreatePlatformView: (PlatformViewCreationParams params) {
+                return PlatformViewsService.initSurfaceAndroidView(
+                  id: params.id,
+                  viewType: VIEW_TYPE_TUN_EDITOR,
+                  layoutDirection: TextDirection.ltr,
+                  creationParams: creationParams,
+                  creationParamsCodec: StandardMessageCodec(),
+                )
+                  ..addOnPlatformViewCreatedListener(
+                      params.onPlatformViewCreated)
+                  ..addOnPlatformViewCreatedListener((int id) {
+                    _tunEditorApi = TunEditorApi(id, this);
+                    controller.setTunEditorApi(_tunEditorApi);
+                  })
+                  ..create();
+              },
+            )
+          : AndroidView(
+              viewType: VIEW_TYPE_TUN_EDITOR,
+              layoutDirection: TextDirection.ltr,
+              creationParams: creationParams,
+              creationParamsCodec: StandardMessageCodec(),
+              onPlatformViewCreated: _onPlatformViewCreated,
+            );
     } else if (Platform.isIOS) {
       // IOS platform.
       child = UiKitView(
@@ -278,6 +289,11 @@ class TunEditorState extends State<TunEditor> with TunEditorHandler {
     } else {
       return child;
     }
+  }
+
+  void _onPlatformViewCreated(int id) {
+    _tunEditorApi = TunEditorApi(id, this);
+    controller.setTunEditorApi(_tunEditorApi);
   }
 
   @override
@@ -341,7 +357,7 @@ class TunEditorState extends State<TunEditor> with TunEditorHandler {
       _tunEditorApi?.focus();
       _tunEditorApi?.updateSelection(controller.selection);
     } else {
-      _tunEditorApi?.updateSelection(controller.selection, ignoreFocus:true);
+      _tunEditorApi?.updateSelection(controller.selection, ignoreFocus: true);
       _tunEditorApi?.blur();
     }
   }
@@ -352,9 +368,9 @@ class TunEditorState extends State<TunEditor> with TunEditorHandler {
     if (hasFocus != _isFocused) {
       _isFocused = hasFocus;
       if (hasFocus) {
-          _tunEditorApi?.focus();
+        _tunEditorApi?.focus();
       } else {
-          _tunEditorApi?.blur();
+        _tunEditorApi?.blur();
       }
     }
   }
