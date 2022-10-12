@@ -740,6 +740,7 @@ enum SubToolbar {
   textType,
   textStyle,
   link,
+  doc,
 }
 
 enum ToolbarMenu {
@@ -767,6 +768,7 @@ enum ToolbarMenu {
   textStyleStrikeThrough,
 
   link,
+  doc,
 }
 
 const List<ToolbarMenu> defaultToolbarMenu = [
@@ -791,4 +793,5 @@ const List<ToolbarMenu> defaultToolbarMenu = [
   ToolbarMenu.textStyleStrikeThrough,
   //
   ToolbarMenu.link,
+  ToolbarMenu.doc,
 ];
