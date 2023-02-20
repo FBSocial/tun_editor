@@ -3,6 +3,7 @@ package com.tuntech.tun_editor.view
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
+import android.content.ContextWrapper
 import android.os.Build
 import android.util.AttributeSet
 import android.util.Base64
@@ -21,7 +22,7 @@ import java.net.URLEncoder
 
 
 @SuppressLint("SetJavaScriptEnabled", "AddJavascriptInterface", "ClickableViewAccessibility")
-class QuillEditor: WebView {
+class QuillEditor : WebView {
 
     companion object {
         val TAG: String = QuillEditor::class.java.name
@@ -29,18 +30,30 @@ class QuillEditor: WebView {
         const val URL = "file:///android_asset/editor/index.html"
     }
 
-    constructor(context: Context): super(context)
+    constructor(context: Context) : super(context)
 
-    constructor(context: Context, attr: AttributeSet): super(context, attr)
+    constructor(context: Context, attr: AttributeSet) : super(context, attr)
 
-    constructor(context: Context, attr: AttributeSet, defStyle: Int): super (context, attr, defStyle)
+    constructor(context: Context, attr: AttributeSet, defStyle: Int) : super(
+        context,
+        attr,
+        defStyle
+    )
 
     constructor(
-        context: Context, placeholder: String, padding: List<Int>, readOnly: Boolean,
-        scrollable: Boolean, autoFocus: Boolean, delta: List<*>, fileBasePath: String,
-        imageStyle: Map<String, Any>, videoStyle: Map<String, Any>, placeholderStyle: Map<String, Any>,
+        context: Context,
+        placeholder: String,
+        padding: List<Int>,
+        readOnly: Boolean,
+        scrollable: Boolean,
+        autoFocus: Boolean,
+        delta: List<*>,
+        fileBasePath: String,
+        imageStyle: Map<String, Any>,
+        videoStyle: Map<String, Any>,
+        placeholderStyle: Map<String, Any>,
         enableMarkdownSyntax: Boolean
-    ): this(context) {
+    ) : this(context) {
         this.placeholder = placeholder
         this.readOnly = readOnly
         this.scrollable = scrollable
@@ -103,37 +116,37 @@ class QuillEditor: WebView {
 
         addJavascriptInterface(JSInterface(
             onTextChangeListener = { delta, oldDelta ->
-                (context as Activity).runOnUiThread {
+                scanForActivity(context)?.runOnUiThread {
                     onTextChangeListener?.invoke(delta, oldDelta)
                 }
             },
             onSelectionChangeListener = { index, length, format ->
-                (context as Activity).runOnUiThread {
+                scanForActivity(context)?.runOnUiThread {
                     onSelectionChangeListener?.invoke(index, length, format)
                 }
             },
             onMentionClickListener = { id, prefixChar, text ->
-                (context as Activity).runOnUiThread {
+                scanForActivity(context)?.runOnUiThread {
                     onMentionClickListener?.invoke(id, prefixChar, text)
                 }
             },
             onLinkClickListener = { url ->
-                (context as Activity).runOnUiThread {
+                scanForActivity(context)?.runOnUiThread {
                     onLinkClickListener?.invoke(url)
                 }
             },
             onFocusChangeListener = { hasFocus ->
-                (context as Activity).runOnUiThread {
+                scanForActivity(context)?.runOnUiThread {
                     onFocusChangeListener?.invoke(hasFocus)
                 }
             },
             onLoadImageListener = { filename ->
-                (context as Activity).runOnUiThread {
+                scanForActivity(context)?.runOnUiThread {
                     refreshImage(filename)
                 }
             },
             onLoadVideoThumbListener = { filename ->
-                (context as Activity).runOnUiThread {
+                scanForActivity(context)?.runOnUiThread {
                     refreshVideoThumb(filename)
                 }
             }
@@ -142,8 +155,24 @@ class QuillEditor: WebView {
         loadUrl(URL)
     }
 
-    fun replaceText(index: Int, length: Int, data: Any, attributes: Map<*, *>,
-                    newLineAfterImage: Boolean, ignoreFocus: Boolean, selection: Map<*, *>) {
+
+    /**
+     * 修复 Context 强制转化 Activity 的问题
+     */
+    private fun scanForActivity(cont: Context?): Activity? {
+        if (cont == null)
+            return null
+        else if (cont is Activity)
+            return cont as Activity?
+        else if (cont is ContextWrapper)
+            return scanForActivity((cont as ContextWrapper).getBaseContext())
+        return null
+    }
+
+    fun replaceText(
+        index: Int, length: Int, data: Any, attributes: Map<*, *>,
+        newLineAfterImage: Boolean, ignoreFocus: Boolean, selection: Map<*, *>
+    ) {
         val attrJsonObject = JSONObject()
         for ((k, v) in attributes) {
             if (k is String) {
@@ -386,7 +415,7 @@ class QuillEditor: WebView {
 
     class QuillEditorWebClient(
         private val onPageFinished: () -> Unit
-    ): WebViewClient() {
+    ) : WebViewClient() {
 
         override fun onPageFinished(view: WebView?, url: String?) {
             super.onPageFinished(view, url)
