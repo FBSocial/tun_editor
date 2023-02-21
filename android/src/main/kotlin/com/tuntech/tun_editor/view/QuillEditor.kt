@@ -137,7 +137,9 @@ class QuillEditor : WebView {
             },
             onFocusChangeListener = { hasFocus ->
                 scanForActivity(context)?.runOnUiThread {
-                    onFocusChangeListener?.invoke(hasFocus)
+                    postDelayed({
+                        onFocusChangeListener?.invoke(hasFocus)
+                    }, 300)
                 }
             },
             onLoadImageListener = { filename ->
@@ -362,7 +364,7 @@ class QuillEditor : WebView {
     private fun toggleKeyboard(isShow: Boolean) {
         val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         if (isShow) {
-            imm.showSoftInput(this, 0)
+            imm.showSoftInput(this, InputMethodManager.RESULT_SHOWN)
         } else {
             imm.hideSoftInputFromWindow(windowToken, 0)
         }
