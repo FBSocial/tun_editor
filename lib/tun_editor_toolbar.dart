@@ -746,6 +746,7 @@ enum ToolbarMenu {
   at,
   channel,
   image,
+  video,
   emoji,
 
   // Text type.
