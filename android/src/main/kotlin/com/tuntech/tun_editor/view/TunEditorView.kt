@@ -52,6 +52,7 @@ internal class TunEditorView(
         const val HANDLE_SET_IMAGE_STYLE = "setImageStyle"
         const val HANDLE_SET_VIDEO_STYLE = "setVideoStyle"
         const val HANDLE_SET_PLACEHOLDER_STYLE = "setPlaceholderStyle"
+        const val HANDLE_THEME_MODE = "switchThemeMode"
     }
 
     // View.
@@ -86,6 +87,7 @@ internal class TunEditorView(
         val videoStyle: HashMap<String, Any> = hashMapOf()
         val placeholderStyle: HashMap<String, Any> = hashMapOf()
         var enableMarkdownSyntax = false
+        var isDarkMode = false
         if (creationParams?.containsKey("placeholder") == true) {
             placeholder = (creationParams["placeholder"] as? String) ?: ""
         }
@@ -137,8 +139,12 @@ internal class TunEditorView(
             enableMarkdownSyntax = (creationParams["enableMarkdownSyntax"] as? Boolean) ?: true
         }
 
+        if (creationParams?.containsKey("darkMode") == true) {
+            isDarkMode = (creationParams["darkMode"] as? Boolean) ?: true
+        }
+
         quillEditor = QuillEditor(context, placeholder, padding, readOnly, scrollable, autoFocus,
-            delta, fileBasePath, imageStyle, videoStyle, placeholderStyle, enableMarkdownSyntax)
+            delta, fileBasePath, imageStyle, videoStyle, placeholderStyle, enableMarkdownSyntax,isDarkMode)
         quillEditor.setOnTextChangeListener { changeDelta, oldDelta ->
             val text = HashMap<String, String>()
             text["delta"] = changeDelta
@@ -331,7 +337,10 @@ internal class TunEditorView(
                 }
                 quillEditor.setPlaceholderStyle(style)
             }
-
+            HANDLE_THEME_MODE -> {
+                val isDarkMode = call.arguments as? Boolean ?: return
+                quillEditor.switchThemeMode(isDarkMode)
+            }
             else -> {
                 println("missing plugin method: ${call.method}")
                 result.notImplemented()

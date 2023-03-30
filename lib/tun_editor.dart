@@ -52,10 +52,13 @@ class TunEditor extends StatefulWidget {
 
   final bool enableMarkdownSyntax;
 
+  final bool darkMode;
+
   const TunEditor({
     Key? key,
     required this.controller,
     required this.fileBasePath,
+    required this.darkMode,
     this.imageStyle = const {},
     this.videoStyle = const {},
     this.placeholder = '',
@@ -150,7 +153,6 @@ class TunEditorState extends State<TunEditor> with TunEditorHandler {
   @override
   void initState() {
     super.initState();
-
     _isFocused = autoFocus;
   }
 
@@ -222,6 +224,7 @@ class TunEditorState extends State<TunEditor> with TunEditorHandler {
         'videoStyle': videoStyle,
         'placeholderStyle': placeholderStyleMap,
         'enableMarkdownSyntax': enableMarkdownSyntax,
+        'darkMode': widget.darkMode,
       };
     }
 

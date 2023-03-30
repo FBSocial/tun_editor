@@ -57,7 +57,7 @@ class TunEditorController {
     TextSelection newSelection;
     if (textSelection == null) {
       newSelection = TextSelection.collapsed(
-        offset: index + (data is String ? data.length : 1));
+          offset: index + (data is String ? data.length : 1));
     } else {
       newSelection = textSelection;
     }
@@ -73,10 +73,10 @@ class TunEditorController {
     );
   }
 
-  void compose(Delta delta, TextSelection? textSelection, ChangeSource source, {
-    bool ignoreFocus = false
-  }) {
-    _tunEditorApi?.updateContents(delta, source, ignoreFocus: ignoreFocus, selection: textSelection);
+  void compose(Delta delta, TextSelection? textSelection, ChangeSource source,
+      {bool ignoreFocus = false}) {
+    _tunEditorApi?.updateContents(delta, source,
+        ignoreFocus: ignoreFocus, selection: textSelection);
   }
 
   /// Insert mention with [id], [text] and [prefixChar], [id] should be unqiue, [id] and [prefixChar] will be used on click event.
@@ -115,7 +115,8 @@ class TunEditorController {
     if (appendSpace) {
       mentionDelta.insert(' ');
     }
-    compose(mentionDelta, newSelection, ChangeSource.LOCAL, ignoreFocus: ignoreFocus);
+    compose(mentionDelta, newSelection, ChangeSource.LOCAL,
+        ignoreFocus: ignoreFocus);
   }
 
   /// Insert [data] at the given [index].
@@ -224,20 +225,19 @@ class TunEditorController {
     compose(delta, newSelection, ChangeSource.LOCAL, ignoreFocus: ignoreFocus);
   }
 
-  void insertVideo({
-    required String source,
-    required String fileType,
-    required double duration,
-    required String thumbUrl,
-    required String thumbName,
-    required double width,
-    required double height,
-    String type = 'video',
-    bool inline = false,
-    List<Attribute>? attributes = const [],
-    bool ignoreFocus = false,
-    bool appendNewLine = false
-  }) {
+  void insertVideo(
+      {required String source,
+      required String fileType,
+      required double duration,
+      required String thumbUrl,
+      required String thumbName,
+      required double width,
+      required double height,
+      String type = 'video',
+      bool inline = false,
+      List<Attribute>? attributes = const [],
+      bool ignoreFocus = false,
+      bool appendNewLine = false}) {
     // Wrap value.
     final Map<String, dynamic> videoBlot = {
       'source': source,
@@ -297,13 +297,15 @@ class TunEditorController {
     final dividerDelta = new Delta()
       ..retain(insertOffset)
       ..insert({'divider': 'hr'});
-    final newSelection =TextSelection.collapsed(offset: insertOffset + 1); 
-    compose(dividerDelta, newSelection, ChangeSource.LOCAL, ignoreFocus: ignoreFocus);
+    final newSelection = TextSelection.collapsed(offset: insertOffset + 1);
+    compose(dividerDelta, newSelection, ChangeSource.LOCAL,
+        ignoreFocus: ignoreFocus);
   }
 
   /// Insert [text] with [link] format to current [selection].
   void insertLink(String text, String url, {bool ignoreFocus = false}) {
-    final newSelection = TextSelection.collapsed(offset: selection.extentOffset + text.length);
+    final newSelection =
+        TextSelection.collapsed(offset: selection.extentOffset + text.length);
     final delta = new Delta()
       ..retain(selection.extentOffset)
       ..insert(text, LinkAttribute(url).toJson());
@@ -337,7 +339,9 @@ class TunEditorController {
 
   /// Update [_selection] with given new [textSelection].
   /// Nothing will happen if invalid [textSelection] is provided.
-  void updateSelection(TextSelection textSelection, ChangeSource source, {
+  void updateSelection(
+    TextSelection textSelection,
+    ChangeSource source, {
     bool ignoreFocus = false,
   }) {
     if (textSelection.baseOffset < 0 || textSelection.extentOffset < 0) {
@@ -475,5 +479,9 @@ class TunEditorController {
     }
     compose(delta, null, ChangeSource.LOCAL, ignoreFocus: ignoreFocus);
     return lineEndOffset + 1;
+  }
+
+  void switchThemeMode(bool isDarkMode) {
+    _tunEditorApi?.switchThemeMode(isDarkMode);
   }
 }

@@ -924,6 +924,26 @@
         //   }
         // }, { width: 230, height: 460 }, false, true, false, { index: -1, length: -1 });
       })
+      ///添加平板样式文件
+      function loadStyles(darkMode) {
+          var link = document.createElement('link');
+          link.rel = 'stylesheet';
+          link.type = 'text/css';
+          link.href = darkMode ? 'quill.custom.dark.css' : 'quill.custom.css';  //引入的文件名
+          document.getElementsByTagName('head')[0].appendChild(link);
+        }
+      ///移除平板样式文件
+      function removeStyles(darkMode){
+          var filename = darkMode ? 'quill.custom.css' : 'quill.custom.dark.css';  //移除引入的文件名
+          var targetelement = "link";
+          var targetattr = "href";
+          var allsuspects = document.getElementsByTagName(targetelement)
+          for (var i = allsuspects.length; i>=0 ; i--){
+            if (allsuspects[i] && allsuspects[i].getAttribute(targetattr) != null && allsuspects[i].getAttribute(targetattr).indexOf(filename) != -1) {
+              allsuspects[i].parentNode.removeChild(allsuspects[i])
+            }
+          }
+      }
     </script>
 
     <link rel="stylesheet" href="normalize.css" type="text/css" charset="utf-8">

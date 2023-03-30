@@ -87,7 +87,8 @@ class QuillEditorView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler {
         imageStyle: [String: Any],
         videoStyle: [String: Any],
         placeholderStyle: [String: Any],
-        enableMarkdownSyntax: Bool
+        enableMarkdownSyntax: Bool,
+        darkMode: Bool
     ) {
         self.frame = frame
         self.autoFocus = autoFocus
@@ -102,6 +103,7 @@ class QuillEditorView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler {
         setPlaceholderStyle(placeholderStyle)
         setContents(delta)
         setupMarkdownSyntax(enableMarkdownSyntax)
+        switchThemeMode(darkMode)
     }
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
@@ -350,6 +352,11 @@ class QuillEditorView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler {
     
     private func setupMarkdownSyntax(_ enableMarkdownSyntax: Bool) {
         exec("setupMarkdownSyntax(\(enableMarkdownSyntax))")
+    }
+    
+    ///修改主题
+    func switchThemeMode(_ isDarkMode: Bool) {
+        exec("loadStyles(\(isDarkMode));removeStyles(\(isDarkMode));")
     }
     
     private func refreshImage(_ filename: String) {

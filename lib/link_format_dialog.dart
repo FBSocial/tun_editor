@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class LinkFormatDialog extends StatefulWidget {
-
   final String defaultText;
   final String defaultUrl;
   final bool isUrlAutofocus;
@@ -10,42 +9,46 @@ class LinkFormatDialog extends StatefulWidget {
   // Primary color.
   final Color? primaryColor;
   final Color defaultPrimaryColor = const Color(0xFF198CFE);
+  final Color? backgroundColor;
+  final Color? textColor;
 
-  const LinkFormatDialog({
-    Key? key,
-    this.defaultText = '',
-    this.defaultUrl = '',
-    this.isUrlAutofocus = false,
-    this.primaryColor,
-  }) : super(key: key);
+  const LinkFormatDialog(
+      {Key? key,
+      this.defaultText = '',
+      this.defaultUrl = '',
+      this.isUrlAutofocus = false,
+      this.primaryColor,
+      this.backgroundColor,
+      this.textColor})
+      : super(key: key);
 
   @override
   State<StatefulWidget> createState() => LinkFormatDialogState();
 
   static Future<List<String>?> show(
     BuildContext context, {
-      String defaultText = '',
-      String defaultUrl = '',
-      bool isUrlAutofocus = false,
-      Color? primaryColor,
-    }
-  ) {
+    String defaultText = '',
+    String defaultUrl = '',
+    bool isUrlAutofocus = false,
+    Color? primaryColor,
+    Color? backgroundColor,
+    Color? textColor,
+  }) {
     return showDialog<List<String>?>(
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) => LinkFormatDialog(
-        defaultText: defaultText,
-        defaultUrl: defaultUrl,
-        isUrlAutofocus: isUrlAutofocus,
-        primaryColor: primaryColor,
-      ),
+          defaultText: defaultText,
+          defaultUrl: defaultUrl,
+          isUrlAutofocus: isUrlAutofocus,
+          primaryColor: primaryColor,
+          backgroundColor: backgroundColor,
+          textColor: textColor),
     );
   }
-
 }
 
 class LinkFormatDialogState extends State<LinkFormatDialog> {
-
   String get defaultText => widget.defaultText;
   String get defaultUrl => widget.defaultUrl;
   bool get isUrlAutofocus => widget.isUrlAutofocus;
@@ -58,7 +61,7 @@ class LinkFormatDialogState extends State<LinkFormatDialog> {
   @override
   void initState() {
     super.initState();
-  
+
     textCtrl = TextEditingController(text: defaultText);
     urlCtrl = TextEditingController(text: defaultUrl);
     textCtrl.addListener(checkForm);
@@ -68,7 +71,7 @@ class LinkFormatDialogState extends State<LinkFormatDialog> {
   @override
   Widget build(BuildContext context) {
     final labelStyle = TextStyle(
-      color: Color(0xFF363940),
+      color: widget.textColor,
       fontWeight: FontWeight.w500,
       fontSize: 16.w,
     );
@@ -78,7 +81,7 @@ class LinkFormatDialogState extends State<LinkFormatDialog> {
       height: 1.25,
     );
     final fieldStyle = TextStyle(
-      color: Color(0xFF363940),
+      color: widget.textColor,
       fontSize: 16.w,
       height: 1.25,
     );
@@ -101,7 +104,7 @@ class LinkFormatDialogState extends State<LinkFormatDialog> {
       child: Container(
         width: double.infinity,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: widget.backgroundColor,
           borderRadius: BorderRadius.circular(4.w),
         ),
         padding: EdgeInsets.symmetric(
@@ -127,7 +130,8 @@ class LinkFormatDialogState extends State<LinkFormatDialog> {
                     height: 40.w,
                     child: TextField(
                       style: fieldStyle,
-                      cursorColor: widget.primaryColor ?? widget.defaultPrimaryColor,
+                      cursorColor:
+                          widget.primaryColor ?? widget.defaultPrimaryColor,
                       textInputAction: TextInputAction.next,
                       decoration: inputDecoration.copyWith(
                         hintText: "输入文本",
@@ -155,7 +159,8 @@ class LinkFormatDialogState extends State<LinkFormatDialog> {
                     height: 40.w,
                     child: TextField(
                       style: fieldStyle,
-                      cursorColor: widget.primaryColor ?? widget.defaultPrimaryColor,
+                      cursorColor:
+                          widget.primaryColor ?? widget.defaultPrimaryColor,
                       decoration: inputDecoration.copyWith(
                         hintText: "粘贴或输入一个链接",
                       ),
@@ -178,7 +183,8 @@ class LinkFormatDialogState extends State<LinkFormatDialog> {
                   child: OutlinedButton(
                     onPressed: () => Navigator.of(context).pop(null),
                     style: ButtonStyle(
-                      foregroundColor: MaterialStateProperty.all(Color(0xFF1F2125)),
+                      foregroundColor:
+                          MaterialStateProperty.all(Color(0xFF1F2125)),
                       backgroundColor: MaterialStateProperty.all(Colors.white),
                       padding: MaterialStateProperty.all(EdgeInsets.zero),
                       side: MaterialStateProperty.all(BorderSide(
@@ -196,7 +202,7 @@ class LinkFormatDialogState extends State<LinkFormatDialog> {
                           fontSize: 16.w,
                         ),
                       ),
-                     ),
+                    ),
                     child: Text(
                       '取消',
                       style: TextStyle(
@@ -205,9 +211,7 @@ class LinkFormatDialogState extends State<LinkFormatDialog> {
                     ),
                   ),
                 ),
-
                 SizedBox(width: 12.w),
-
                 SizedBox(
                   width: 65.w,
                   height: 40.w,
@@ -215,11 +219,15 @@ class LinkFormatDialogState extends State<LinkFormatDialog> {
                     onPressed: isFormValid ? onLinkSubmit : null,
                     style: ButtonStyle(
                       foregroundColor: MaterialStateProperty.all(Colors.white),
-                      backgroundColor: MaterialStateProperty.resolveWith((Set<MaterialState> states) {
+                      backgroundColor: MaterialStateProperty.resolveWith(
+                          (Set<MaterialState> states) {
                         if (states.contains(MaterialState.disabled)) {
-                          return (widget.primaryColor ?? widget.defaultPrimaryColor).withAlpha(128);
+                          return (widget.primaryColor ??
+                                  widget.defaultPrimaryColor)
+                              .withAlpha(128);
                         }
-                        return widget.primaryColor ?? widget.defaultPrimaryColor;
+                        return widget.primaryColor ??
+                            widget.defaultPrimaryColor;
                       }),
                       padding: MaterialStateProperty.all(EdgeInsets.zero),
                       side: MaterialStateProperty.all(BorderSide.none),
@@ -234,7 +242,7 @@ class LinkFormatDialogState extends State<LinkFormatDialog> {
                           fontSize: 16.w,
                         ),
                       ),
-                     ),
+                    ),
                     child: Text(
                       "确定",
                       style: TextStyle(
@@ -255,7 +263,7 @@ class LinkFormatDialogState extends State<LinkFormatDialog> {
   void dispose() {
     textCtrl.dispose();
     urlCtrl.dispose();
-  
+
     super.dispose();
   }
 
@@ -274,5 +282,4 @@ class LinkFormatDialogState extends State<LinkFormatDialog> {
       urlCtrl.text,
     ]);
   }
-
 }

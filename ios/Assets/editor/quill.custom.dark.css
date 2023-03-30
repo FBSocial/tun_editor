@@ -1,22 +1,22 @@
 body{
-  background: #FFFFFF;
+  background: #1F1F1F;
 }
 .ql-container {
   font-size: 16px;
-  color: #363940;
+  color: #e6e6e6;
   font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, Ubuntu;
   height: 100vh;
 }
 .ql-container.ql-snow {
    border: none !important;
-   caret-color: #198CFE;
+   caret-color: #1677D9;
  }
 .ql-editor {
   line-height: 1.5;
 }
 .ql-editor.ql-blank::before {
   font-style: normal;
-  color: #8F959EA5;
+  color: #A5A5A5;
 }
 .ql-snow .ql-editor img {
   display: inline-block;
@@ -51,21 +51,21 @@ body{
   margin-right: 8px;
 }
 .ql-editor ul li:not(.ql-direction-rtl)::before {
-  color: #363940;
+  color: #e6e6e6;
   content: '\2022';
   width: 12px;
 }
 .ql-editor ol li:not(.ql-direction-rtl)::before {
-  color: #363940;
+  color: #e6e6e6;
   font-size: 16px;
 }
 .ql-editor ol li[data-list=bullet]::before {
-  color: #363940;
+  color: #e6e6e6;
   content: '\2022';
   width: 12px;
 }
 .ql-editor ol li[data-list=ordered]:before {
-  color: #363940;
+  color: #e6e6e6;
   font-size: 16px;
 }
 hr {
@@ -75,18 +75,18 @@ hr {
   background-color: #8f959e1e;
 }
 .ql-snow .ql-editor blockquote {
-  border-left: 2px solid #198CFE;
+  border-left: 2px solid #1677D9;
   padding-left: 12px;
-  color: #646A73;
+  color: #797979;
 }
 .ql-snow a {
-  color: #198CFE;
+  color: #1677D9;
 }
 .ql-editor .ql-code-block-container,
 .ql-snow .ql-editor pre.ql-syntax {
   font-size: 14px;
-  color: #646A73;
-  background-color: #F5F5F8;
+  color: #A5A5A5;
+  background-color: #141414;
   border-radius: 4px;
   border: 0.5px solid #8f959e14;
   margin: 5px 0;
@@ -109,7 +109,7 @@ pre .hljs-line::before {
   margin-right: 16px;
 }
 span.mention {
-  color: #198CFE;
+  color: #1677D9;
 }
 .ql-snow .ql-editor blockquote {
   margin: 0;

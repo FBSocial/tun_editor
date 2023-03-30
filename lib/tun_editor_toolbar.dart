@@ -30,6 +30,7 @@ class TunEditorToolbar extends StatefulWidget {
   final Color primaryIconColor;
   final Color iconOverlayColor;
   final Color? disabledIconColor;
+  final Color? backgroundColor;
 
   const TunEditorToolbar(
       {Key? key,
@@ -43,7 +44,8 @@ class TunEditorToolbar extends StatefulWidget {
       this.primaryColor = const Color(0xFF198CFE),
       this.primaryIconColor = const Color(0xFF5C6273),
       this.disabledIconColor,
-      this.iconOverlayColor = const Color(0x268F959E)})
+      this.iconOverlayColor = const Color(0x268F959E),
+      this.backgroundColor})
       : super(key: key);
 
   @override
@@ -215,7 +217,7 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
         horizontal: 12.w,
       ),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: widget.backgroundColor,
       ),
       child: Row(
         children: menuList,
@@ -336,7 +338,7 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
       child: Container(
         height: 44.w,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: widget.backgroundColor,
           borderRadius: BorderRadius.circular(4.w),
           border: Border.all(
             width: 1.w,
@@ -419,7 +421,7 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
       child: Container(
         height: 44.w,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: widget.backgroundColor,
           borderRadius: BorderRadius.circular(4.w),
           border: Border.all(
             width: 1.w,
@@ -580,6 +582,8 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
       defaultUrl: defaultUrl,
       isUrlAutofocus: !selection.isCollapsed,
       primaryColor: widget.primaryColor,
+      backgroundColor: widget.backgroundColor,
+      textColor: widget.primaryIconColor,
     );
     if (res != null && res.length >= 2) {
       final text = res[0];

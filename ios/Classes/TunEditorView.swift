@@ -66,6 +66,7 @@ class TunEditorView: NSObject, FlutterPlatformView {
         var videoStyle: [String: Any] = [:]
         var placeholderStyle: [String: Any] = [:]
         var enableMarkdownSyntax: Bool = true
+        var darkMode: Bool = false
         
         if let argsMap = args as? [String: Any] {
             if let optPlaceholder = argsMap["placeholder"] as? String {
@@ -101,6 +102,10 @@ class TunEditorView: NSObject, FlutterPlatformView {
             if let optEnableMarkdownSyntax = argsMap["enableMarkdownSyntax"] as? Bool {
                 enableMarkdownSyntax = optEnableMarkdownSyntax
             }
+            
+            if let optDarkMode = argsMap["darkMode"] as? Bool {
+                darkMode = optDarkMode
+            }
         }
         _editor.configureEditor(
             frame: frame,
@@ -114,7 +119,8 @@ class TunEditorView: NSObject, FlutterPlatformView {
             imageStyle: imageStyle,
             videoStyle: videoStyle,
             placeholderStyle: placeholderStyle,
-            enableMarkdownSyntax: enableMarkdownSyntax
+            enableMarkdownSyntax: enableMarkdownSyntax,
+            darkMode: darkMode
         )
         methodChannel = FlutterMethodChannel(name: "tun/editor/\(viewId)", binaryMessenger: messenger)
         super.init()
@@ -301,7 +307,10 @@ class TunEditorView: NSObject, FlutterPlatformView {
             if let style = call.arguments as? [String: Any] {
                 _editor.setPlaceholderStyle(style)
             }
-            
+        case "switchThemeMode":
+            if let darkMode = call.arguments as? Bool {
+                _editor.switchThemeMode(darkMode)
+            }
         default:
             print("missing tun editor method")
         }

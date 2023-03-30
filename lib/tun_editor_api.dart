@@ -9,7 +9,6 @@ import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter/widgets.dart';
 
 class TunEditorApi {
-
   final MethodChannel _channel;
   final TunEditorHandler _handler;
 
@@ -34,11 +33,10 @@ class TunEditorApi {
           final args = call.arguments as Map<dynamic, dynamic>;
           final index = args['index'] as int;
           final length = args['length'] as int;
-          final format = args['format'] is String
-              ? json.decode(args['format'])
-              : {};
+          final format =
+              args['format'] is String ? json.decode(args['format']) : {};
           _handler.onSelectionChange(index, length, format);
-        } catch(e, s) {
+        } catch (e, s) {
           print('on selection change $e $s');
         }
         break;
@@ -74,7 +72,10 @@ class TunEditorApi {
   }
 
   // Content related.
-  void replaceText(int index, int len, Object? data, {
+  void replaceText(
+    int index,
+    int len,
+    Object? data, {
     List<Attribute> attributes = const [],
     bool autoAppendNewlineAfterImage = true,
     bool ignoreFocus = false,
@@ -99,7 +100,10 @@ class TunEditorApi {
       },
     });
   }
-  void updateContents(Delta delta, ChangeSource source, {
+
+  void updateContents(
+    Delta delta,
+    ChangeSource source, {
     bool ignoreFocus = false,
     TextSelection? selection,
   }) {
@@ -120,15 +124,18 @@ class TunEditorApi {
   void setTextType(String textType) {
     _channel.invokeMethod('setTextType', textType);
   }
+
   void setTextStyle(List<dynamic> textStyle) {
     _channel.invokeMethod('setTextStyle', textStyle);
   }
+
   void format(String name, dynamic value) {
     _channel.invokeMethod('format', {
       'name': name,
       'value': value,
     });
   }
+
   void formatText(int index, int len, Attribute attribute) {
     _channel.invokeMethod('formatText', {
       'index': index,
@@ -139,7 +146,8 @@ class TunEditorApi {
   }
 
   // Selection related.
-  void updateSelection(TextSelection selection, {
+  void updateSelection(
+    TextSelection selection, {
     bool ignoreFocus = false,
   }) {
     _channel.invokeMethod('updateSelection', {
@@ -153,39 +161,51 @@ class TunEditorApi {
   void focus() {
     _channel.invokeMethod('focus');
   }
+
   void blur() {
     _channel.invokeMethod('blur');
   }
+
   void scrollTo(int offset) {
     _channel.invokeMethod('scrollTo', offset);
   }
+
   void scrollToTop() {
     _channel.invokeMethod('scrollToTop');
   }
+
   void scrollToBottom() {
     _channel.invokeMethod('scrollToBottom');
   }
+
   void setPlaceholder(String placeholder) {
     _channel.invokeMethod('setPlaceholder', placeholder);
   }
+
   void setReadOnly(bool readOnly) {
     _channel.invokeMethod('setReadOnly', readOnly);
   }
+
   void setScrollable(bool scrollable) {
     _channel.invokeMethod('setScrollable', scrollable);
   }
+
   void setPadding(List<int> padding) {
     _channel.invokeMethod('setPadding', padding);
   }
+
   void setFileBasePath(String fileBasePath) {
     _channel.invokeMethod('setFileBasePath', fileBasePath);
   }
+
   void setImageStyle(Map<String, dynamic> style) {
     _channel.invokeMethod('setImageStyle', style);
   }
+
   void setVideoStyle(Map<String, dynamic> style) {
     _channel.invokeMethod('setVideoStyle', style);
   }
+
   void setPlaceholderStyle(TextStyle style) {
     final color = style.color ?? Color(0xA58F959E);
     final colorHex = '#${color.red.toRadixString(16).padLeft(2, '0')}'
@@ -213,6 +233,9 @@ class TunEditorApi {
     _channel.invokeMethod('setPlaceholderStyle', args);
   }
 
+  void switchThemeMode(bool isDarkMode) {
+    _channel.invokeMethod('switchThemeMode', isDarkMode);
+  }
 }
 
 mixin TunEditorHandler {

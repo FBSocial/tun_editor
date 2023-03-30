@@ -52,7 +52,8 @@ class QuillEditor : WebView {
         imageStyle: Map<String, Any>,
         videoStyle: Map<String, Any>,
         placeholderStyle: Map<String, Any>,
-        enableMarkdownSyntax: Boolean
+        enableMarkdownSyntax: Boolean,
+        isDarkMode: Boolean
     ) : this(context) {
         this.placeholder = placeholder
         this.readOnly = readOnly
@@ -65,6 +66,7 @@ class QuillEditor : WebView {
         this.videoStyle = videoStyle
         this.placeholderStyle = placeholderStyle
         this.enableMarkdownSyntax = enableMarkdownSyntax
+        this.isDarkMode = isDarkMode
     }
 
     private var placeholder: String = ""
@@ -78,6 +80,7 @@ class QuillEditor : WebView {
     private var videoStyle: Map<String, Any> = mapOf()
     private var placeholderStyle: Map<String, Any> = mapOf()
     private var enableMarkdownSyntax: Boolean = false
+    private var isDarkMode: Boolean = false
 
     private var onTextChangeListener: ((String, String) -> Unit)? = null
     private var onSelectionChangeListener: ((Int, Int, String) -> Unit)? = null
@@ -104,7 +107,7 @@ class QuillEditor : WebView {
                 setPlaceholderStyle(placeholderStyle)
                 setContents(delta)
                 setupMarkdownSyntax(enableMarkdownSyntax)
-
+                switchThemeMode(isDarkMode)
                 // if (autoFocus) {
                 //     focus()
                 // } else {
@@ -323,6 +326,10 @@ class QuillEditor : WebView {
         this.onPageLoadedListener = onPageLoadedListener
     }
 
+    fun switchThemeMode(isDarkMode: Boolean) {
+        exec("loadStyles($isDarkMode);removeStyles($isDarkMode);")
+    }
+
     private fun setContents(delta: List<*>) {
         exec("javascript:setContents(${JSONArray(delta)})")
     }
@@ -369,6 +376,7 @@ class QuillEditor : WebView {
             imm.hideSoftInputFromWindow(windowToken, 0)
         }
     }
+
 
     class JSInterface(
         private val onTextChangeListener: (String, String) -> Unit,
