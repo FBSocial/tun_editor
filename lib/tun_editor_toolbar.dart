@@ -748,7 +748,7 @@ enum ToolbarMenu {
   channel,
   image,
   emoji,
-
+  video,
   // Text type.
   textType,
   textTypeHeadline1,
