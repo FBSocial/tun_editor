@@ -97,10 +97,8 @@ class QuillEditor : WebView {
 
         webChromeClient = WebChromeClient()
         webViewClient = QuillEditorWebClient(
-            onPageStarted = {
-                switchThemeMode(isDarkMode)
-            },
             onPageFinished = {
+                switchThemeMode(isDarkMode)
                 setPlaceholder(placeholder)
                 setPadding(padding)
                 setReadOnly(readOnly)
@@ -427,21 +425,14 @@ class QuillEditor : WebView {
     }
 
     class QuillEditorWebClient(
-        private val onPageStarted: () -> Unit,
         private val onPageFinished: () -> Unit
     ) : WebViewClient() {
 
-        override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
-            super.onPageStarted(view, url, favicon)
-            onPageStarted.invoke()
-        }
-
         override fun onPageFinished(view: WebView?, url: String?) {
-            super.onPageFinished(view, url)
-
             if (url?.equals(URL, true) == true) {
                 onPageFinished.invoke()
             }
+            super.onPageFinished(view, url)
         }
 
     }
