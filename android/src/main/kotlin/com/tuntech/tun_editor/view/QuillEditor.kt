@@ -433,9 +433,7 @@ class QuillEditor : WebView {
 
         override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
             super.onPageStarted(view, url, favicon)
-            if (url?.equals(URL, true) == true) {
-                onPageStarted.invoke()
-            }
+            onPageStarted.invoke()
         }
 
         override fun onPageFinished(view: WebView?, url: String?) {
