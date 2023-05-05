@@ -98,7 +98,6 @@ class QuillEditor : WebView {
         webChromeClient = WebChromeClient()
         webViewClient = QuillEditorWebClient(
             onPageFinished = {
-                switchThemeMode(isDarkMode)
                 setPlaceholder(placeholder)
                 setPadding(padding)
                 setReadOnly(readOnly)
@@ -109,6 +108,7 @@ class QuillEditor : WebView {
                 setPlaceholderStyle(placeholderStyle)
                 setContents(delta)
                 setupMarkdownSyntax(enableMarkdownSyntax)
+                switchThemeMode(isDarkMode)
                 // if (autoFocus) {
                 //     focus()
                 // } else {
@@ -429,10 +429,11 @@ class QuillEditor : WebView {
     ) : WebViewClient() {
 
         override fun onPageFinished(view: WebView?, url: String?) {
+            super.onPageFinished(view, url)
+
             if (url?.equals(URL, true) == true) {
                 onPageFinished.invoke()
             }
-            super.onPageFinished(view, url)
         }
 
     }
