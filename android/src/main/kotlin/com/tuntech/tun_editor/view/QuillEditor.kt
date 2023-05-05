@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
+import android.graphics.Bitmap
 import android.os.Build
 import android.util.AttributeSet
 import android.util.Base64
@@ -96,6 +97,9 @@ class QuillEditor : WebView {
 
         webChromeClient = WebChromeClient()
         webViewClient = QuillEditorWebClient(
+            onPageStarted = {
+                switchThemeMode(isDarkMode)
+            },
             onPageFinished = {
                 setPlaceholder(placeholder)
                 setPadding(padding)
@@ -107,7 +111,6 @@ class QuillEditor : WebView {
                 setPlaceholderStyle(placeholderStyle)
                 setContents(delta)
                 setupMarkdownSyntax(enableMarkdownSyntax)
-                switchThemeMode(isDarkMode)
                 // if (autoFocus) {
                 //     focus()
                 // } else {
@@ -424,8 +427,16 @@ class QuillEditor : WebView {
     }
 
     class QuillEditorWebClient(
+        private val onPageStarted: () -> Unit,
         private val onPageFinished: () -> Unit
     ) : WebViewClient() {
+
+        override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
+            super.onPageStarted(view, url, favicon)
+            if (url?.equals(URL, true) == true) {
+                onPageStarted.invoke()
+            }
+        }
 
         override fun onPageFinished(view: WebView?, url: String?) {
             super.onPageFinished(view, url)
