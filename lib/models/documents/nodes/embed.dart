@@ -125,7 +125,7 @@ class ImageEmbed extends Embeddable {
     return ImageEmbed(
       name: data['name'] as String,
       source: data['source'] as String,
-      checkPath: data['checkPath'] as String,
+      checkPath: data['checkPath'] as String?,
       width: width,
       height: height,
     );
