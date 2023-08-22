@@ -27,6 +27,7 @@ dependencies:
   image_picker: ^0.8.3+2
   path_provider: ^2.0.2
   flutter_keyboard_size: ^1.0.0+3
+  file: ^6.1.4
 
 dev_dependencies:
   flutter_test:

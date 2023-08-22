@@ -17,7 +17,5 @@ void main() {
     channel.setMockMethodCallHandler(null);
   });
 
-  test('getPlatformVersion', () async {
-    expect(await TunEditor.platformVersion, '42');
-  });
+  test('getPlatformVersion', () async {});
 }

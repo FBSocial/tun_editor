@@ -104,6 +104,9 @@ class QuillEditorView: WKWebView, WKNavigationDelegate, WKScriptMessageHandler {
         setContents(delta)
         setupMarkdownSyntax(enableMarkdownSyntax)
         switchThemeMode(darkMode)
+        self.backgroundColor = darkMode ? UIColor(red: 36/255, green: 36/255, blue: 36/255, alpha: 1) : UIColor.white;
+        self.scrollView.backgroundColor = darkMode ? UIColor(red: 36/255, green: 36/255, blue: 36/255, alpha: 1) :UIColor.white;
+        self.isOpaque = false;
     }
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
