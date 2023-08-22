@@ -752,6 +752,7 @@ enum ToolbarMenu {
   channel,
   image,
   emoji,
+  video,
 
   // Text type.
   textType,
@@ -779,6 +780,7 @@ const List<ToolbarMenu> defaultToolbarMenu = [
   ToolbarMenu.at,
   ToolbarMenu.image,
   ToolbarMenu.emoji,
+  ToolbarMenu.video,
   //
   ToolbarMenu.textType,
   ToolbarMenu.textTypeHeadline1,
