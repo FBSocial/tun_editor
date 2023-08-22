@@ -9,8 +9,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
 import 'package:tun_editor/edit_text.dart';
 import 'package:tun_editor/iconfont.dart';
-import 'package:tun_editor/models/documents/document.dart';
-import 'package:tun_editor/models/documents/nodes/embed.dart';
+import 'package:flutter_quill/flutter_quill.dart' hide Text;
 
 import 'package:tun_editor/tun_editor.dart';
 import 'package:tun_editor/tun_editor_toolbar.dart';
@@ -52,16 +51,119 @@ class FullPageEditorState extends State<FullPageEditor> {
   String _previewText = '';
 
   final _emojiList = [
-    '😃', '😄', '😁', '😆', '😅', '😂', '🤣', '🥲', '☺️', '😊', '😇', '🙂',
-    '🙃', '😉', '😌', '😍', '🥰', '😘', '😗', '😙', '😚', '😋', '😛', '😝',
-    '😜', '🤪', '🤨', '🧐', '🤓', '😎', '🥸', '🤩', '🥳', '😏', '😒', '😞',
-    '😔', '😟', '😕', '🙁', '☹️', '😣', '😖', '😫', '😩', '🥺', '😢', '😭',
-    '😤', '😠', '😡', '🤬', '🤯', '😳', '🥵', '🥶', '😱', '😨', '😰', '😥',
-    '😓', '🤗', '🤔', '🤭', '🤫', '🤥', '😶', '😐', '😑', '😬', '🙄', '😯',
-    '😦', '😧', '😮', '😲', '🥱', '😴', '🤤', '😪', '😵', '🤐', '🥴', '🤢',
-    '🤮', '🤧', '😷', '🤒', '🤕', '🤑', '🤠', '😈', '👿', '👹', '👺', '🤡',
-    '💩', '👻', '💀', '☠️', '👽', '👾', '🤖', '🎃', '😺', '😸', '😹', '😻',
-    '😼', '😽', '🙀', '😿', '😾',
+    '😃',
+    '😄',
+    '😁',
+    '😆',
+    '😅',
+    '😂',
+    '🤣',
+    '🥲',
+    '☺️',
+    '😊',
+    '😇',
+    '🙂',
+    '🙃',
+    '😉',
+    '😌',
+    '😍',
+    '🥰',
+    '😘',
+    '😗',
+    '😙',
+    '😚',
+    '😋',
+    '😛',
+    '😝',
+    '😜',
+    '🤪',
+    '🤨',
+    '🧐',
+    '🤓',
+    '😎',
+    '🥸',
+    '🤩',
+    '🥳',
+    '😏',
+    '😒',
+    '😞',
+    '😔',
+    '😟',
+    '😕',
+    '🙁',
+    '☹️',
+    '😣',
+    '😖',
+    '😫',
+    '😩',
+    '🥺',
+    '😢',
+    '😭',
+    '😤',
+    '😠',
+    '😡',
+    '🤬',
+    '🤯',
+    '😳',
+    '🥵',
+    '🥶',
+    '😱',
+    '😨',
+    '😰',
+    '😥',
+    '😓',
+    '🤗',
+    '🤔',
+    '🤭',
+    '🤫',
+    '🤥',
+    '😶',
+    '😐',
+    '😑',
+    '😬',
+    '🙄',
+    '😯',
+    '😦',
+    '😧',
+    '😮',
+    '😲',
+    '🥱',
+    '😴',
+    '🤤',
+    '😪',
+    '😵',
+    '🤐',
+    '🥴',
+    '🤢',
+    '🤮',
+    '🤧',
+    '😷',
+    '🤒',
+    '🤕',
+    '🤑',
+    '🤠',
+    '😈',
+    '👿',
+    '👹',
+    '👺',
+    '🤡',
+    '💩',
+    '👻',
+    '💀',
+    '☠️',
+    '👽',
+    '👾',
+    '🤖',
+    '🎃',
+    '😺',
+    '😸',
+    '😹',
+    '😻',
+    '😼',
+    '😽',
+    '🙀',
+    '😿',
+    '😾',
   ];
 
   @override
@@ -77,10 +179,13 @@ class FullPageEditorState extends State<FullPageEditor> {
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
-      return const Scaffold(body: Center(child: Text('Loading...')));
+      return const Scaffold(
+          backgroundColor: Colors.black,
+          body: Center(child: Text('Loading...')));
     }
     return KeyboardSizeProvider(
       child: Scaffold(
+        backgroundColor: Colors.black,
         resizeToAvoidBottomInset: false,
         appBar: AppBar(
           title: GestureDetector(
@@ -110,6 +215,7 @@ class FullPageEditorState extends State<FullPageEditor> {
             width: double.infinity,
             height: double.infinity,
             alignment: Alignment.center,
+            color: Colors.black,
             child: Consumer<ScreenHeight>(
                 builder: (BuildContext context, ScreenHeight keyboard, child) {
               if (keyboard.keyboardHeight > _keyboardMaxHeight) {
@@ -166,6 +272,7 @@ class FullPageEditorState extends State<FullPageEditor> {
                             debugPrint('link click $url');
                           },
                           enableMarkdownSyntax: false,
+                          darkMode: true,
                         ),
                       ),
                       SizedBox(
@@ -549,6 +656,7 @@ class FullPageEditorState extends State<FullPageEditor> {
                   controller: _dialogEditorController,
                   fileBasePath: _fileBasePath,
                   placeholder: 'placeholder on dialog editor',
+                  darkMode: true,
                 ),
               ),
             ],
