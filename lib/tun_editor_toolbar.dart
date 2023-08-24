@@ -129,8 +129,8 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
         buildButton(
           IconFont.emoji,
           () => toggleSubToolbar(SubToolbar.emoji),
-          false,
-          disabledMenu.contains(ToolbarMenu.emoji),
+          showingSubToolbar == SubToolbar.emoji ,
+          disabledMenu.contains(ToolbarMenu.emoji) && showingSubToolbar != SubToolbar.emoji,
         ),
         SizedBox(width: 8.w),
       ]);
