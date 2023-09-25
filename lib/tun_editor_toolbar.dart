@@ -129,8 +129,9 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
         buildButton(
           IconFont.emoji,
           () => toggleSubToolbar(SubToolbar.emoji),
-          showingSubToolbar == SubToolbar.emoji ,
-          disabledMenu.contains(ToolbarMenu.emoji) && showingSubToolbar != SubToolbar.emoji,
+          showingSubToolbar == SubToolbar.emoji,
+          disabledMenu.contains(ToolbarMenu.emoji) &&
+              showingSubToolbar != SubToolbar.emoji,
         ),
         SizedBox(width: 8.w),
       ]);
@@ -683,6 +684,7 @@ class TunEditorToolbarState extends State<TunEditorToolbar> {
         // ToolbarMenu.textStyleUnderline,
         // ToolbarMenu.textStyleStrikeThrough,
         ToolbarMenu.link,
+        ToolbarMenu.question,
       ]);
     }
     setState(() {});
@@ -745,6 +747,7 @@ enum SubToolbar {
   textStyle,
   link,
   doc,
+  question,
 }
 
 enum ToolbarMenu {
@@ -774,6 +777,7 @@ enum ToolbarMenu {
 
   link,
   doc,
+  question,
 }
 
 const List<ToolbarMenu> defaultToolbarMenu = [
@@ -800,4 +804,5 @@ const List<ToolbarMenu> defaultToolbarMenu = [
   //
   ToolbarMenu.link,
   ToolbarMenu.doc,
+  ToolbarMenu.question,
 ];
